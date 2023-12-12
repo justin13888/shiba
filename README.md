@@ -1,3 +1,3 @@
 # Shiba
 
-A cute home page and tab manager (Chrome extension)
+A cute home page and tab manager (browser extension)
