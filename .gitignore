@@ -1,26 +1,33 @@
-data/
 
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# dependencies
+/node_modules
+/.pnp
+.pnp.js
+
+# testing
+/coverage
+
+# misc
 .DS_Store
-node_modules
-/build
-/.svelte-kit
-/package
-.env
-.env.*
-!.env.example
-vite.config.js.timestamp-*
-vite.config.ts.timestamp-*
+*.pem
 
-.vscode/*
-!.vscode/settings.json
-!.vscode/tasks.json
-!.vscode/launch.json
-!.vscode/extensions.json
-!.vscode/*.code-snippets
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
 
-# Local History for Visual Studio Code
-.history/
+# local env files
+.env*.local
 
-# Built Visual Studio Code Extensions
-*.vsix
+out/
+build/
+dist/
 
+# plasmo
+.plasmo
+
+# typescript
+.tsbuildinfo
