@@ -35,7 +35,11 @@
       "activeTab",
       "storage",
       "unlimitedStorage",
-      "webRequest"
+      "webRequest",
+      "contextMenus",
+      "history",
+      "identity",
+      "notifications"
     ],
     "host_permissions": [
       "https://*/*",
@@ -43,11 +47,11 @@
     ],
     "web_accessible_resources": [
       {
-        "matches": [
-          "<all_urls>"
-        ],
         "resources": [
           "tabs/*"
+        ],
+        "matches": [
+          "<all_urls>"
         ]
       }
     ]
