@@ -26,11 +26,13 @@ A cute home page and tab manager (browser extension)
    ```sh
    pnpm install
    ```
+
 3. Start the development server
 
    ```sh
    pnpm dev
    ```
+
 4. Load the extension in your browser
    1. For Chrome, go to `chrome://extensions`, enable developer mode, click "Load unpacked", and select the `dist` folder
    2. Fore firefox, install `web-ext` with `pnpm install --global web-ext`, then run `web-ext run` in the project directory

@@ -9,6 +9,8 @@
         count -= 1;
         action = "decrement";
     }
+
+    const isDevelopment = process.env.NODE_ENV === 'development';
 </script>
 
 <style>
@@ -38,4 +40,6 @@
         <button on:click={increment}>+</button>
     </div>
     {#if action}<p class="action text-center">{action}</p>{/if}
+    <p>Development mode: {isDevelopment}</p>
+    
 </div>

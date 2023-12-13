@@ -7,10 +7,13 @@
   "homepage_url": "https://github.com/justin13888/shiba",
   "packageManager": "pnpm@8.12.0",
   "scripts": {
-    "dev": "plasmo dev",
+    "dev": "plasmo dev --target=chrome-mv3",
+    "dev:firefox": "plasmo dev --target=firefox-mv2",
     "dev:browser": "plasmo dev --serve-host=localhost --serve-port-1012",
     "build": "plasmo build",
-    "test": "plasmo test"
+    "test": "plasmo test",
+    "package": "plasmo package",
+    "lint": "prettier --write \"**/*.{ts,tsx,md,mjs}\""
   },
   "dependencies": {
     "plasmo": "0.84.0",
@@ -25,8 +28,28 @@
     "typescript": "5.2.2"
   },
   "manifest": {
+    "homepage_url": "$PLASMO_PUBLIC_SITE_URL",
+    "permissions": [
+      "scripting",
+      "tabs",
+      "activeTab",
+      "storage",
+      "unlimitedStorage",
+      "webRequest"
+    ],
     "host_permissions": [
-      "https://*/*"
+      "https://*/*",
+      "*://*.youtube.com/*"
+    ],
+    "web_accessible_resources": [
+      {
+        "matches": [
+          "<all_urls>"
+        ],
+        "resources": [
+          "tabs/*"
+        ]
+      }
     ]
   }
 }
