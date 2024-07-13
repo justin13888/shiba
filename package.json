@@ -1,59 +1,26 @@
 {
-  "name": "shiba",
-  "displayName": "Shiba",
-  "version": "0.0.1",
-  "description": "A cute home page and tab manager",
-  "author": "Justin Chung",
-  "homepage_url": "https://github.com/justin13888/shiba",
-  "packageManager": "pnpm@8.12.0",
+  "name": "wxt-starter",
+  "description": "manifest.json description",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
   "scripts": {
-    "dev": "plasmo dev --target=chrome-mv3",
-    "dev:firefox": "plasmo dev --target=firefox-mv2",
-    "dev:browser": "plasmo dev --serve-host=localhost --serve-port-1012",
-    "build": "plasmo build",
-    "test": "plasmo test",
-    "package": "plasmo package",
-    "lint": "prettier --write \"**/*.{ts,tsx,md,mjs}\""
+    "dev": "wxt",
+    "dev:firefox": "wxt -b firefox",
+    "build": "wxt build",
+    "build:firefox": "wxt build -b firefox",
+    "zip": "wxt zip",
+    "zip:firefox": "wxt zip -b firefox",
+    "compile": "tsc --noEmit",
+    "postinstall": "wxt prepare"
   },
   "dependencies": {
-    "plasmo": "0.84.0",
-    "svelte": "^4.2.8",
-    "svelte-preprocess": "^5.1.2"
+    "solid-js": "^1.8.17"
   },
   "devDependencies": {
-    "@ianvs/prettier-plugin-sort-imports": "4.1.1",
-    "@types/chrome": "0.0.251",
-    "@types/node": "20.9.0",
-    "prettier": "3.0.3",
-    "typescript": "5.2.2"
+    "@wxt-dev/module-solid": "^1.1.1",
+    "typescript": "^5.5.2",
+    "wxt": "^0.18.10"
   },
-  "manifest": {
-    "homepage_url": "$PLASMO_PUBLIC_SITE_URL",
-    "permissions": [
-      "scripting",
-      "tabs",
-      "activeTab",
-      "storage",
-      "unlimitedStorage",
-      "webRequest",
-      "contextMenus",
-      "history",
-      "identity",
-      "notifications"
-    ],
-    "host_permissions": [
-      "https://*/*",
-      "*://*.youtube.com/*"
-    ],
-    "web_accessible_resources": [
-      {
-        "resources": [
-          "tabs/*"
-        ],
-        "matches": [
-          "<all_urls>"
-        ]
-      }
-    ]
-  }
+  "packageManager": "pnpm@9.1.1+sha512.14e915759c11f77eac07faba4d019c193ec8637229e62ec99eefb7cf3c3b75c64447882b7c485142451ee3a6b408059cdfb7b7fa0341b975f12d0f7629c71195"
 }
