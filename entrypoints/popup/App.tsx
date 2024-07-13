@@ -1,34 +1,46 @@
-import { createSignal } from 'solid-js';
-import solidLogo from '@/assets/solid.svg';
-import wxtLogo from '/wxt.svg';
 import './App.css';
 
-// TODO:
+// TODO: Style
 function App() {
-  const [count, setCount] = createSignal(0);
+  // Sample data for the number of tabs saved
+  const savedTabsTotal = 420; // TODO: Connect with background script
+
+  // Define handler functions for buttons
+  const handleSaveCurrentTab = () => {
+    // TODO: Implement
+    // Add logic to save the current tab
+    console.log('Save current tab');
+  };
+
+  const handleSaveAllTabs = () => {
+    // TODO: Implement
+    // Add logic to save all tabs
+    console.log('Save all tabs');
+  };
 
   return (
     <>
-      <div>
-        <a href="https://wxt.dev" target="_blank">
-          <img src={wxtLogo} class="logo" alt="WXT logo" />
-        </a>
-        <a href="https://solidjs.com" target="_blank">
-          <img src={solidLogo} class="logo solid" alt="Solid logo" />
-        </a>
+      <div class="flex flex-col items-center justify-center h-screen p-4 bg-gray-100">
+      <div class="text-5xl font-bold text-gray-800">
+          {savedTabsTotal} Tabs Saved
       </div>
-      <h1>WXT + Solid</h1>
-      <div class="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count()}
+
+      {/* Save Buttons */}
+      <div class="flex flex-col space-y-4">
+        <button
+          onClick={handleSaveCurrentTab}
+          class="w-full p-4 bg-blue-500 text-white text-xl font-semibold rounded-lg shadow-md hover:bg-blue-600 transition-colors"
+        >
+          Save Current Tab
         </button>
-        <p>
-          Edit <code>popup/App.tsx</code> and save to test HMR
-        </p>
+        <button
+          onClick={handleSaveAllTabs}
+          class="w-full p-4 bg-green-500 text-white text-xl font-semibold rounded-lg shadow-md hover:bg-green-600 transition-colors"
+        >
+          Save All Tabs
+        </button>
       </div>
-      <p class="read-the-docs">
-        Click on the WXT and Solid logos to learn more
-      </p>
+    </div>
     </>
   );
 }
