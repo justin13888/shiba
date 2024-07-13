@@ -4,12 +4,9 @@ import { defineConfig } from 'wxt';
 export default defineConfig({
   manifest: {
     permissions: ['storage'],
-    author: 'Justin Chung',
     // browser_action
-    // browser_specific_settings
-    description: 'Cute tab manager and custom homepage',
-    homepage_url: 'https://github.com/justin13888/shiba',
-    
+    // browser_specific_settings 
+    author: "Justin Chung"
   },
   modules: ['@wxt-dev/module-solid'],
 });
