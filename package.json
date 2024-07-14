@@ -20,12 +20,18 @@
     "postinstall": "wxt prepare"
   },
   "dependencies": {
+    "@kobalte/core": "^0.13.3",
+    "class-variance-authority": "^0.7.0",
+    "clsx": "^2.1.1",
     "idb": "^8.0.0",
     "nanoid": "^5.0.7",
     "solid-js": "^1.8.18",
+    "tailwind-merge": "^2.4.0",
+    "tailwindcss-animate": "^1.0.7",
     "webext-bridge": "^6.0.1"
   },
   "devDependencies": {
+    "@types/node": "^20.14.10",
     "@wxt-dev/module-solid": "^1.1.1",
     "autoprefixer": "^10.4.19",
     "postcss": "^8.4.39",

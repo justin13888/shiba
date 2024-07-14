@@ -1,3 +1,11 @@
+import type { ClassValue } from "clsx"
+import { clsx } from "clsx"
+import { twMerge } from "tailwind-merge"
+
+export function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs))
+}
+
 export const switchToOrOpenTab = (url: string) => {
     browser.tabs.query({ currentWindow: true, url }).then((tabs) => {
         if (tabs.length > 0) {
