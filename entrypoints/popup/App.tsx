@@ -11,7 +11,7 @@ function App() {
     <>
       <div class="w-[300px] h-[300px] flex flex-col items-center justify-between p-1 bg-gray-100">
         <div class="flex flex-col grow text-center items-center p-4">
-          <Show when={tabCount.state === 'ready'}
+          <Show when={tabCount.state === 'ready' || tabCount.state === 'refreshing'}
             fallback={<Skeleton height={72} width={62} radius={10} />}>
             <p class="text-7xl font-extrabold text-gray-800">
               {tabCount()}
@@ -24,13 +24,19 @@ function App() {
         <div class="grid grid-cols-2 gap-1">
           {
             ([
-              ['Save Current Tab', () => {
-                saveCurrentTab();
+              ['Save Current Tab', async () => {
+                const savedTabId = await saveCurrentTab();
                 refetch();
+                switchToOrOpenTab(browser.runtime.getURL('/saved.html'));
+                browser.tabs.remove(savedTabId);
               }],
-              ['Save All Tabs', () => {
-                saveAllTabs();
+              ['Save All Tabs', async () => {
+                const savedTabIds = await saveAllTabs();
                 refetch();
+                switchToOrOpenTab(browser.runtime.getURL('/saved.html'));
+                savedTabIds.forEach((tabId) => {
+                  browser.tabs.remove(tabId);
+                });
               }],
               ['Open Import', () => {
                 window.open(browser.runtime.getURL('/import.html'), '_blank');
