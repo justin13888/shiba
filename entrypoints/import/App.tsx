@@ -26,13 +26,14 @@ function App() {
       const tabGroups = await (async () => {
         if (importOption() === 'oneTab') {
           return parseOneTabUrl(importString());
-        } else if (importOption() === 'betterOneTab') {
-          return parseBetterOneTabUrl(importString());
-        } else {
-          setFeedbackMessage("Invalid import option. Please try again.");
-          setFeedbackType("error");
-          return undefined;
         }
+        if (importOption() === 'betterOneTab') {
+          return parseBetterOneTabUrl(importString());
+        }
+        
+        setFeedbackMessage("Invalid import option. Please try again.");
+        setFeedbackType("error");
+        return undefined;
       })();
       if (!tabGroups) return;
       
