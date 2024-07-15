@@ -1,6 +1,7 @@
 import { Skeleton } from "@/components/ui/skeleton"
 import { saveAllTabs, saveCurrentTab } from '@/utils/tabs';
 import { Tab, TabGroup } from '@/types/model';
+import { addTabBundle } from '@/utils/db';
 import './App.css';
 
 // TODO: Style
@@ -59,8 +60,8 @@ function App() {
                   tab.tabGroupId = newTabGroup.groupId;
                   return tab;
                 });
-                addTabGroup(newTabGroup);
-                addTabs(newTabs);
+
+                addTabBundle([newTabGroup, newTabs]);
 
                 refetch();
                 await switchToOrOpenTab(browser.runtime.getURL('/saved.html'));

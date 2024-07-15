@@ -11,7 +11,7 @@ export interface TabOptions {
 export class Tab {
     /** Unique id */
     id: string;
-    /** Favicon image data URL encoded */
+    /** Favicon image (URL or data encoded URL) */
     favicon?: string;
     title: string;
     url: string;
@@ -33,6 +33,7 @@ export interface TabGroupOptions {
 }
 
 export class TabGroup {
+    /** Unique group ID */
     groupId: string;
     name?: string;
     /**

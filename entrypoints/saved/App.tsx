@@ -95,6 +95,8 @@ function App() {
                 {/* TODO: Display favicon */}
                 {/* TODO: Current tab interactions include: Delete, Restore */}
                 {/* TODO: Add "restore all", "Delete all" */}
+                {/* TODO: Display timeCreated */}
+                {/* TODO: Make file explorer like keyboard shortcuts work (e.g. Ctrl+A, Shift) */}
                 <ul>
                   <For each={tabs}>
                     {(tab) => (

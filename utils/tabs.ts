@@ -1,4 +1,5 @@
-import { Tab, TabGroup } from '@/types/model';
+import { Tab, type TabBundle, TabGroup } from '@/types/model';
+import { addTabBundle } from '@/utils/db';
 
 /**
  * Save the current tab to the database.
@@ -15,8 +16,7 @@ export const saveCurrentTab = async (): Promise<number | undefined> => {
         const tab = tabs[0];
         const [currentTab, tabId] = browserTabToShibaTab(tab, newTabGroup.groupId);
         
-        addTabGroup(newTabGroup);
-        addTabs([currentTab]);
+        addTabBundle([newTabGroup, [currentTab]]);
 
         return tabId;
     }
@@ -47,8 +47,7 @@ export const saveAllTabs = async () => {
         }
     }
 
-    addTabGroup(newTabGroup);
-    addTabs(savedTabs);
+    addTabBundle([newTabGroup, savedTabs]);
     
     return savedTabIds;
 };
@@ -82,4 +81,3 @@ const browserTabToShibaTab = (tab: Tabs.Tab, tabGroupId: string): [Tab, number |
     
     throw new Error(`Tab title or URL is undefined: ${title}, ${url}`);
 };
-

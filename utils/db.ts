@@ -117,4 +117,9 @@ export const getTabCount = async (): Promise<number> => {
     return await store.count();
 };
 
+export const addTabBundle = ([tabGroup, tabs]: TabBundle) => {
+    addTabGroup(tabGroup);
+    addTabs(tabs);
+};
+
 // TODO: Handle when tabGroupId in a Tab object is not found

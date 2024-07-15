@@ -1,7 +1,7 @@
 // Implement Onetab-related functionality
 
 import { nanoid } from "nanoid";
-import { Tab, TabGroup } from "../types/model";
+import { Tab, type TabBundle, TabGroup } from "../types/model";
 
 const isValidUrl = (url: string): boolean => {
     try {
@@ -13,22 +13,25 @@ const isValidUrl = (url: string): boolean => {
   };
 
 // TODO: Develop unit tests
-export const parseOneTabUrl = (output: string): TabGroup[] => {
-    const lines = output.split('\n');
-    const groups: TabGroup[] = [];
-    var currentGroup: TabGroup = new TabGroup();
+export const parseOneTabUrl = (output: string): TabBundle[] => {
+    console.log('Parsing OneTab output:', output);
 
-    var lineCount = 0;
+    const lines = output.split('\n');
+    const groups: TabBundle[] = [];
+    let currentGroup: TabGroup = new TabGroup();
+    let currentTabs: Tab[] = [];
+
+    let lineCount = 0;
     for (const line of lines) {
         lineCount++;
         // If empty line, move to next tab group
         const l = line.trim();
         if (l === '') {
-            if (!currentGroup.empty()) {
-                groups.push(currentGroup);
+            if (currentTabs.length > 0) {
+                groups.push([currentGroup, currentTabs]);
             }
             currentGroup = new TabGroup();
-            continue;
+            currentTabs = [];
         } else {
             // Line should be of format: "url | title"
             // Note: title can contain "|"
@@ -42,17 +45,18 @@ export const parseOneTabUrl = (output: string): TabGroup[] => {
             }
 
             // Create tab object
-            const tab = {
+            const tab: Tab = {
                 id: nanoid(),
                 title: trimmedTitle,
-                url: trimmedUrl
+                url: trimmedUrl,
+                tabGroupId: currentGroup.groupId,
             };
-            currentGroup.tabs.push(tab);
+            currentTabs.push(tab);
         }
     }
 
-    if (!currentGroup.empty()) {
-        groups.push(currentGroup);
+    if (currentTabs.length > 0) {
+        groups.push([currentGroup, currentTabs]);
     }
 
     return groups;
@@ -82,64 +86,73 @@ const isImageUrl = (url: string): boolean => {
 };
 
 // TODO: Develop unit tests
-export const parseBetterOneTabUrl = async (output: string): Promise<TabGroup[]> => {
+export const parseBetterOneTabUrl = async (output: string): Promise<TabBundle[]> => {
+    console.log('Parsing Better OneTab output:', output);
+
     const dataUrlRegex = /^data:image\/(png|jpeg|jpg|gif|svg\+xml);base64,.+/;
     const parsedJSON = JSON.parse(output) as BetterOneTab.TabGroup[];
 
+    console.log('Parsed Better OneTab JSON:', parsedJSON);
+
     return Promise.all(parsedJSON.map(async (group) => {
-        return new TabGroup({
-            tabs: await Promise.all(group.tabs.map(async (tab) => {
-                const favicon = await (async (favIconUrl?: string) => {
-                    if (!favIconUrl) {
-                        return undefined;
-                    }
-
-                    if (isImageUrl(favIconUrl)) {
-                        try {
-                            // Get image data
-                            const response = await fetch(favIconUrl);
-                            if (!response.ok) {
-                                console.warn(`Failed to fetch image: ${favIconUrl}`);
-                                return undefined;
-                            }
-
-                            const contentType = response.headers.get('content-type');
-            
-                            if (!contentType) {
-                                throw new Error("Failed to get content type");
-                            }
-
-                            if (contentType.startsWith('image/png')) {
-                                console.log('Processing PNG image');
-                                const blob = await response.blob();
-                                // Here you can further process the PNG blob, e.g., creating an object URL for display
-                                console.log('PNG image fetched successfully');
-                            } else if (contentType.startsWith('image/svg+xml')) {
-                                console.log('Processing SVG image');
-                                const text = await response.text();
-                                // Here you can further process the SVG text, e.g., displaying it directly in the DOM
-                                console.log('SVG image fetched successfully');
-                            } else {
-                                throw new Error(`Unsupported content type: ${contentType}`);
-                            }
-                        } catch (error) {
-                            console.error(`Error parsing "${favIconUrl}": ${error instanceof Error ? error.message : error}`);
-                        }
-                    } else if (dataUrlRegex.test(favIconUrl)) {
-                        return favIconUrl;
-                    } else {
-                        return undefined;
-                    }
-                
-                })(tab.favIconUrl);
-
-                return new Tab({
-                    favicon,
-                    title: tab.title,
-                    url: tab.url,
-                })
-            })),
+        const tabGroup = new TabGroup({
             timeCreated: group.time,
-        })
+        });
+        const tabs = await Promise.all(group.tabs.map(async (tab) => {
+            const favicon = await (async (favIconUrl?: string) => {
+                if (!favIconUrl) {
+                    return undefined;
+                }
+
+                if (isImageUrl(favIconUrl)) {
+                    try {
+                        // TODO: Fix this because it's not working
+                        // Get image data
+                        const response = await fetch(favIconUrl);
+                        if (!response.ok) {
+                            console.warn(`Failed to fetch image: ${favIconUrl}`);
+                            return undefined;
+                        }
+
+                        const contentType = response.headers.get('content-type');
+        
+                        if (!contentType) {
+                            throw new Error("Failed to get content type");
+                        }
+
+                        if (contentType.startsWith('image/png')) {
+                            console.log('Processing PNG image');
+                            const blob = await response.blob();
+                            // Here you can further process the PNG blob, e.g., creating an object URL for display
+                            console.log('PNG image fetched successfully');
+                        } else if (contentType.startsWith('image/svg+xml')) {
+                            console.log('Processing SVG image');
+                            const text = await response.text();
+                            // Here you can further process the SVG text, e.g., displaying it directly in the DOM
+                            console.log('SVG image fetched successfully');
+                        } else {
+                            throw new Error(`Unsupported content type: ${contentType}`);
+                        }
+                    } catch (error) {
+                        console.error(`Error parsing "${favIconUrl}": ${error instanceof Error ? error.message : error}`);
+                        return undefined;                        
+                    }
+                } else if (dataUrlRegex.test(favIconUrl)) {
+                    return favIconUrl;
+                } else {
+                    return undefined;
+                }
+            
+            })(tab.favIconUrl);
+
+            return new Tab({ 
+                favicon,
+                title: tab.title,
+                url: tab.url,
+                tabGroupId: tabGroup.groupId,
+            })
+        }));
+
+        return [tabGroup, tabs];
     }));
 };
