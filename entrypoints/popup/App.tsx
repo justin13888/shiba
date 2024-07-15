@@ -3,6 +3,7 @@ import { saveAllTabs, saveCurrentTab } from '@/utils/tabs';
 import { Tab, TabGroup } from '@/types/model';
 import { addTabBundle } from '@/utils/db';
 import './App.css';
+import { URLS } from "@/utils/constants";
 
 // TODO: Style
 function App() {
@@ -28,7 +29,7 @@ function App() {
               ['Save Current Tab', async () => {
                 const savedTabId = await saveCurrentTab();
                 refetch();
-                await switchToOrOpenTab(browser.runtime.getURL('/saved.html'));
+                await switchToOrOpenTab(URLS.SAVED);
                 if (savedTabId !== undefined) {
                   browser.tabs.remove(savedTabId);
                 }
@@ -37,17 +38,17 @@ function App() {
               ['Save All Tabs', async () => {
                 const savedTabIds = await saveAllTabs();
                 refetch();
-                await switchToOrOpenTab(browser.runtime.getURL('/saved.html'));
+                await switchToOrOpenTab(URLS.SAVED);
                 for (const tabId of savedTabIds) {
                   browser.tabs.remove(tabId);
                 }
                 // TODO: Force refresh all saved pages (since the DB has been replaced)
               }],
               ['Open Import', () => {
-                window.open(browser.runtime.getURL('/import.html'), '_blank');
+                window.open(URLS.IMPORT, '_blank');
               }],
               ['Open Saved', () => {
-                window.open(browser.runtime.getURL('/saved.html'), '_blank');
+                window.open(URLS.SAVED, '_blank');
               }],
               ['Seed', async () => { // TODO: Remove this later after testing
                 const newTabGroup = new TabGroup();
@@ -64,7 +65,7 @@ function App() {
                 addTabBundle([newTabGroup, newTabs]);
 
                 refetch();
-                await switchToOrOpenTab(browser.runtime.getURL('/saved.html'));
+                await switchToOrOpenTab(URLS.SAVED);
               }],
             ] as [string, () => void][]}>
               {([text, handler]) => (

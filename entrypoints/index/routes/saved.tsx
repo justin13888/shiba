@@ -1,9 +1,9 @@
-import { Show } from 'solid-js';
-import './App.css';
+import { type Component, Show } from 'solid-js';
 import { deleteTabGroup, getTabs } from '@/utils/db';
+import { Title } from '@solidjs/meta';
 
 // TODO: Implement style
-function App() {
+const Saved: Component = () => {
   const [maxTabGroups, setMaxTabGroups] = createSignal<number | undefined>(10); // TODO: Make UI edit it
   // const [savedTabsTotal] = createResource(async () => {
   //   return await sendMessage("getTabCount", {}, "background");
@@ -32,6 +32,8 @@ function App() {
   // )
 
   return (
+    <>
+    <Title>Saved | Shiba</Title>
     <div class="flex flex-col p-4">
       <div class="flex flex-row items-baseline space-x-4 pb-4">
         <p class="text-4xl font-extrabold">Shiba</p>
@@ -122,7 +124,8 @@ function App() {
         </Show>
       </div>
     </div>
+    </>
   );
 }
 
-export default App;
+export default Saved;
