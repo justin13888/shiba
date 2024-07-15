@@ -1,15 +1,18 @@
 {
-  "name": "shiba-api",
-  "version": "1.0.50",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "bun run --watch src/index.ts"
-  },
-  "dependencies": {
-    "elysia": "latest"
-  },
-  "devDependencies": {
-    "bun-types": "latest"
-  },
-  "module": "src/index.js"
+    "name": "shiba-api",
+    "version": "1.0.50",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "dev": "bun run --watch src/index.ts",
+        "lint": "bunx @biomejs/biome check .",
+        "lint:fix": "bunx @biomejs/biome check --write ."
+    },
+    "dependencies": {
+        "elysia": "latest"
+    },
+    "devDependencies": {
+        "@biomejs/biome": "1.8.3",
+        "bun-types": "latest"
+    },
+    "module": "src/index.js"
 }
