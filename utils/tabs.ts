@@ -82,3 +82,4 @@ const browserTabToShibaTab = (tab: Tabs.Tab, tabGroupId: string): [Tab, number |
     
     throw new Error(`Tab title or URL is undefined: ${title}, ${url}`);
 };
+

@@ -48,21 +48,28 @@ export const addTabs = async (tabs: Tab[]) => {
     console.log("Tabs added successfully");
 };
 
-// export const appendTabs = async (tabGroups: TabGroup[]) => {
-//     console.log("Appending tabs:", tabGroups);
+export const deleteTabGroup = async (tabGroupId: string) => {
+    const db = await dbPromise;
+    
+    
+    // Delete tabs with tabGroupId
+    const tabsTx = db.transaction('tabs', 'readwrite');
+    const tabsStore = tabsTx.objectStore('tabs');
+    const tabsIndex = tabsStore.index('byTabGroupId');
+    const tabsRange = IDBKeyRange.only(tabGroupId);
+    let cursor = await tabsIndex.openCursor(tabsRange);
+    while (cursor) {
+        cursor.delete();
+        cursor = await cursor.continue();
+    }
+    await tabsTx.done;
 
-//     const db = await dbPromise;
-//     const tx = db.transaction("tabs", "readwrite"); // Ensure readwrite transaction
-//     const store = tx.objectStore("tabs");
-
-//     for (const tabGroup of tabGroups) {
-//         // Use add() for new entries or put() with overwrite for existing
-//         store.add(tabGroup); // Or store.put(tabGroup, { overwrite: true });
-//     }
-
-//     await tx.done; // Wait for the transaction to complete
-//     console.log("Tabs appended successfully");
-// };
+    // Delete tab group with tabGroupId
+    const tabGroupsTx = db.transaction('tabGroups', 'readwrite');
+    const tabGroupsStore = tabGroupsTx.objectStore('tabGroups');
+    await tabGroupsStore.delete(tabGroupId);
+    await tabGroupsTx.done;
+};
 
 // TODO: Check
 /**
