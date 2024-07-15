@@ -1,6 +1,7 @@
 import { type Component, Show } from 'solid-js';
 import { deleteTabGroup, getTabs } from '@/utils/db';
 import { Title } from '@solidjs/meta';
+import { showToast, Toaster } from '@/components/ui/toast';
 
 // TODO: Implement style
 const Saved: Component = () => {
@@ -56,6 +57,11 @@ const Saved: Component = () => {
                       }
                       deleteTabGroup(tabGroup.groupId);
                       tabGroupsRefetch();
+                      showToast({
+                        title: <p>Restored tabs {<Show when={tabGroup.name}>{(name) => <span class="font-bold">{name()}</span>}</Show>}</p>,
+                        duration: 3000,
+                        variant: "success",
+                      })
                     }}>
                     Restore All
                   </button>
@@ -63,11 +69,16 @@ const Saved: Component = () => {
                   <button class="p-2 rounded-sm text-blue-600 hover:bg-blue-300"
                     type="button"
                     onClick={async () => {
-                      const newWindow = await browser.windows.create({
+                      await browser.windows.create({
                         url: tabs.map((tab) => tab.url),
                       });
                       deleteTabGroup(tabGroup.groupId);
                       tabGroupsRefetch();
+                      showToast({
+                        title: <p>Restored tabs {<Show when={tabGroup.name}>{(name) => <span class="font-bold">{name()}</span>}</Show>} in new window</p>,
+                        duration: 3000,
+                        variant: "success",
+                      })
                     }}>
                     Restore All in New Window
                   </button>
@@ -77,6 +88,11 @@ const Saved: Component = () => {
                     onClick={() => {
                       deleteTabGroup(tabGroup.groupId);
                       tabGroupsRefetch();
+                      showToast({
+                        title: <p>Deleted tabs {<Show when={tabGroup.name}>{(name) => <span class="font-bold">{name()}</span>}</Show>}</p>,
+                        duration: 3000,
+                        variant: "destructive",
+                      }) // TODO: Make toast allow undo
                     }}
                     >
                     Delete All
@@ -111,6 +127,7 @@ const Saved: Component = () => {
           {/* TODO: Implement pagination */}
         </Show>
       </div>
+      <Toaster />
     </div>
     </>
   );
