@@ -1,5 +1,6 @@
 import { Skeleton } from "@/components/ui/skeleton"
 import { saveAllTabs, saveCurrentTab } from '@/utils/tabs';
+import { Tab, TabGroup } from '@/types/model';
 import './App.css';
 
 // TODO: Style
@@ -46,6 +47,23 @@ function App() {
               }],
               ['Open Saved', () => {
                 window.open(browser.runtime.getURL('/saved.html'), '_blank');
+              }],
+              ['Seed', async () => { // TODO: Remove this later after testing
+                const newTabGroup = new TabGroup();
+                const newTabs = Array.from({ length: 10 }, () => {
+                  const tab = new Tab({
+                    title: 'Test Tab',
+                    url: 'https://example.com',
+                    tabGroupId: newTabGroup.groupId,
+                  });
+                  tab.tabGroupId = newTabGroup.groupId;
+                  return tab;
+                });
+                addTabGroup(newTabGroup);
+                addTabs(newTabs);
+
+                refetch();
+                await switchToOrOpenTab(browser.runtime.getURL('/saved.html'));
               }],
             ] as [string, () => void][]}>
               {([text, handler]) => (
