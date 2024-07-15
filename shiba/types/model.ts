@@ -6,7 +6,7 @@ export interface TabOptions {
     title: string;
     url: string;
     tabGroupId: string;
-};
+}
 
 export class Tab {
     /** Unique id */
@@ -40,7 +40,7 @@ export class TabGroup {
      * Time created in milliseconds since epoch
      */
     timeCreated: number;
-    
+
     constructor({ groupId, name, timeCreated }: TabGroupOptions = {}) {
         this.groupId = groupId || nanoid();
         this.name = name;

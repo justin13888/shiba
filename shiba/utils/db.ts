@@ -1,11 +1,13 @@
+import type { TabBundle, TabGroup } from "@/types/model";
 import type { TabDB } from "@/types/schema";
 import { openDB } from "idb";
-import type { TabBundle, TabGroup } from "@/types/model";
 
 export const dbPromise = openDB<TabDB>("tabs", 1, {
     upgrade(db) {
-        const tabGroupStore = db.createObjectStore('tabGroups', { keyPath: 'groupId' });
-        tabGroupStore.createIndex('byTimeCreated', 'timeCreated');
+        const tabGroupStore = db.createObjectStore("tabGroups", {
+            keyPath: "groupId",
+        });
+        tabGroupStore.createIndex("byTimeCreated", "timeCreated");
 
         const tabStore = db.createObjectStore("tabs", { keyPath: "id" });
         tabStore.createIndex("byTabGroupId", "tabGroupId");
@@ -14,7 +16,7 @@ export const dbPromise = openDB<TabDB>("tabs", 1, {
 
 /**
  * Add a tab group to the database.
- * @param tabGroup 
+ * @param tabGroup
  */
 export const addTabGroup = async (tabGroup: TabGroup) => {
     console.log("Adding tab group:", tabGroup);
@@ -31,7 +33,7 @@ export const addTabGroup = async (tabGroup: TabGroup) => {
 
 /**
  * Add tabs to the database.
- * @param tabs 
+ * @param tabs
  */
 export const addTabs = async (tabs: Tab[]) => {
     console.log("Adding tabs:", tabs);
@@ -50,12 +52,11 @@ export const addTabs = async (tabs: Tab[]) => {
 
 export const deleteTabGroup = async (tabGroupId: string) => {
     const db = await dbPromise;
-    
-    
+
     // Delete tabs with tabGroupId
-    const tabsTx = db.transaction('tabs', 'readwrite');
-    const tabsStore = tabsTx.objectStore('tabs');
-    const tabsIndex = tabsStore.index('byTabGroupId');
+    const tabsTx = db.transaction("tabs", "readwrite");
+    const tabsStore = tabsTx.objectStore("tabs");
+    const tabsIndex = tabsStore.index("byTabGroupId");
     const tabsRange = IDBKeyRange.only(tabGroupId);
     let cursor = await tabsIndex.openCursor(tabsRange);
     while (cursor) {
@@ -65,8 +66,8 @@ export const deleteTabGroup = async (tabGroupId: string) => {
     await tabsTx.done;
 
     // Delete tab group with tabGroupId
-    const tabGroupsTx = db.transaction('tabGroups', 'readwrite');
-    const tabGroupsStore = tabGroupsTx.objectStore('tabGroups');
+    const tabGroupsTx = db.transaction("tabGroups", "readwrite");
+    const tabGroupsStore = tabGroupsTx.objectStore("tabGroups");
     await tabGroupsStore.delete(tabGroupId);
     await tabGroupsTx.done;
 };
@@ -79,10 +80,10 @@ export const deleteTabGroup = async (tabGroupId: string) => {
  */
 export const getTabs = async (num?: number): Promise<TabBundle[]> => {
     const db = await dbPromise;
-    const tx = db.transaction('tabGroups', 'readonly');
-    const store = tx.objectStore('tabGroups');
-    const index = store.index('byTimeCreated');
-    
+    const tx = db.transaction("tabGroups", "readonly");
+    const store = tx.objectStore("tabGroups");
+    const index = store.index("byTimeCreated");
+
     const tabs: TabGroup[] = [];
     let cursor = await index.openCursor();
 
@@ -98,16 +99,18 @@ export const getTabs = async (num?: number): Promise<TabBundle[]> => {
         }
     }
 
-    return Promise.all(tabs.map(async (tabGroup) => {
-        const tabList = await getTabsByGroup(tabGroup.groupId);
-        return [tabGroup, tabList] as TabBundle;
-    }));
+    return Promise.all(
+        tabs.map(async (tabGroup) => {
+            const tabList = await getTabsByGroup(tabGroup.groupId);
+            return [tabGroup, tabList] as TabBundle;
+        }),
+    );
 };
 
 export const getTabsByGroup = async (tabGroupId: string): Promise<Tab[]> => {
     const db = await dbPromise;
     return db.getAllFromIndex("tabs", "byTabGroupId", tabGroupId);
-}
+};
 
 export const getTabCount = async (): Promise<number> => {
     const db = await dbPromise;

@@ -1,6 +1,7 @@
-import { render } from 'solid-js/web';
+import { render } from "solid-js/web";
 
-import '@/assets/tailwind.css';
-import App from './App';
+import "@/assets/tailwind.css";
+import App from "./App";
 
-render(() => <App />, document.getElementById('root')!);
+// biome-ignore lint/style/noNonNullAssertion: See <./index.html>
+render(() => <App />, document.getElementById("root")!);
