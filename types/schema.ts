@@ -1,9 +1,18 @@
-import {  DBSchema } from 'idb';
+import type { DBSchema } from 'idb';
 
 export interface TabDB extends DBSchema {
-    tabs: {
+    tabGroups: {
         key: string;
         value: TabGroup;
-        indexes: { 'byTimeCreated': number };
+        indexes: {
+            'byTimeCreated': number;
+        };
+    },
+    tabs: {
+        key: string;
+        value: Tab;
+        indexes: {
+            'byTabGroupId': string;
+        };
     };
 }

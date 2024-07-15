@@ -22,21 +22,24 @@ function App() {
 
         {/* Save Buttons */}
         <div class="grid grid-cols-2 gap-1">
-          {
-            ([
+          <For each={[
               ['Save Current Tab', async () => {
                 const savedTabId = await saveCurrentTab();
                 refetch();
-                switchToOrOpenTab(browser.runtime.getURL('/saved.html'));
-                browser.tabs.remove(savedTabId);
+                await switchToOrOpenTab(browser.runtime.getURL('/saved.html'));
+                if (savedTabId !== undefined) {
+                  browser.tabs.remove(savedTabId);
+                }
+                // TODO: Force refresh all saved pages (since the DB has been replaced)
               }],
               ['Save All Tabs', async () => {
                 const savedTabIds = await saveAllTabs();
                 refetch();
-                switchToOrOpenTab(browser.runtime.getURL('/saved.html'));
-                savedTabIds.forEach((tabId) => {
+                await switchToOrOpenTab(browser.runtime.getURL('/saved.html'));
+                for (const tabId of savedTabIds) {
                   browser.tabs.remove(tabId);
-                });
+                }
+                // TODO: Force refresh all saved pages (since the DB has been replaced)
               }],
               ['Open Import', () => {
                 window.open(browser.runtime.getURL('/import.html'), '_blank');
@@ -44,24 +47,19 @@ function App() {
               ['Open Saved', () => {
                 window.open(browser.runtime.getURL('/saved.html'), '_blank');
               }],
-            ] as [string, () => void][]).map(([text, handler]) => (
-              <button
-                onClick={handler}
-                class="p-4 bg-blue-500 text-white text-sm font-semibold rounded-lg shadow-md hover:bg-blue-600 transition-colors"
-              >
-                {text}
-              </button>
-            ))
-          }
+            ] as [string, () => void][]}>
+              {([text, handler]) => (
+                <button
+                  onClick={handler}
+                  type="button"
+                  class="p-4 bg-blue-500 text-white text-sm font-semibold rounded-lg shadow-md hover:bg-blue-600 transition-colors"
+                >
+                  {text}
+                </button>
+              )}
+            </For>
 
-          {/* <button
-          onClick={handleSaveCurrentTab}
-          class="w-full p-4 bg-blue-500 text-white text-xl font-semibold rounded-lg shadow-md hover:bg-blue-600 transition-colors"
-        >
-          Save Current Tab
-        </button> */}
-
-          {/* TODO: Remove extra buttons after editing */}
+          {/* TODO: Remove extra buttons after major changes */}
         </div>
       </div>
     </>

@@ -5,6 +5,7 @@ export interface TabOptions {
     favicon?: string;
     title: string;
     url: string;
+    tabGroupId: string;
 };
 
 export class Tab {
@@ -14,36 +15,36 @@ export class Tab {
     favicon?: string;
     title: string;
     url: string;
+    tabGroupId: string;
 
-    constructor({ id, favicon, title, url }: TabOptions) {
+    constructor({ id, favicon, title, url, tabGroupId }: TabOptions) {
         this.id = id || nanoid();
         this.favicon = favicon;
         this.title = title;
         this.url = url;
+        this.tabGroupId = tabGroupId;
     }
 }
 
 export interface TabGroupOptions {
     groupId?: string;
-    tabs?: Tab[];
+    name?: string;
     timeCreated?: number;
 }
 
 export class TabGroup {
     groupId: string;
-    tabs: Tab[];
+    name?: string;
     /**
      * Time created in milliseconds since epoch
      */
     timeCreated: number;
     
-    constructor({ groupId, tabs, timeCreated }: TabGroupOptions = {}) {
+    constructor({ groupId, name, timeCreated }: TabGroupOptions = {}) {
         this.groupId = groupId || nanoid();
-        this.tabs = tabs || [];
+        this.name = name;
         this.timeCreated = timeCreated || Date.now();
     }
-
-    empty(): boolean {
-        return this.tabs.length === 0;
-    }
 }
+
+export type TabBundle = [TabGroup, Tab[]];
