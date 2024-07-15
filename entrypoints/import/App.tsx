@@ -3,6 +3,7 @@ import { parseOneTabUrl } from '@/utils/onetab';
 import './App.css';
 import { switchToOrOpenTab } from '@/utils';
 import { sendMessage } from 'webext-bridge/window';
+import { addTabBundle } from '@/utils/db';
 
 // TODO: Style
 function App() {
@@ -23,7 +24,7 @@ function App() {
 
     try {
       // Parse tab groups from import string
-      const tabGroups = await (async () => {
+      const tabBundles = await (async () => {
         if (importOption() === 'oneTab') {
           return parseOneTabUrl(importString());
         }
@@ -35,14 +36,17 @@ function App() {
         setFeedbackType("error");
         return undefined;
       })();
-      if (!tabGroups) return;
+      if (!tabBundles) return;
+
+      console.log('Parsed tab bundles:', tabBundles);
       
-      // TODO: Add tabs to storage
-      // await sendMessage('importTabs', tabGroups, "background");
-      await appendTabs(tabGroups);
+      // Add tabs to storage
+      for (const tabBundle of tabBundles) {
+        await addTabBundle(tabBundle);
+      }
 
       // Open the new tab
-      switchToOrOpenTab(browser.runtime.getURL('/saved.html'))
+      await switchToOrOpenTab(browser.runtime.getURL('/saved.html'))
       
       setFeedbackMessage("Tabs successfully imported!");
       setFeedbackType("success");
