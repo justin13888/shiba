@@ -4,12 +4,10 @@ import { Tab, TabGroup } from '@/types/model';
 import { addTabBundle } from '@/utils/db';
 import './App.css';
 import { URLS } from "@/utils/constants";
+import { dataRefetch, tabCount } from "@/utils/store";
 
 // TODO: Style
 function App() {
-  // Sample data for the number of tabs saved
-  const [tabCount, { refetch }] = createResource(getTabCount);
-
   return (
     <>
       <div class="w-[300px] h-[300px] flex flex-col items-center justify-between p-1 bg-gray-100">
@@ -28,7 +26,7 @@ function App() {
           <For each={[
               ['Save Current Tab', async () => {
                 const savedTabId = await saveCurrentTab();
-                refetch();
+                dataRefetch();
                 await switchToOrOpenTab(URLS.SAVED);
                 if (savedTabId !== undefined) {
                   browser.tabs.remove(savedTabId);
@@ -37,7 +35,7 @@ function App() {
               }],
               ['Save All Tabs', async () => {
                 const savedTabIds = await saveAllTabs();
-                refetch();
+                dataRefetch();
                 await switchToOrOpenTab(URLS.SAVED);
                 for (const tabId of savedTabIds) {
                   browser.tabs.remove(tabId);
@@ -64,7 +62,7 @@ function App() {
 
                 addTabBundle([newTabGroup, newTabs]);
 
-                refetch();
+                dataRefetch();
                 await switchToOrOpenTab(URLS.SAVED);
               }],
             ] as [string, () => void][]}>

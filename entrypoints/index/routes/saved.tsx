@@ -8,16 +8,10 @@ const Saved: Component = () => {
   // const [savedTabsTotal] = createResource(async () => {
   //   return await sendMessage("getTabCount", {}, "background");
   // });
-  const [tabCount, {refetch: tabCountRefetch}] = createResource(getTabCount);
   const [tabGroups, {refetch: tabGroupsRefetch}] = createResource(
     maxTabGroups(),
     getTabs,
   );
-
-  const dataRefresh = () => {
-    tabCountRefetch();
-    tabGroupsRefetch();
-  }
 
   // createEffect(
   //   on(tabCount, (value) => {
@@ -35,13 +29,7 @@ const Saved: Component = () => {
     <>
     <Title>Saved | Shiba</Title>
     <div class="flex flex-col p-4">
-      <div class="flex flex-row items-baseline space-x-4 pb-4">
-        <p class="text-4xl font-extrabold">Shiba</p>
-        {/* TODO: Replace fallback with loading animation */}
-        <Show when={tabCount.state === 'ready'} fallback={<p>Loading...</p>}>
-          <p class="text-xl">{tabCount()} Tabs Saved</p>
-        </Show>
-      </div>
+      
       <div class="flex flex-col space-y-6">
 
         {/* TODO: Replace fallback with loading animation */}
@@ -67,7 +55,7 @@ const Saved: Component = () => {
                         browser.tabs.create({ url: tab.url });
                       }
                       deleteTabGroup(tabGroup.groupId);
-                      dataRefresh();
+                      tabGroupsRefetch();
                     }}>
                     Restore All
                   </button>
@@ -79,7 +67,7 @@ const Saved: Component = () => {
                         url: tabs.map((tab) => tab.url),
                       });
                       deleteTabGroup(tabGroup.groupId);
-                      dataRefresh();
+                      tabGroupsRefetch();
                     }}>
                     Restore All in New Window
                   </button>
@@ -88,7 +76,7 @@ const Saved: Component = () => {
                     type="button"
                     onClick={() => {
                       deleteTabGroup(tabGroup.groupId);
-                      dataRefresh();
+                      tabGroupsRefetch();
                     }}
                     >
                     Delete All
