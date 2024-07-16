@@ -1,18 +1,32 @@
 {
-    "name": "shiba-api",
-    "version": "1.0.50",
-    "scripts": {
-        "test": "echo \"Error: no test specified\" && exit 1",
-        "dev": "bun run --watch src/index.ts",
-        "lint": "bunx @biomejs/biome check .",
-        "lint:fix": "bunx @biomejs/biome check --write ."
-    },
-    "dependencies": {
-        "elysia": "latest"
-    },
-    "devDependencies": {
-        "@biomejs/biome": "1.8.3",
-        "bun-types": "latest"
-    },
-    "module": "src/index.js"
+  "name": "shiba-api",
+  "version": "1.0.50",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "bun run --watch src/index.ts",
+    "build": "bun build src/index.ts",
+    "start": "NODE_ENV=production bun src/index.ts",
+    "lint": "bunx @biomejs/biome check .",
+    "lint:fix": "bunx @biomejs/biome check --write .",
+    "db:push": "drizzle-kit push:pg",
+    "db:studio": "drizzle-kit studio"
+  },
+  "dependencies": {
+    "@elysiajs/bearer": "^1.0.2",
+    "@elysiajs/cors": "^1.0.5",
+    "@elysiajs/jwt": "^1.0.2",
+    "drizzle-orm": "^0.32.0",
+    "drizzle-typebox": "^0.1.1",
+    "elysia": "latest",
+    "pino": "^9.3.1",
+    "pino-pretty": "^11.2.1",
+    "postgres": "^3.4.4",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "1.8.3",
+    "bun-types": "latest",
+    "drizzle-kit": "^0.23.0"
+  },
+  "module": "src/index.js"
 }

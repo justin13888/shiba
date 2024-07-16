@@ -1,7 +1,16 @@
+import { cors } from "@elysiajs/cors";
 import { Elysia } from "elysia";
+import { envs } from "./env";
+import { logger } from "./logger";
 
-const app = new Elysia().get("/", () => "Hello Elysia").listen(3000);
+// Start Elysia
+const app = new Elysia()
+    .use(cors())
+    // .use(users)
+    // .use(token)
+    .get("/", () => "Hello from Shiba API")
+    .listen(envs.PORT);
 
-console.log(
+logger.info(
     `🦊 Elysia is running at ${app.server?.hostname}:${app.server?.port}`,
 );
