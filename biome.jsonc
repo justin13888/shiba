@@ -15,5 +15,9 @@
     "formatter": {
         "indentStyle": "space",
         "indentWidth": 4
+    },
+    "vcs": {
+        "enabled": true,
+        "clientKind":"git"
     }
 }
