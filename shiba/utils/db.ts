@@ -2,7 +2,7 @@ import type { TabBundle, TabGroup } from "@/types/model";
 import type { TabDB } from "@/types/schema";
 import { openDB } from "idb";
 
-export const dbPromise = openDB<TabDB>("tabs", 1, {
+const dbPromise = openDB<TabDB>("tabs", 1, {
     upgrade(db) {
         const tabGroupStore = db.createObjectStore("tabGroups", {
             keyPath: "groupId",
