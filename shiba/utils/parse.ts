@@ -2,6 +2,7 @@
 
 import { nanoid } from "nanoid";
 import { Tab, type TabBundle, TabGroup } from "../types/model";
+import { getAllTabGroups, getAllTabs } from "./db";
 
 const isValidUrl = (url: string): boolean => {
     try {
@@ -13,10 +14,15 @@ const isValidUrl = (url: string): boolean => {
 };
 
 // TODO: Develop unit tests
-export const parseOneTabUrl = (output: string): TabBundle[] => {
-    console.log("Parsing OneTab output:", output);
+/**
+ * Parse OneTab export string into tab groups
+ * @param input OneTab input string
+ * @returns TabBundle[] representing tab groups
+ */
+export const parseOneTabUrl = (input: string): TabBundle[] => {
+    console.log("Parsing OneTab input:", input);
 
-    const lines = output.split("\n");
+    const lines = input.split("\n");
     const groups: TabBundle[] = [];
     let currentGroup: TabGroup = new TabGroup();
     let currentTabs: Tab[] = [];
@@ -91,13 +97,18 @@ const isImageUrl = (url: string): boolean => {
 };
 
 // TODO: Develop unit tests
+/**
+ * Parse Better OneTab export string into tab groups
+ * @param input Input string from Better OneTab
+ * @returns TabBundle[] representing tab groups
+ */
 export const parseBetterOneTabUrl = async (
-    output: string,
+    input: string,
 ): Promise<TabBundle[]> => {
-    console.log("Parsing Better OneTab output:", output);
+    console.log("Parsing Better OneTab input:", input);
 
     const dataUrlRegex = /^data:image\/(png|jpeg|jpg|gif|svg\+xml);base64,.+/;
-    const parsedJSON = JSON.parse(output) as BetterOneTab.TabGroup[];
+    const parsedJSON = JSON.parse(input) as BetterOneTab.TabGroup[];
 
     console.log("Parsed Better OneTab JSON:", parsedJSON);
 
@@ -181,3 +192,38 @@ export const parseBetterOneTabUrl = async (
         }),
     );
 };
+
+export interface ShibaExport {
+    tabs: Tab[];
+    tabGroups: TabGroup[];
+}
+
+/**
+ * 
+ * @returns Export tabs in Shiba format
+ */
+export const exportTabBundles = async (): Promise<string> => {
+    const shibaExport: ShibaExport = {
+        tabs: await getAllTabs(),
+        tabGroups: await getAllTabGroups(),
+    };
+    return JSON.stringify(shibaExport);
+}
+
+/**
+ * 
+ * @returns Export tabs in OneTab format
+ */
+export const exportTabBundlesOneTab = async (): Promise<string> => {
+    let output = "";
+    const tabGroups = await getAllTabGroups();
+    for (const tabGroup of tabGroups) {
+        const tabs = await getTabsByGroup(tabGroup.groupId);
+        for (const tab of tabs) {
+            output += `${tab.url} | ${tab.title}\n`;
+        }
+        output += "\n";
+    }
+
+    return output;
+}

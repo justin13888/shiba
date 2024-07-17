@@ -107,9 +107,32 @@ export const getTabs = async (num?: number): Promise<TabBundle[]> => {
     );
 };
 
+/**
+ * Gets all tabs in a tab group.
+ * @param tabGroupId Tab Group ID
+ * @returns List of tabs in the tab group
+ */
 export const getTabsByGroup = async (tabGroupId: string): Promise<Tab[]> => {
     const db = await dbPromise;
     return db.getAllFromIndex("tabs", "byTabGroupId", tabGroupId);
+};
+
+/**
+ * 
+ * @returns List of all tabs
+ */
+export const getAllTabs = async (): Promise<Tab[]> => {
+    const db = await dbPromise;
+    return db.getAll("tabs");
+};
+
+/**
+ * 
+ * @returns List of all tab groups
+ */
+export const getAllTabGroups = async (): Promise<TabGroup[]> => {
+    const db = await dbPromise;
+    return db.getAll("tabGroups");
 };
 
 export const getTabCount = async (): Promise<number> => {

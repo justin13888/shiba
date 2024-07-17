@@ -1,7 +1,7 @@
 import { switchToOrOpenTab } from "@/utils";
 import { URLS } from "@/utils/constants";
 import { addTabBundle } from "@/utils/db";
-import { parseOneTabUrl } from "@/utils/onetab";
+import { parseOneTabUrl } from "@/utils/parse";
 import { Title } from "@solidjs/meta";
 import { type Component, createSignal } from "solid-js";
 
