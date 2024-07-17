@@ -4,6 +4,7 @@ import { Title } from "@solidjs/meta";
 import { type Component, Show } from "solid-js";
 
 // TODO: Implement style
+// TODO: Implement search bar
 const Saved: Component = () => {
     const [maxTabGroups, setMaxTabGroups] = createSignal<number | undefined>(
         10,
