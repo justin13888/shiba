@@ -4,12 +4,12 @@ A cute home page and tab manager (browser extension)
 
 <!-- TODO: Add screenshot -->
 
-## Features
+## What to Expect
 
-- [x] Customizable home page
-- [ ] Customizable new tab page
-- [ ] Customizable themes
-- [ ] Customizable shortcuts
+- [x] Advanced browser tab management
+- [x] Offline-first, cross-browser sync (CRDT)
+- [x] NLP-powered contextual search
+- [x] Customizable themes and shortcuts
 
 <!-- TODO: Finish -->
 
