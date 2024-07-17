@@ -20,6 +20,14 @@ export const App = () => {
                     path="/export"
                     component={lazy(() => import("./routes/export"))}
                 />
+                <Route
+                    path="/analytics"
+                    component={lazy(() => import("./routes/analytics"))}
+                />
+                <Route
+                    path="/history"
+                    component={lazy(() => import("./routes/history"))}
+                />
                 <Route path="*" component={() => <Navigate href="/saved" />} />
             </HashRouter>
         </MetaProvider>
