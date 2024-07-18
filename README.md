@@ -3,6 +3,7 @@
 A cute home page and tab manager (browser extension)
 
 <!-- TODO: Add screenshot -->
+<!-- TODO: Add extension store logos -->
 
 ## What to Expect
 
