@@ -199,7 +199,7 @@ export interface ShibaExport {
 }
 
 /**
- * 
+ *
  * @returns Export tabs in Shiba format
  */
 export const exportTabBundles = async (): Promise<string> => {
@@ -208,10 +208,10 @@ export const exportTabBundles = async (): Promise<string> => {
         tabGroups: await getAllTabGroups(),
     };
     return JSON.stringify(shibaExport);
-}
+};
 
 /**
- * 
+ *
  * @returns Export tabs in OneTab format
  */
 export const exportTabBundlesOneTab = async (): Promise<string> => {
@@ -226,4 +226,4 @@ export const exportTabBundlesOneTab = async (): Promise<string> => {
     }
 
     return output;
-}
+};

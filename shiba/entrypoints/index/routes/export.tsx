@@ -5,9 +5,9 @@ import { type Component, createSignal } from "solid-js";
 // TODO: Style
 const Export: Component = () => {
     const [exportString, setExportString] = createSignal("");
-    const [exportOption, setExportOption] = createSignal<
-        "shiba" | "oneTab"
-    >("shiba");
+    const [exportOption, setExportOption] = createSignal<"shiba" | "oneTab">(
+        "shiba",
+    );
     const [feedbackMessage, setFeedbackMessage] = createSignal<string | null>(
         null,
     );
@@ -22,11 +22,15 @@ const Export: Component = () => {
         try {
             if (exportOption() === "shiba") {
                 setExportString(await exportTabBundles());
-                setFeedbackMessage("Tabs successfully exported in Shiba format!");
+                setFeedbackMessage(
+                    "Tabs successfully exported in Shiba format!",
+                );
                 setFeedbackType("success");
             } else if (exportOption() === "oneTab") {
                 setExportString(await exportTabBundlesOneTab());
-                setFeedbackMessage("Tabs successfully exported in OneTab format!");
+                setFeedbackMessage(
+                    "Tabs successfully exported in OneTab format!",
+                );
                 setFeedbackType("success");
             } else {
                 setFeedbackMessage("Invalid import option. Please try again.");

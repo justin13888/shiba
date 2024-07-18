@@ -118,7 +118,7 @@ export const getTabsByGroup = async (tabGroupId: string): Promise<Tab[]> => {
 };
 
 /**
- * 
+ *
  * @returns List of all tabs
  */
 export const getAllTabs = async (): Promise<Tab[]> => {
@@ -127,7 +127,7 @@ export const getAllTabs = async (): Promise<Tab[]> => {
 };
 
 /**
- * 
+ *
  * @returns List of all tab groups
  */
 export const getAllTabGroups = async (): Promise<TabGroup[]> => {

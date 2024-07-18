@@ -11,3 +11,4 @@ export default defineConfig({
     },
     modules: ["@wxt-dev/module-solid"],
 });
+// TODO: Define commands/keyboard shortcuts
