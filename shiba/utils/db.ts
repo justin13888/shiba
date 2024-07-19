@@ -72,6 +72,24 @@ export const deleteTabGroup = async (tabGroupId: string) => {
     await tabGroupsTx.done;
 };
 
+/**
+ * Delete all tabs from the database.
+ */
+export const clearTabs = async () => {
+    const db = await dbPromise;
+    const tabsTx = db.transaction("tabs", "readwrite");
+    const tabStore = tabsTx.objectStore("tabs");
+    tabStore.clear();
+    await tabsTx.done;
+
+    const tabGroupsTx = db.transaction("tabGroups", "readwrite");
+    const tabGroupsStore = tabGroupsTx.objectStore("tabGroups");
+    tabGroupsStore.clear();
+    await tabGroupsTx.done;
+
+    console.log("All tabs deleted");
+};
+
 // TODO: Check
 /**
  * Get tabs from the database.

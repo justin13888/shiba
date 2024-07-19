@@ -1,6 +1,6 @@
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tab, TabGroup } from "@/types/model";
-import { addTabBundle } from "@/utils/db";
+import { addTabBundle, clearTabs } from "@/utils/db";
 import { saveAllTabs, saveCurrentTab } from "@/utils/tabs";
 import "./App.css";
 import { URLS } from "@/utils/constants";
@@ -59,15 +59,15 @@ function App() {
                                     },
                                 ],
                                 [
-                                    "Open Import",
+                                    "Open Debug",
                                     () => {
-                                        window.open(URLS.IMPORT, "_blank");
+                                        switchToOrOpenTab(URLS.DEBUG);
                                     },
                                 ],
                                 [
                                     "Open Saved",
                                     () => {
-                                        window.open(URLS.SAVED, "_blank");
+                                        switchToOrOpenTab(URLS.SAVED);
                                     },
                                 ],
                                 [
@@ -96,7 +96,14 @@ function App() {
                                         await switchToOrOpenTab(URLS.SAVED);
                                     },
                                 ],
-                            ] as [string, () => void][]
+                                [
+                                    "Clear All",
+                                    async () => {
+                                        await clearTabs();
+                                        dataRefetch();
+                                    },
+                                ],
+                            ] as [string, () => void | Promise<void>][]
                         }
                     >
                         {([text, handler]) => (
