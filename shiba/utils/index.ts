@@ -7,15 +7,39 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 import type { Tabs } from "webextension-polyfill";
+
+const logger = new Logger(import.meta.url);
+
 /**
  * Switch to or open tab
  * @param url
  */
 export const switchToOrOpenTab = async (url: string): Promise<Tabs.Tab> => {
-    const tabs = await browser.tabs.query({ currentWindow: true, url });
+    const existingTab = await (async () => {
+        // Check if current tab is url
+        const currentTab = await browser.tabs.getCurrent();
+        if (currentTab && currentTab.url === url) {
+            return currentTab;
+        }
 
-    if (tabs.length > 0) {
-        return browser.tabs.update(tabs[0].id, { active: true });
+        // Check current window
+        const currentTabs = await browser.tabs.query({ currentWindow: true })
+            .then((tabs) => tabs.filter((tab) => tab.url?.startsWith(url)));
+        if (currentTabs.length > 0) {
+            return browser.tabs.update(currentTabs[0].id, { active: true });
+        }
+
+        // Check all tabs
+        const allTabs = await browser.tabs.query({})
+            .then((tabs) => tabs.filter((tab) => tab.url?.startsWith(url)));
+
+        if (allTabs.length > 0) {
+            return browser.tabs.update(allTabs[0].id, { active: true });
+        }
+    })();
+
+    if (existingTab?.windowId) {
+        browser.windows.update(existingTab.windowId, { focused: true });
     }
 
     return browser.tabs.create({ url });
