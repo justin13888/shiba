@@ -1,5 +1,7 @@
+import { SuspenseImage } from "@/components/image";
 import { StatusBar } from "@/components/statusbar";
 import { Toaster, showToast } from "@/components/ui/toast";
+import { diffDate } from "@/utils";
 import { deleteTabGroup, getTabs } from "@/utils/db";
 import { Title } from "@solidjs/meta";
 import { type Component, Show } from "solid-js";
@@ -7,6 +9,10 @@ import { type Component, Show } from "solid-js";
 // TODO: Implement style
 // TODO: Implement search bar
 const Saved: Component = () => {
+    // createEffect(async () => {
+    //     console.log("a",await faviconFromString("https://tanstack.com/favicon.ico"));
+    // console.log("b",await faviconFromString("https://github.githubassets.com/favicons/favicon-dark.svg"));
+    // })
     const [maxTabGroups, setMaxTabGroups] = createSignal<number | undefined>(
         10,
     ); // TODO: Make UI edit it
@@ -14,7 +20,9 @@ const Saved: Component = () => {
     // TODO: Make custom order (not in order of date) possible by modifying data structure and adding UI
     const [tabGroups, { refetch: tabGroupsRefetch }] = createResource(
         maxTabGroups(),
-        getTabs,
+        async (num) => {
+            return (await getTabs(num)).sort((a, b) => b[0].timeCreated - a[0].timeCreated);
+        },
     );
 
     // createEffect(
@@ -187,28 +195,26 @@ const Saved: Component = () => {
                                         >
                                             Delete All
                                         </button>
+                                        <p class="pl-4">{diffDate(tabGroup.timeCreated)}</p>
                                     </div>
                                     {/* TODO: Display favicon */}
                                     {/* TODO: Current tab interactions include: Delete, Restore */}
                                     {/* TODO: Add "restore all", "Delete all" */}
                                     {/* TODO: Display timeCreated */}
                                     {/* TODO: Make file explorer like keyboard shortcuts work (e.g. Ctrl+A, Shift) */}
-                                    <ul class="pl-2">
+                                    <ul class="pl-2 space-y-1">
                                         <For each={tabs}>
                                             {(tab) => (
                                                 <li>
                                                     <span class="flex flex-row items-center space-x-4">
-                                                        {/* TODO: Set to better fallback */}
-                                                        <img
-                                                            src={
-                                                                tab.favicon ||
-                                                                "/dogface.ico"
-                                                            }
+                                                        <SuspenseImage
+                                                            src={tab.favicon}
+                                                            fallbackSrc="/dogface.ico"
                                                             alt="Favicon logo"
-                                                            class="h-5"
+                                                            height={20}
+                                                            width={20}
                                                         />
 
-                                                        {/* <p>{tab.favicon}</p> */}
                                                         <a
                                                             href={tab.url}
                                                             target="_blank"

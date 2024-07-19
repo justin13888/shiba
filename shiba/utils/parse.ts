@@ -90,11 +90,80 @@ export namespace BetterOneTab {
     }
 }
 
-const imageExtensions = [".png", ".jpeg", ".jpg", ".gif", ".svg"];
+const imageExtensions = [".png", ".jpeg", ".jpg", ".gif", ".svg", ".ico", ".webp"];
 const isImageUrl = (url: string): boolean => {
     const urlObj = new URL(url);
     return imageExtensions.some((ext) => urlObj.pathname.endsWith(ext));
 };
+const dataUrlRegex = /^data:image\/(png|jpeg|jpg|gif|svg\+xml);base64,.+/;
+
+// TODO: Unit test
+// TODO: Fix edge cases
+/**
+ * Converts favicon URL to data encoded URL
+ * @param favIconUrl Favicon URL (image or data encoded URL)
+ * @returns Favicon data encoded URL
+ */
+export const faviconFromString = async (favIconUrl?: string) => {
+    if (!favIconUrl) {
+        return undefined;
+    }
+
+    if (isImageUrl(favIconUrl)) {
+        return favIconUrl;
+        // try {
+        //     // TODO: Fix this because it's not working
+        //     // Get image data
+        //     const response = await fetch(favIconUrl);
+        //     if (!response.ok) {
+        //         console.warn(
+        //             `Failed to fetch image: ${favIconUrl}`,
+        //         );
+        //         return undefined;
+        //     }
+
+        //     const contentType =
+        //         response.headers.get("content-type");
+
+        //     if (!contentType) {
+        //         throw new Error(
+        //             "Failed to get content type",
+        //         );
+        //     }
+
+        //     if (contentType.startsWith("image/png")) {
+        //         console.log("Processing PNG image");
+        //         const blob = await response.blob();
+        //         // Here you can further process the PNG blob, e.g., creating an object URL for display
+        //         console.log(
+        //             "PNG image fetched successfully",
+        //         );
+        //     } else if (
+        //         contentType.startsWith("image/svg+xml")
+        //     ) {
+        //         console.log("Processing SVG image");
+        //         const text = await response.text();
+        //         // Here you can further process the SVG text, e.g., displaying it directly in the DOM
+        //         console.log(
+        //             "SVG image fetched successfully",
+        //         );
+        //     } else {
+        //         throw new Error(
+        //             `Unsupported content type: ${contentType}`,
+        //         );
+        //     }
+        // } catch (error) {
+        //     console.error(
+        //         `Error parsing "${favIconUrl}": ${error instanceof Error ? error.message : error}`,
+        //     );
+        //     return undefined;
+        // }
+    } else if (dataUrlRegex.test(favIconUrl)) {
+        return favIconUrl;
+    } else {
+        return undefined;
+    }
+}
 
 // TODO: Develop unit tests
 /**
@@ -107,7 +176,6 @@ export const parseBetterOneTabUrl = async (
 ): Promise<TabBundle[]> => {
     console.log("Parsing Better OneTab input:", input);
 
-    const dataUrlRegex = /^data:image\/(png|jpeg|jpg|gif|svg\+xml);base64,.+/;
     const parsedJSON = JSON.parse(input) as BetterOneTab.TabGroup[];
 
     console.log("Parsed Better OneTab JSON:", parsedJSON);
@@ -119,65 +187,7 @@ export const parseBetterOneTabUrl = async (
             });
             const tabs = await Promise.all(
                 group.tabs.map(async (tab) => {
-                    const favicon = await (async (favIconUrl?: string) => {
-                        if (!favIconUrl) {
-                            return undefined;
-                        }
-
-                        if (isImageUrl(favIconUrl)) {
-                            try {
-                                // TODO: Fix this because it's not working
-                                // Get image data
-                                const response = await fetch(favIconUrl);
-                                if (!response.ok) {
-                                    console.warn(
-                                        `Failed to fetch image: ${favIconUrl}`,
-                                    );
-                                    return undefined;
-                                }
-
-                                const contentType =
-                                    response.headers.get("content-type");
-
-                                if (!contentType) {
-                                    throw new Error(
-                                        "Failed to get content type",
-                                    );
-                                }
-
-                                if (contentType.startsWith("image/png")) {
-                                    console.log("Processing PNG image");
-                                    const blob = await response.blob();
-                                    // Here you can further process the PNG blob, e.g., creating an object URL for display
-                                    console.log(
-                                        "PNG image fetched successfully",
-                                    );
-                                } else if (
-                                    contentType.startsWith("image/svg+xml")
-                                ) {
-                                    console.log("Processing SVG image");
-                                    const text = await response.text();
-                                    // Here you can further process the SVG text, e.g., displaying it directly in the DOM
-                                    console.log(
-                                        "SVG image fetched successfully",
-                                    );
-                                } else {
-                                    throw new Error(
-                                        `Unsupported content type: ${contentType}`,
-                                    );
-                                }
-                            } catch (error) {
-                                console.error(
-                                    `Error parsing "${favIconUrl}": ${error instanceof Error ? error.message : error}`,
-                                );
-                                return undefined;
-                            }
-                        } else if (dataUrlRegex.test(favIconUrl)) {
-                            return favIconUrl;
-                        } else {
-                            return undefined;
-                        }
-                    })(tab.favIconUrl);
+                    const favicon = await faviconFromString(tab.favIconUrl);
 
                     return new Tab({
                         favicon,
