@@ -1,3 +1,4 @@
+import { StatusBar } from "@/components/statusbar";
 import { Toaster, showToast } from "@/components/ui/toast";
 import { deleteTabGroup, getTabs } from "@/utils/db";
 import { Title } from "@solidjs/meta";
@@ -9,9 +10,8 @@ const Saved: Component = () => {
     const [maxTabGroups, setMaxTabGroups] = createSignal<number | undefined>(
         10,
     ); // TODO: Make UI edit it
-    // const [savedTabsTotal] = createResource(async () => {
-    //   return await sendMessage("getTabCount", {}, "background");
-    // });
+    // TODO: Fix loading issue when maxTabGroups is undefined
+    // TODO: Make custom order (not in order of date) possible by modifying data structure and adding UI
     const [tabGroups, { refetch: tabGroupsRefetch }] = createResource(
         maxTabGroups(),
         getTabs,
@@ -32,18 +32,33 @@ const Saved: Component = () => {
     return (
         <>
             <Title>Saved | Shiba</Title>
-            <div class="flex flex-col p-4">
-                <div class="flex flex-col space-y-6">
+            <div class="flex flex-col min-h-screen">
+                {/* Header */}
+                <div class="flex-none overflow-auto">
+                    <div class="flex flex-row flex-none items-baseline space-x-4 pb-4">
+                        <p class="text-4xl font-extrabold">Shiba</p>
+                        {/* TODO: Replace fallback with loading animation */}
+                        <Show
+                            when={tabCount.state === "ready"}
+                            fallback={<p>Loading...</p>}
+                        >
+                            <p class="text-xl">{tabCount()} Tabs Saved</p>
+                        </Show>
+                    </div>
+                </div>
+                {/* Tabs List */}
+                <div class="flex flex-grow flex-col space-y-6">
                     {/* TODO: Replace fallback with loading animation */}
                     <Show
                         when={tabGroups.state === "ready"}
-                        fallback={<p>Loading...</p>}
+                        fallback={<p>Loading...</p>} // TODO: Make it look better
                     >
+                        {/* TODO: State of length seem to not correctly update to nothing. Only fixed after hard refresh */}
                         <For each={tabGroups()}>
                             {([tabGroup, tabs]) => (
                                 <div class="m-4">
-                                    <div class="flex flex-row align-baseline space-x-4">
-                                        <span class="pr-2">
+                                    <div class="flex flex-row items-center space-x-4 pb-4">
+                                        <span class="pr-2 align-middle">
                                             {
                                                 // TODO: Make name box editable
                                                 tabGroup.name ? (
@@ -178,16 +193,16 @@ const Saved: Component = () => {
                                     {/* TODO: Add "restore all", "Delete all" */}
                                     {/* TODO: Display timeCreated */}
                                     {/* TODO: Make file explorer like keyboard shortcuts work (e.g. Ctrl+A, Shift) */}
-                                    <ul>
+                                    <ul class="pl-2">
                                         <For each={tabs}>
                                             {(tab) => (
                                                 <li>
-                                                    <span class="flex flex-row items-center space-x-2">
+                                                    <span class="flex flex-row items-center space-x-4">
                                                         {/* TODO: Set to better fallback */}
                                                         <img
                                                             src={
                                                                 tab.favicon ||
-                                                                ""
+                                                                "/dogface.ico"
                                                             }
                                                             alt="Favicon logo"
                                                             class="h-5"
@@ -213,8 +228,10 @@ const Saved: Component = () => {
                         {/* TODO: Implement pagination */}
                     </Show>
                 </div>
-                <Toaster />
+                {/* Status Bar */}
+                <StatusBar />
             </div>
+            <Toaster />
         </>
     );
 };
