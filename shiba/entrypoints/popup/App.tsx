@@ -3,9 +3,9 @@ import { Tab, TabGroup } from "@/types/model";
 import { addTabBundle, clearTabs } from "@/utils/db";
 import { saveAllTabs, saveCurrentTab } from "@/utils/tabs";
 import "./App.css";
-import { URLS } from "@/utils/constants";
-import { tabDBRefetch, tabCount } from "@/utils/store";
 import { switchToOrOpenTab } from "@/utils";
+import { URLS } from "@/utils/constants";
+import { tabCount, tabDBRefetch } from "@/utils/store";
 
 // TODO: Style
 function App() {

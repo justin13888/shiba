@@ -35,7 +35,7 @@ export const themeToString = (value: Theme): string => {
         case Theme.Custom:
             return "Custom";
     }
-}
+};
 
 // TODO: Implement more locales
 export enum Locale {
@@ -50,7 +50,7 @@ export const localeToString = (value: Locale): string => {
         case Locale.SimplifiedChinese:
             return "简体中文";
     }
-}
+};
 
 export interface Settings {
     darkMode: DarkMode;
@@ -69,10 +69,9 @@ export const DEFAULT_SETTINGS: Settings = {
 export const saveSettings = async (settings: Settings) => {
     await browser.storage.sync.set({ settings });
     logger.info("Settings saved", settings);
-    
-}
+};
 
 export const loadSettings = async (): Promise<Settings> => {
     const { settings } = await browser.storage.sync.get("settings");
     return (settings || DEFAULT_SETTINGS) as Settings;
-}
+};

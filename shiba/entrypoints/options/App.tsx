@@ -11,16 +11,16 @@ import {
 import {
     DarkMode,
     Locale,
-    darkModeToString,
     Theme,
-    themeToString,
+    darkModeToString,
     localeToString,
+    themeToString,
 } from "@/utils/settings";
 import {
-    createMutation,
-    createQuery,
     QueryClient,
     QueryClientProvider,
+    createMutation,
+    createQuery,
 } from "@tanstack/solid-query";
 import type { Component } from "solid-js";
 
@@ -48,7 +48,7 @@ const Options: Component = () => {
     createEffect(() => {
         console.log("Settings:", settings);
         console.log("isSuccess", isSuccess);
-    }) // TODO: REMOVE
+    }); // TODO: REMOVE
 
     const mutation = createMutation(() => ({
         mutationKey: ["settings"],
@@ -95,7 +95,8 @@ const Options: Component = () => {
                                         <Label for="darkmode">Dark Mode</Label>
                                         <Select
                                             value={settings?.darkMode}
-                                            onChange={(value) =>{}
+                                            onChange={
+                                                (value) => {}
                                                 // TODO
                                             }
                                             options={[
@@ -128,7 +129,8 @@ const Options: Component = () => {
                                         <Label for="theme">Theme</Label>
                                         <Select
                                             value={settings?.theme}
-                                            onChange={(value) =>{}
+                                            onChange={
+                                                (value) => {}
                                                 // TODO
                                             }
                                             options={[
@@ -160,7 +162,8 @@ const Options: Component = () => {
                                         <Label for="locale">Locale</Label>
                                         <Select
                                             value={settings?.locale}
-                                            onChange={(value) =>{}
+                                            onChange={
+                                                (value) => {}
                                                 // TODO
                                             }
                                             options={

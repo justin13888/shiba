@@ -90,7 +90,15 @@ export namespace BetterOneTab {
     }
 }
 
-const imageExtensions = [".png", ".jpeg", ".jpg", ".gif", ".svg", ".ico", ".webp"];
+const imageExtensions = [
+    ".png",
+    ".jpeg",
+    ".jpg",
+    ".gif",
+    ".svg",
+    ".ico",
+    ".webp",
+];
 const isImageUrl = (url: string): boolean => {
     const urlObj = new URL(url);
     return imageExtensions.some((ext) => urlObj.pathname.endsWith(ext));
@@ -163,7 +171,7 @@ export const faviconFromString = async (favIconUrl?: string) => {
     } else {
         return undefined;
     }
-}
+};
 
 // TODO: Develop unit tests
 /**

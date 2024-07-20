@@ -4,9 +4,10 @@ import type { Component, JSX } from "solid-js";
 
 interface SyncStatusProps {
     status: "loading" | "success" | "error";
-};
+}
 
-const SyncStatus: Component<SyncStatusProps> = ({status}) => { // TODO: Replace with animation
+const SyncStatus: Component<SyncStatusProps> = ({ status }) => {
+    // TODO: Replace with animation
     return (
         <Switch fallback={<p>Sync status unknown...</p>}>
             <Match when={status === "loading"}>
@@ -19,14 +20,17 @@ const SyncStatus: Component<SyncStatusProps> = ({status}) => { // TODO: Replace 
                 <p>Sync errored</p>
             </Match>
         </Switch>
-    )
-}
+    );
+};
 
 export const StatusBar: Component = () => {
     // TODO: Hook signal in
-    const [status, setStatus] = createSignal<"loading" | "success" | "error">("loading");
+    const [status, setStatus] = createSignal<"loading" | "success" | "error">(
+        "loading",
+    );
 
-    return ( // TODO: Display tabs saved here
+    return (
+        // TODO: Display tabs saved here
         <div class="flex flex-row h-8 w-full items-center justify-between p-1 bg-zinc-300">
             <div class="flex-none">
                 <p class="font-bold">Shiba</p>
@@ -36,5 +40,5 @@ export const StatusBar: Component = () => {
                 <SyncStatus status={status()} />
             </div>
         </div>
-    )
+    );
 };

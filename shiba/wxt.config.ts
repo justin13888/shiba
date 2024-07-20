@@ -10,9 +10,9 @@ export default defineConfig({
         author: "Justin Chung",
         browser_specific_settings: {
             gecko: {
-                id: "shiba@justinchung.net"
-            }
-        }
+                id: "shiba@justinchung.net",
+            },
+        },
     },
     modules: ["@wxt-dev/module-solid"],
 });

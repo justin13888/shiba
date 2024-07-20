@@ -23,14 +23,16 @@ export const switchToOrOpenTab = async (url: string): Promise<Tabs.Tab> => {
         }
 
         // Check current window
-        const currentTabs = await browser.tabs.query({ currentWindow: true })
+        const currentTabs = await browser.tabs
+            .query({ currentWindow: true })
             .then((tabs) => tabs.filter((tab) => tab.url?.startsWith(url)));
         if (currentTabs.length > 0) {
             return browser.tabs.update(currentTabs[0].id, { active: true });
         }
 
         // Check all tabs
-        const allTabs = await browser.tabs.query({})
+        const allTabs = await browser.tabs
+            .query({})
             .then((tabs) => tabs.filter((tab) => tab.url?.startsWith(url)));
 
         if (allTabs.length > 0) {
@@ -45,14 +47,14 @@ export const switchToOrOpenTab = async (url: string): Promise<Tabs.Tab> => {
     return browser.tabs.create({ url });
 };
 
-const dateFormatter = new Intl.DateTimeFormat((DEFAULT_SETTINGS.locale), {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-    weekday: 'long',
-    hour: 'numeric',
-    minute: 'numeric',
-    second: 'numeric',
+const dateFormatter = new Intl.DateTimeFormat(DEFAULT_SETTINGS.locale, {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    weekday: "long",
+    hour: "numeric",
+    minute: "numeric",
+    second: "numeric",
 }); // TODO: Load locale from settings
 
 /**
@@ -61,15 +63,17 @@ const dateFormatter = new Intl.DateTimeFormat((DEFAULT_SETTINGS.locale), {
  */
 export const diffDate = (timestamp: number): string => {
     const seconds = Math.floor((Date.now() - timestamp) / 1000);
-    
+
     let interval = Math.floor(seconds / 3600);
-    if (interval >= 1) { // >= 1 hour ago
+    if (interval >= 1) {
+        // >= 1 hour ago
         // Render whole date
         return dateFormatter.format(new Date(timestamp));
     }
 
     interval = Math.floor(seconds / 60);
-    if (interval >= 1) { // >= 1 minute ago
+    if (interval >= 1) {
+        // >= 1 minute ago
         return `${interval} minutes ago`;
     }
 

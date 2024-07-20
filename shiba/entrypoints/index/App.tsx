@@ -1,13 +1,12 @@
+import { MetaProvider, Title } from "@solidjs/meta";
+import { HashRouter, Navigate, Route } from "@solidjs/router";
 import {
     QueryClient,
     QueryClientProvider,
     createQuery,
-  } from '@tanstack/solid-query'
-import { Header } from "@/components/header";
-import { MetaProvider, Title } from "@solidjs/meta";
-import { HashRouter, Navigate, Route } from "@solidjs/router";
+} from "@tanstack/solid-query";
 
-const queryClient = new QueryClient()
+const queryClient = new QueryClient();
 
 export const App = () => {
     return (
@@ -35,7 +34,10 @@ export const App = () => {
                         path="/history"
                         component={lazy(() => import("./routes/history"))}
                     />
-                    <Route path="*" component={() => <Navigate href="/saved" />} />
+                    <Route
+                        path="*"
+                        component={() => <Navigate href="/saved" />}
+                    />
                 </HashRouter>
             </QueryClientProvider>
         </MetaProvider>

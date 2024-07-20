@@ -21,7 +21,9 @@ const Saved: Component = () => {
     const [tabGroups, { refetch: tabGroupsRefetch }] = createResource(
         maxTabGroups(),
         async (num) => {
-            return (await getTabs(num)).sort((a, b) => b[0].timeCreated - a[0].timeCreated);
+            return (await getTabs(num)).sort(
+                (a, b) => b[0].timeCreated - a[0].timeCreated,
+            );
         },
     );
 
@@ -195,7 +197,9 @@ const Saved: Component = () => {
                                         >
                                             Delete All
                                         </button>
-                                        <p class="pl-4">{diffDate(tabGroup.timeCreated)}</p>
+                                        <p class="pl-4">
+                                            {diffDate(tabGroup.timeCreated)}
+                                        </p>
                                     </div>
                                     {/* TODO: Display favicon */}
                                     {/* TODO: Current tab interactions include: Delete, Restore */}
