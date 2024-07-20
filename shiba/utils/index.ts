@@ -45,7 +45,7 @@ export const switchToOrOpenTab = async (url: string): Promise<Tabs.Tab> => {
     return browser.tabs.create({ url });
 };
 
-const dateFormatter = new Intl.DateTimeFormat("en-US", {
+const dateFormatter = new Intl.DateTimeFormat((DEFAULT_SETTINGS.locale), {
     year: 'numeric',
     month: 'long',
     day: 'numeric',
@@ -53,7 +53,7 @@ const dateFormatter = new Intl.DateTimeFormat("en-US", {
     hour: 'numeric',
     minute: 'numeric',
     second: 'numeric',
-});
+}); // TODO: Load locale from settings
 
 /**
  * Convert unix timestamp to human readable diff date

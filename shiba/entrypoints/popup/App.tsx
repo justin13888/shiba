@@ -4,7 +4,8 @@ import { addTabBundle, clearTabs } from "@/utils/db";
 import { saveAllTabs, saveCurrentTab } from "@/utils/tabs";
 import "./App.css";
 import { URLS } from "@/utils/constants";
-import { dataRefetch, tabCount } from "@/utils/store";
+import { tabDBRefetch, tabCount } from "@/utils/store";
+import { switchToOrOpenTab } from "@/utils";
 
 // TODO: Style
 function App() {
@@ -38,7 +39,7 @@ function App() {
                                     async () => {
                                         const savedTabId =
                                             await saveCurrentTab();
-                                        dataRefetch();
+                                        tabDBRefetch();
                                         await switchToOrOpenTab(URLS.SAVED);
                                         if (savedTabId !== undefined) {
                                             browser.tabs.remove(savedTabId);
@@ -50,7 +51,7 @@ function App() {
                                     "Save All Tabs",
                                     async () => {
                                         const savedTabIds = await saveAllTabs();
-                                        dataRefetch();
+                                        tabDBRefetch();
                                         await switchToOrOpenTab(URLS.SAVED);
                                         for (const tabId of savedTabIds) {
                                             browser.tabs.remove(tabId);
@@ -68,6 +69,12 @@ function App() {
                                     "Open Saved",
                                     () => {
                                         switchToOrOpenTab(URLS.SAVED);
+                                    },
+                                ],
+                                [
+                                    "Open Options",
+                                    () => {
+                                        switchToOrOpenTab(URLS.OPTIONS);
                                     },
                                 ],
                                 [
@@ -92,7 +99,7 @@ function App() {
 
                                         addTabBundle([newTabGroup, newTabs]);
 
-                                        dataRefetch();
+                                        tabDBRefetch();
                                         await switchToOrOpenTab(URLS.SAVED);
                                     },
                                 ],
@@ -100,7 +107,7 @@ function App() {
                                     "Clear All",
                                     async () => {
                                         await clearTabs();
-                                        dataRefetch();
+                                        tabDBRefetch();
                                     },
                                 ],
                             ] as [string, () => void | Promise<void>][]

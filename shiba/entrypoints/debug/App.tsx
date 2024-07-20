@@ -1,9 +1,8 @@
 import { LogLevel, Logger, getLogs } from "@/utils/logger";
-import type { Component } from "solid-js";
 
 // TODO: Implement
 // TODO: View database
-const App: Component = () => {
+export const App = () => {
     const logger = new Logger(import.meta.url);
     const addTestLogs = async () => {
         console.log("Adding test logs");
@@ -164,5 +163,3 @@ const App: Component = () => {
         </div>
     );
 };
-
-export default App;
