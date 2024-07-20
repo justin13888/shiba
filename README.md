@@ -11,8 +11,17 @@ A cute home page and tab manager (browser extension)
 - [x] Offline-first, cross-browser sync (CRDT)
 - [x] NLP-powered contextual search
 - [x] Customizable themes and shortcuts
+- [x] First-class support for mobile browsers
 
 <!-- TODO: Finish -->
+
+## Getting Started
+
+Shiba is distributed on the Chrome Web Store, Firefox Add-ons, Microsoft Edge Add-ons, and GitHub Releases.
+
+<!-- TODO: Add store links -->
+
+For developers, refer to the READMEs in the individual components.
 
 ## License
 
