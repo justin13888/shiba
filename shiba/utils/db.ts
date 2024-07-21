@@ -50,6 +50,10 @@ export const addTabs = async (tabs: Tab[]) => {
     console.log("Tabs added successfully");
 };
 
+/**
+ * Delete a tab group from the database.
+ * @param tabGroupId Tab Group ID
+ */
 export const deleteTabGroup = async (tabGroupId: string) => {
     const db = await dbPromise;
 
