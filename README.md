@@ -12,6 +12,7 @@ A cute home page and tab manager (browser extension)
 - [x] NLP-powered contextual search
 - [x] Customizable themes and shortcuts
 - [x] First-class support for mobile browsers
+- [x] Snapshotting and tab analytics
 
 <!-- TODO: Finish -->
 

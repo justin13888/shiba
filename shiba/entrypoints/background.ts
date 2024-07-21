@@ -1,5 +1,68 @@
+import { Logger } from "@/utils/logger";
+import type { RetentionPolicy } from "@/utils/snapshot";
+
 export default defineBackground({
     main() {
-        console.log("Hello background.");
+        console.debug("Started Shiba background script");
+        const logger = new Logger("background.ts");
+        logger.info("Background script started");
+
+        // Do log cleanup
+        const doLogCleanup = async (
+            minLogs: number,
+            minAge: number,
+        ) => {
+            logger.debug("Cleaning up logs");
+            const logsDeleted = await cleanupLogs(minLogs, minAge);
+            logger.debug(`Logs deleted: ${logsDeleted}`);
+        }
+        const setupLogCleanup = async () => {
+            logger.debug("Setting up log cleanup");
+
+            try {
+                const logSettings = await loadLoggingSettings();
+
+                logger.debug(`Setting up log cleanup interval for ${logSettings.cleanupInterval} minutes`);
+                setInterval(() => {
+                    doLogCleanup(logSettings.minLogs, logSettings.minAge);
+                    console.log("cleanupLogs");
+                }, logSettings.cleanupInterval * 60 * 1000);
+
+                doLogCleanup(logSettings.minLogs, logSettings.minAge);
+            } catch (error) {
+                logger.fatal("Failed to setup log cleanup", error);
+            }
+        };
+        setupLogCleanup();
+
+        // Do snapshot generation
+        const updateSnapshots = async (retentionPolicies: RetentionPolicy[]) => {
+            logger.debug("Updating snapshots");
+            const newSnapshot = await runSnapshot(retentionPolicies);
+            if (newSnapshot) {
+                logger.debug("Snapshot generated", newSnapshot);
+            } else {
+                logger.debug("No new snapshot generated");
+            }
+        }
+        const setupSnapshots = async () => {
+            logger.info("Setting up snapshots");
+            try {
+                const snapshotSettings = await loadSnapshotSettings();
+                logger.debug("Snapshot settings", snapshotSettings);
+                
+                logger.debug(`Setting up snapshot interval for ${snapshotSettings.reconciliationInterval} minutes`);
+                setInterval(() => {
+                    updateSnapshots(snapshotSettings.retentionPolicies)
+                }, snapshotSettings.reconciliationInterval * 60 * 1000);
+
+                updateSnapshots(snapshotSettings.retentionPolicies);
+                
+            } catch (error) {
+                logger.fatal("Failed to setup snapshots", error);
+            }
+        }
+        setupSnapshots();
+        console.debug("Shiba background script setup complete");
     },
 });
