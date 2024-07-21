@@ -134,7 +134,7 @@ const addSnapshot = async (snapshot: ShibaSnapshot) => {
  * Get snapshots in order of newest to oldest.
  * @returns Snapshots from newest to oldest
  */
-const getSnapshots = async (): Promise<ShibaSnapshot[]> => {
+export const getSnapshots = async (): Promise<ShibaSnapshot[]> => {
     const db = await dbPromise;
     const tx = db.transaction("snapshots", "readonly");
     const store = tx.objectStore("snapshots");
@@ -150,6 +150,20 @@ const getSnapshots = async (): Promise<ShibaSnapshot[]> => {
 
     await tx.done;
     return snapshots;
+}
+
+/**
+ * Generate manual snapshot
+ */
+export const generateManualSnapshot = async () => {
+    const snapshot = new ShibaSnapshot({
+        identifier: "unknown", // TODO: Fetch identifier from settings
+        timestamp: Date.now(),
+        triggers: [],
+        tabs: await getTabs(),
+        tabGroups: await getAllTabGroups(),
+    });
+    await addSnapshot(snapshot);
 }
 
 // TODO: Test

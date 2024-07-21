@@ -47,7 +47,7 @@ export const switchToOrOpenTab = async (url: string): Promise<Tabs.Tab> => {
     return browser.tabs.create({ url });
 };
 
-const dateFormatter = new Intl.DateTimeFormat(DEFAULT_SETTINGS.locale, {
+export const dateFormatter = new Intl.DateTimeFormat(DEFAULT_SETTINGS.locale, {
     year: "numeric",
     month: "long",
     day: "numeric",
