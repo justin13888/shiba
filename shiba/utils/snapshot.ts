@@ -111,6 +111,11 @@ const dbPromise = openDB<SnapshotDB>("snapshots", 1, {
     },
 });
 
+// TODO: Test
+/**
+ * Add snapshot to database.
+ * @param snapshot Snapshot to add
+ */
 const addSnapshot = async (snapshot: ShibaSnapshot) => {
     logger.trace("Adding snapshot", snapshot);
     
@@ -124,8 +129,9 @@ const addSnapshot = async (snapshot: ShibaSnapshot) => {
     logger.trace("Snapshot added successfully:", snapshot);
 }
 
+// TODO: Test
 /**
- * 
+ * Get snapshots in order of newest to oldest.
  * @returns Snapshots from newest to oldest
  */
 const getSnapshots = async (): Promise<ShibaSnapshot[]> => {
@@ -146,6 +152,7 @@ const getSnapshots = async (): Promise<ShibaSnapshot[]> => {
     return snapshots;
 }
 
+// TODO: Test
 /**
  * Delete a snapshot
  * @param id Snapshot ID
@@ -160,6 +167,7 @@ const deleteSnapshot = async (id: string) => {
     await tx.done;
 }
 
+// TODO: Test
 /**
  * Generate and clean up snapshots based on TabDB, SnapshotDB and RetentionPolicy[]
  * @param retentionPolicies Retention policies to trigger snapshots
