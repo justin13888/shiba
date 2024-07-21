@@ -72,7 +72,7 @@ const Saved: Component = () => {
                                     </div>
                                 }
                             >
-                                <Match when={tabGroups.length > 0}>
+                                <Match when={tabGroups().length > 0}>
                                     <div class="flex-col space-y-6">
                                         <For each={tabGroups()}>
                                             {([tabGroup, tabs]) => (
