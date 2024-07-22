@@ -5,6 +5,8 @@ import { parseOneTabUrl } from "@/utils/parse";
 import { Title } from "@solidjs/meta";
 import { type Component, createSignal } from "solid-js";
 
+const logger = new Logger(import.meta.url);
+
 // TODO: Style
 const Import: Component = () => {
     const [importString, setImportString] = createSignal("");
@@ -44,7 +46,7 @@ const Import: Component = () => {
             })();
             if (!tabBundles) return;
 
-            console.log("Parsed tab bundles:", tabBundles);
+            logger.info("Parsed tab bundles:", tabBundles);
 
             // Add tabs to storage
             for (const tabBundle of tabBundles) {

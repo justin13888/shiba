@@ -17,10 +17,6 @@ export const App = () => {
     const [pageLimit, setPageLimit] = createSignal(10);
     const [lastKeys, setLastKeys] = createSignal<number[]>([]);
 
-    createEffect(() => {
-        console.log("Last keys:", lastKeys());
-    });
-
     const getLastKey = () => (page() > 1 ? lastKeys()[page() - 2] : undefined);
     // Resource to fetch logs based on the current page
     const [logs, { mutate }] = createResource(

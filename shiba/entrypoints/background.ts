@@ -3,9 +3,8 @@ import type { RetentionPolicy } from "@/utils/snapshot";
 
 export default defineBackground({
     main() {
-        console.debug("Started Shiba background script");
         const logger = new Logger("background.ts");
-        logger.info("Background script started");
+        logger.debug("Started Shiba background script");
 
         // Do log cleanup
         const doLogCleanup = async (
@@ -26,11 +25,9 @@ export default defineBackground({
                 setInterval(async () => {
                     try {
                         await doLogCleanup(logSettings.minLogs, logSettings.minAge);
-                        console.log("cleanupLogs");
                     } catch (cleanupError) {
                         logger.error("Error during log cleanup", cleanupError);
                     }
-                    console.log("cleanupLogs");
                 }, logSettings.cleanupInterval * 60 * 1000);
 
                 doLogCleanup(logSettings.minLogs, logSettings.minAge);
@@ -72,6 +69,6 @@ export default defineBackground({
             }
         }
         setupSnapshots();
-        console.debug("Shiba background script setup complete");
+        logger.debug("Shiba background script setup complete");
     },
 });

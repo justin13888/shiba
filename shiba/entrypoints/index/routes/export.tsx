@@ -3,6 +3,8 @@ import { Title } from "@solidjs/meta";
 import { type Component, createSignal } from "solid-js";
 
 // TODO: Style
+const logger = new Logger(import.meta.url);
+
 const Export: Component = () => {
     const [exportString, setExportString] = createSignal("");
     const [exportOption, setExportOption] = createSignal<"shiba" | "oneTab">(
@@ -37,13 +39,13 @@ const Export: Component = () => {
                 setFeedbackType("error");
             }
 
-            console.log("Export string:", exportString());
+            logger.log("Export string:", exportString());
         } catch (error) {
             setFeedbackMessage(
                 `Error exporting tabs: ${error instanceof Error ? error.message : error}`,
             );
             setFeedbackType("error");
-            console.error(error);
+            logger.error(error);
         }
     };
 
