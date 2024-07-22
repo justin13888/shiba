@@ -100,7 +100,7 @@ export const clearTabs = async () => {
  * @param num Number of tab groups to get.
  * @returns Array of bundles
  */
-export const getTabs = async (num?: number): Promise<TabBundle[]> => {
+export const getTabBundles = async (num?: number): Promise<TabBundle[]> => {
     const db = await dbPromise;
     const tx = db.transaction("tabGroups", "readonly");
     const store = tx.objectStore("tabGroups");

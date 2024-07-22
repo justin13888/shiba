@@ -1,5 +1,6 @@
 import { type DBSchema, openDB } from "idb";
 import { nanoid } from "nanoid";
+import type {Tab, TabGroup} from "@/types/model";
 
 const logger = new Logger(import.meta.url);
 
@@ -129,6 +130,15 @@ const addSnapshot = async (snapshot: ShibaSnapshot) => {
     logger.trace("Snapshot added successfully:", snapshot);
 }
 
+/**
+ * @param id Snapshot ID
+ * @returns Snapshot with ID if found
+ */
+export const getSnapshot = async (id: string): Promise<ShibaSnapshot | undefined> => {
+    const db = await dbPromise;
+    return db.get("snapshots", id);
+};
+
 // TODO: Test
 /**
  * Get snapshots in order of newest to oldest.
@@ -160,7 +170,7 @@ export const generateManualSnapshot = async () => {
         identifier: "unknown", // TODO: Fetch identifier from settings
         timestamp: Date.now(),
         triggers: [],
-        tabs: await getTabs(),
+        tabs: await getAllTabs(),
         tabGroups: await getAllTabGroups(),
     });
     await addSnapshot(snapshot);
@@ -204,7 +214,7 @@ export const runSnapshot = async (retentionPolicies: RetentionPolicy[]): Promise
             identifier: "unknown", // TODO: Fetch identifier from settings
             timestamp: Date.now(),
             triggers: retentionPolicies.map(policy => policy.id),
-            tabs: await getTabs(),
+            tabs: await getAllTabs(),
             tabGroups: await getAllTabGroups(),
         });
         logger.trace("New snapshot:", newSnapshot);
@@ -221,7 +231,7 @@ export const runSnapshot = async (retentionPolicies: RetentionPolicy[]): Promise
                 identifier: "unknown", // TODO: Fetch identifier from settings
                 timestamp: Date.now(),
                 triggers,
-                tabs: await getTabs(),
+                tabs: await getAllTabs(),
                 tabGroups: await getAllTabGroups(),
             });
             logger.trace("New snapshot:", newSnapshot);

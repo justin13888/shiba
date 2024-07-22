@@ -2,7 +2,7 @@ import { SuspenseImage } from "@/components/image";
 import { StatusBar } from "@/components/statusbar";
 import { Toaster, showToast } from "@/components/ui/toast";
 import { diffDate } from "@/utils";
-import { deleteTabGroup, getTabs } from "@/utils/db";
+import { deleteTabGroup, getTabBundles } from "@/utils/db";
 import { Title } from "@solidjs/meta";
 import { type Component, Show } from "solid-js";
 
@@ -21,7 +21,7 @@ const Saved: Component = () => {
     const [tabGroups, { refetch: tabGroupsRefetch }] = createResource(
         maxTabGroups(),
         async (num) => {
-            return (await getTabs(num)).sort(
+            return (await getTabBundles(num)).sort(
                 (a, b) => b[0].timeCreated - a[0].timeCreated,
             );
         },
