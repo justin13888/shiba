@@ -42,22 +42,16 @@ const Saved: Component = () => {
     return (
         <>
             <Title>Saved | Shiba</Title>
-            <div class="flex flex-col min-h-screen">
+            <div class="flex flex-col h-screen">
                 {/* Header */}
-                <div class="flex-none overflow-auto">
+                {/* TODO: Complete header */}
+                <header class="flex-none">
                     <div class="flex flex-row flex-none items-baseline space-x-4 pb-4">
                         <p class="text-4xl font-extrabold">Shiba</p>
-                        {/* TODO: Replace fallback with loading animation */}
-                        <Show
-                            when={tabCount.state === "ready"}
-                            fallback={<p>Loading...</p>}
-                        >
-                            <p class="text-xl">{tabCount()} Tabs Saved</p>
-                        </Show>
                     </div>
-                </div>
+                </header>
                 {/* Tabs List */}
-                <div class="flex flex-grow">
+                <div class="flex flex-grow overflow-auto">
                     {/* TODO: Replace fallback with loading animation */}
                     <Show
                         when={tabGroups()}

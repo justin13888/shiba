@@ -1,33 +1,67 @@
-import type { Component, JSX } from "solid-js";
+import { Check, CircleX, Loader } from "lucide-solid";
+import type { Accessor, Component } from "solid-js";
 
 // TODO: Implement with sync status
 
+export type SyncStatus = "loading" | "success" | "error";
 interface SyncStatusProps {
-    status: "loading" | "success" | "error";
+    status: Accessor<SyncStatus>;
 }
 
 const SyncStatus: Component<SyncStatusProps> = ({ status }) => {
     // TODO: Replace with animation
+
+    const colourLoading = "text-blue-500";
+    const colourSuccess = "text-green-500";
+    const colourError = "text-red-500";
     return (
-        <Switch fallback={<p>Sync status unknown...</p>}>
-            <Match when={status === "loading"}>
-                <p>Syncing...</p>
-            </Match>
-            <Match when={status === "success"}>
-                <p>Up to date</p>
-            </Match>
-            <Match when={status === "error"}>
-                <p>Sync errored</p>
-            </Match>
-        </Switch>
+        <span
+            class={
+                `flex flex-row items-center space-x-2 text-xs"`
+            }
+            aria-label="Sync status"
+        >
+            <Switch fallback={<p>Unknown...</p>}>
+                <Match when={status() === "loading"}>
+                    {/* Blue */}
+                    <p class={colourLoading}>Syncing...</p>
+                    <Loader class={`animate-pulse h-4 w-4 ${colourLoading}`} />
+                </Match>
+                <Match when={status() === "success"}>
+                    {/* Green */}
+                    <p class={colourSuccess}>Up to date</p>
+                    <Check class={colourSuccess} />
+                </Match>
+                <Match when={status() === "error"}>
+                    {/* Red */}
+                    <p class={colourError}>Sync errored</p>
+                    <CircleX class={colourError} />
+                </Match>
+            </Switch>
+        </span>
     );
 };
 
 export const StatusBar: Component = () => {
     // TODO: Hook signal in
     const [status, setStatus] = createSignal<"loading" | "success" | "error">(
-        "loading",
+        "success",
     );
+
+    // const interval = setInterval(() => {
+    //     switch (status()) {
+    //         case "loading":
+    //             setStatus("success");
+    //             break;
+    //         case "success":
+    //             setStatus("error");
+    //             break;
+    //         case "error":
+    //             setStatus("loading");
+    //             break;
+    //     }
+    //   }, 1000);
+    //   onCleanup(() => clearInterval(interval));
 
     return (
         // TODO: Display tabs saved here
@@ -37,7 +71,10 @@ export const StatusBar: Component = () => {
             </div>
             {/* <div class="flex-grow" /> */}
             <div class="flex-none">
-                <SyncStatus status={status()} />
+                <div class="flex flex-row space-x-4 items-center">
+                    <p>{tabCount()} tabs saved</p>
+                    <SyncStatus status={status} />
+                </div>
             </div>
         </div>
     );
