@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/button";
 import { LogLevel, Logger, getLogs } from "@/utils/logger";
 
 // TODO: Implement
@@ -54,13 +55,13 @@ export const App = () => {
     };
 
     return (
-        <div class="container">
+        <div class="container space-y-4">
             <div class="pb-4 align-middle">
                 <h1 class="text-4xl font-extrabold">Shiba Debug</h1>
             </div>
-            <button type="button" onClick={addTestLogs}>
-                Add logs
-            </button>
+            <Button onClick={addTestLogs}>
+                Add test logs
+            </Button>
             <div class="flex flex-col">
                 <Show
                     when={logs.state === "ready"}
@@ -138,16 +139,15 @@ export const App = () => {
                     </ul>
                 </Show>
             </div>
+            <p>Page count: {page()}</p>
             <div class="flex flex-row space-x-6">
-                <button
-                    type="button"
+                <Button
                     onClick={handlePreviousPage}
                     disabled={page() === 1}
                 >
                     Previous Page
-                </button>
-                <button
-                    type="button"
+                </Button>
+                <Button
                     onClick={handleNextPage}
                     disabled={(() => {
                         const l = logs();
@@ -157,9 +157,8 @@ export const App = () => {
                     })()}
                 >
                     Next Page
-                </button>
+                </Button>
             </div>
-            <p>Page count: {page()}</p>
         </div>
     );
 };
