@@ -1,4 +1,5 @@
 import { type Component, Show } from "solid-js";
+import { Title } from "@solidjs/meta";
 import { getSnapshots } from "@/utils/snapshot";
 import {
     Table,
@@ -11,6 +12,7 @@ import {
 } from "@/components/ui/table";
 import { dateFormatter } from "@/utils";
 import { Button } from "@/components/ui/button";
+import { useNavigate } from "@solidjs/router";
 
 // TODO: Implement list displaying past snapshots and card viewer for each snapshot, allowing restoration
 // For version timeline, display date and number of tabs and changes
@@ -26,8 +28,12 @@ const History: Component = () => {
         }
     });
 
+    const navigate = useNavigate();
+
     return (
-        <div class="flex min-h-screen w-full flex-col items-center justify-center bg-background px-4 py-12 md:px-6">
+        <>
+        <Title>History | Shiba</Title>
+        <div class="flex min-h-screen w-full flex-col items-center bg-background px-4 py-12 md:px-6">
             <div class="w-full max-w-screen-lg space-y-6">
                 <h1 class="text-3xl font-bold tracking-tighter">History</h1>
                 <div class="space-y-4">
@@ -75,7 +81,11 @@ const History: Component = () => {
                                             <For each={snapshots()}>
                                                 {/* TODO: Make rows clickable */}
                                                 {(snapshot) => (
-                                                    <TableRow>
+                                                    <TableRow // TODO: Make it obvious rows are clickable
+                                                        onClick={() => {
+                                                            navigate(`/history/${snapshot.id}`);
+                                                        }}
+                                                    >
                                                         <TableCell class="font-medium">
                                                             {snapshot.id}
                                                         </TableCell>
@@ -83,7 +93,13 @@ const History: Component = () => {
                                                         <TableCell>{snapshot.identifier}</TableCell>
                                                         <TableCell>{diffDate(snapshot.timestamp)}</TableCell>
                                                         {/* TODO: Make trigger IDs hoverable */}
-                                                        <TableCell>{snapshot.triggers.join("\n")}</TableCell>
+                                                        <TableCell>
+                                                            {
+                                                                snapshot.triggers.length
+                                                                    ? snapshot.triggers.join("\n")
+                                                                    : "Manual"
+                                                            }
+                                                        </TableCell>
                                                         <TableCell class="text-center">
                                                             {snapshot.tabs.length}
                                                         </TableCell>
@@ -118,6 +134,7 @@ const History: Component = () => {
                 </div>
             </div>
         </div>
+        </>
     );
 };
 

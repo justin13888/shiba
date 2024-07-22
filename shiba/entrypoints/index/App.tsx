@@ -31,6 +31,10 @@ export const App = () => {
                         component={lazy(() => import("./routes/analytics"))}
                     />
                     <Route
+                        path="/history/:id"
+                        component={lazy(() => import("./routes/history/[id]"))}
+                    />
+                    <Route
                         path="/history"
                         component={lazy(() => import("./routes/history"))}
                     />
