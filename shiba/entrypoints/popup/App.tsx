@@ -85,21 +85,20 @@ function App() {
                                 "Seed",
                                 async () => {
                                     // TODO: Remove this later after testing
-                                    const newTabGroup = new TabGroup();
                                     const newTabs = Array.from(
                                         { length: 10 },
                                         () => {
                                             const tab = new Tab({
                                                 title: "Test Tab",
                                                 url: "https://example.com",
-                                                tabGroupId:
-                                                    newTabGroup.groupId,
                                             });
-                                            tab.tabGroupId =
-                                                newTabGroup.groupId;
                                             return tab;
                                         },
                                     );
+                                    const newTabGroup = new TabGroup({
+                                        tabs: newTabs.map((tab) => tab.id),
+                                    });
+                                    
 
                                     addTabBundle([newTabGroup, newTabs]);
 

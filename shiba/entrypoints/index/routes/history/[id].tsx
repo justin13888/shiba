@@ -13,6 +13,7 @@ const SnapshotPreview: Component = () => {
     ); // TODO: Replace with solid infintie query and virtual
     // TODO: Because snapshot could be undefined, errors and loading states both are undefined. (Solve by not using createResource)
 
+    // TODO: Display tab group categories properly
     return (
         <div class="flex min-h-screen w-full flex-col items-center bg-background px-4 py-12 md:px-6">
             <div class="w-full max-w-screen-lg space-y-6">
@@ -23,13 +24,12 @@ const SnapshotPreview: Component = () => {
                     fallback={<p>Loading...</p>} // TODO: Make it look better
                 >
                     {(snapshot) => {
-                        const tabRecord: Record<string, Tab[]> = snapshot().tabs.reduce((acc, tab) => {
-                            if (!acc[tab.tabGroupId]) {
-                                acc[tab.tabGroupId] = [];
-                            }
-                            acc[tab.tabGroupId].push(tab);
+                        // Dictionary of Tab ID to Tab
+                        const tabRecord: Record<string, Tab> = snapshot().tabs.reduce((acc, tab) => {
+                            acc[tab.id] = tab;                                
                             return acc;
-                        }, {} as Record<string, Tab[]>);
+                        }, {} as Record<string, Tab>);
+
                         // Tab Group sorted in descending order
                         const tabGroups = snapshot().tabGroups.sort((a, b) => b.timeCreated - a.timeCreated);
 
@@ -56,7 +56,7 @@ const SnapshotPreview: Component = () => {
                                                 <For each={tabGroups}>
                                                     {(tabGroup) => {
                                                         const tabs = tabRecord[tabGroup.groupId];
-
+                                                        // {/* TODO: Display Tab.notes */}
                                                         return (
                                                             <>
                                                                 <div class="flex flex-row items-center space-x-4">

@@ -4,6 +4,8 @@ import { nanoid } from "nanoid";
 import { Tab, type TabBundle, TabGroup } from "../types/model";
 import { getAllTabGroups, getAllTabs } from "./db";
 
+const logger = new Logger(import.meta.url);
+
 const isValidUrl = (url: string): boolean => {
     try {
         new URL(url);
@@ -20,7 +22,7 @@ const isValidUrl = (url: string): boolean => {
  * @returns TabBundle[] representing tab groups
  */
 export const parseOneTabUrl = (input: string): TabBundle[] => {
-    console.log("Parsing OneTab input:", input);
+    logger.debug("Parsing OneTab input:", input);
 
     const lines = input.split("\n");
     const groups: TabBundle[] = [];
@@ -60,9 +62,9 @@ export const parseOneTabUrl = (input: string): TabBundle[] => {
                 id: nanoid(),
                 title: trimmedTitle,
                 url: trimmedUrl,
-                tabGroupId: currentGroup.groupId,
             };
             currentTabs.push(tab);
+            currentGroup.tabs.push(tab.id);
         }
     }
 
@@ -140,19 +142,19 @@ export const faviconFromString = async (favIconUrl?: string) => {
         //     }
 
         //     if (contentType.startsWith("image/png")) {
-        //         console.log("Processing PNG image");
+        //         logger.debug("Processing PNG image");
         //         const blob = await response.blob();
         //         // Here you can further process the PNG blob, e.g., creating an object URL for display
-        //         console.log(
+        //         logger.debug(
         //             "PNG image fetched successfully",
         //         );
         //     } else if (
         //         contentType.startsWith("image/svg+xml")
         //     ) {
-        //         console.log("Processing SVG image");
+        //         logger.debug("Processing SVG image");
         //         const text = await response.text();
         //         // Here you can further process the SVG text, e.g., displaying it directly in the DOM
-        //         console.log(
+        //         logger.debug(
         //             "SVG image fetched successfully",
         //         );
         //     } else {
@@ -182,17 +184,14 @@ export const faviconFromString = async (favIconUrl?: string) => {
 export const parseBetterOneTabUrl = async (
     input: string,
 ): Promise<TabBundle[]> => {
-    console.log("Parsing Better OneTab input:", input);
+    logger.debug("Parsing Better OneTab input:", input);
 
     const parsedJSON = JSON.parse(input) as BetterOneTab.TabGroup[];
 
-    console.log("Parsed Better OneTab JSON:", parsedJSON);
+    logger.debug("Parsed Better OneTab JSON:", parsedJSON);
 
     return Promise.all(
         parsedJSON.map(async (group) => {
-            const tabGroup = new TabGroup({
-                timeCreated: group.time,
-            });
             const tabs = await Promise.all(
                 group.tabs.map(async (tab) => {
                     const favicon = await faviconFromString(tab.favIconUrl);
@@ -201,10 +200,14 @@ export const parseBetterOneTabUrl = async (
                         favicon,
                         title: tab.title,
                         url: tab.url,
-                        tabGroupId: tabGroup.groupId,
                     });
                 }),
             );
+            const tabGroup = new TabGroup({
+                timeCreated: group.time,
+                tabs: tabs.map((tab) => tab.id),
+            });
+            
 
             return [tabGroup, tabs];
         }),

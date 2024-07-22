@@ -3,7 +3,7 @@ import { addTabBundle } from "@/utils/db";
 
 /**
  * Save the current tab to the database.
- * @returns Saved current tab ID.
+ * @returns Browser tab ID of current tab.
  * @throws If the tab title or URL is undefined.
  */
 export const saveCurrentTab = async (): Promise<number | undefined> => {
@@ -14,17 +14,15 @@ export const saveCurrentTab = async (): Promise<number | undefined> => {
     });
 
     if (tabs.length > 0) {
-        const newTabGroup = new TabGroup();
-
         const tab = tabs[0];
-        const [currentTab, tabId] = browserTabToShibaTab(
-            tab,
-            newTabGroup.groupId,
-        );
+        const [currentTab, browserTabId] = browserTabToShibaTab(tab);
+        const newTabGroup = new TabGroup({
+            tabs: [currentTab.id],
+        });
 
         addTabBundle([newTabGroup, [currentTab]]);
 
-        return tabId;
+        return browserTabId;
     }
 
     return undefined;
@@ -43,22 +41,20 @@ export const saveAllTabs = async () => {
     const newTabGroup = new TabGroup();
 
     const savedTabs: Tab[] = [];
-    const savedTabIds: number[] = [];
+    const savedBrowserTabIds: number[] = [];
 
     for (const tab of tabs) {
-        const [currentTab, tabId] = browserTabToShibaTab(
-            tab,
-            newTabGroup.groupId,
-        );
+        const [currentTab, browserTabId] = browserTabToShibaTab(tab);
         savedTabs.push(currentTab);
-        if (tabId !== undefined) {
-            savedTabIds.push(tabId);
+        newTabGroup.tabs.push(currentTab.id);
+        if (browserTabId !== undefined) {
+            savedBrowserTabIds.push(browserTabId);
         }
     }
 
     addTabBundle([newTabGroup, savedTabs]);
 
-    return savedTabIds;
+    return savedBrowserTabIds;
 };
 
 // TODO: Implement option for saving tabs highlighted
@@ -68,13 +64,9 @@ import { addTabGroup, addTabs } from "./db";
 /**
  * Convert browser Tab to Shiba Tab.
  * @param tab Browser Tab
- * @param tabGroupId Tab group ID to assign to the Shiba Tab
  * @returns [Shiba Tab, browser Tab ID]
  */
-const browserTabToShibaTab = (
-    tab: Tabs.Tab,
-    tabGroupId: string,
-): [Tab, number | undefined] => {
+const browserTabToShibaTab = (tab: Tabs.Tab): [Tab, number | undefined] => {
     const title = tab.title;
     const url = tab.url;
     const favicon = tab.favIconUrl;
@@ -84,7 +76,6 @@ const browserTabToShibaTab = (
                 title,
                 url,
                 favicon,
-                tabGroupId,
             }),
             tab.id,
         ];
