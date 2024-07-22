@@ -11,6 +11,7 @@ interface SyncStatusProps {
 const SyncStatus: Component<SyncStatusProps> = ({ status }) => {
     // TODO: Replace with animation
 
+    // TODO: Replace these with css variables
     const colourLoading = "text-blue-500";
     const colourSuccess = "text-green-500";
     const colourError = "text-red-500";

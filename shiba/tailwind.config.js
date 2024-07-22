@@ -96,3 +96,5 @@ module.exports = {
     },
     plugins: [require("tailwindcss-animate")],
 };
+// TODO: Change to Shiba theme for default
+// TODO: Make it editable by user
