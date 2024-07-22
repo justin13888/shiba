@@ -155,6 +155,8 @@ export const App = () => {
                     Next Page
                 </Button>
             </div>
+            {/* TODO: Add Download logs button */}
+            {/* TODO: Add ability to filter out sensitive logs (e.g. PII) */}
         </div>
     );
 };

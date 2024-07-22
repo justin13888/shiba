@@ -58,6 +58,7 @@ export interface LogEntry {
     // biome-ignore lint/suspicious/noExplicitAny: Required
     meta: any[];
 }
+// TODO: Add attribute for sensitive data
 
 // Define your IndexedDB schema
 interface LogDB extends DBSchema {

@@ -1,6 +1,7 @@
 # Shiba
 
 A cute home page and tab manager (browser extension)
+<!-- TODO: Update message -->
 
 <!-- TODO: Add screenshot -->
 <!-- TODO: Add extension store logos -->
