@@ -68,87 +68,6 @@ interface LogDB extends DBSchema {
     };
 }
 
-// Initialize IndexedDB
-const dbPromise = openDB<LogDB>("logs", 1, {
-    upgrade(db) {
-        db.createObjectStore("logs", { keyPath: "id", autoIncrement: true });
-    },
-});
-
-/**
- * Get logs from IndexedDB from newest to oldest.
- * @param cursor Cursor to start from
- * @param limit Maximum number of logs to retrieve
- */
-export const getLogs = async (lastKey: number | undefined, limit: number) => {
-    const db = await dbPromise;
-    const tx = db.transaction("logs", "readonly");
-    const store = tx.objectStore("logs");
-
-    const logs: LogEntry[] = [];
-
-    let cursor = await store.openCursor(
-        lastKey ? IDBKeyRange.upperBound(lastKey, true) : undefined,
-        "prev",
-    );
-
-    while (cursor && logs.length < limit) {
-        logs.push(cursor.value);
-        cursor = await cursor.continue();
-    }
-
-    await tx.done;
-
-    return logs;
-};
-
-// TODO: Test
-/**
- * Clean up logs
- * @param minLogs Minimum number of logs to keep
- * @param minAge Minimum age in minutes to keep logs
- * @returns Number of logs cleaned up
- */
-export const cleanupLogs = async (
-    minLogs: number,
-    minAge: number,
-): Promise<number> => {
-    const db = await dbPromise;
-    const tx = db.transaction("logs", "readwrite");
-    const store = tx.objectStore("logs");
-    const index = store.index("byTimestamp");
-
-    // Age cut off
-    const ageCutoff = Date.now() - minAge * 60 * 1000;
-
-    // Determine cutoff point based on minLogs
-    let countCursor = await index.openCursor(null, "prev");
-    for (let i = 0; i < minLogs - 1 && countCursor; i++) {
-        countCursor = await countCursor.continue();
-    }
-
-    // Use the earlier timestamp between age cutoff and minLogs cutoff
-    const cutoffTime = Math.min(
-        ageCutoff,
-        countCursor ? countCursor.value.timestamp : 0,
-    );
-
-    // Delete logs older than the cutoff time
-    let deleteCursor = await index.openCursor(
-        IDBKeyRange.upperBound(cutoffTime, true),
-    );
-    let deleteCount = 0;
-    while (deleteCursor) {
-        await deleteCursor.delete();
-        deleteCount++;
-        deleteCursor = await deleteCursor.continue();
-    }
-
-    await tx.done;
-
-    return deleteCount;
-};
-
 const DEFAULT_LOG_LEVEL: LevelFilter = LevelFilter.DEBUG; // TODO: Make this configurable and defined via extension settings
 
 export class Logger {
@@ -226,7 +145,89 @@ export class Logger {
     }
 }
 
-// export con
+const logger = new Logger(import.meta.url);
+
+// Initialize IndexedDB
+const dbPromise = openDB<LogDB>("logs", 1, {
+    upgrade(db) {
+        db.createObjectStore("logs", { keyPath: "id", autoIncrement: true });
+    },
+});
+
+/**
+ * Get logs from IndexedDB from newest to oldest.
+ * @param cursor Cursor to start from
+ * @param limit Maximum number of logs to retrieve
+ */
+export const getLogs = async (lastKey: number | undefined, limit: number) => {
+    const db = await dbPromise;
+    const tx = db.transaction("logs", "readonly");
+    const store = tx.objectStore("logs");
+
+    const logs: LogEntry[] = [];
+
+    let cursor = await store.openCursor(
+        lastKey ? IDBKeyRange.upperBound(lastKey, true) : undefined,
+        "prev",
+    );
+
+    while (cursor && logs.length < limit) {
+        logs.push(cursor.value);
+        cursor = await cursor.continue();
+    }
+
+    await tx.done;
+
+    return logs;
+};
+
+// TODO: Test
+/**
+ * Clean up logs
+ * @param minLogs Minimum number of logs to keep
+ * @param minAge Minimum age in minutes to keep logs
+ * @returns Number of logs cleaned up
+ */
+export const cleanupLogs = async (
+    minLogs: number,
+    minAge: number,
+): Promise<number> => {
+    logger.trace("cleanupLogs", { minLogs, minAge });
+    const db = await dbPromise;
+    const tx = db.transaction("logs", "readwrite");
+    const store = tx.objectStore("logs");
+    const index = store.index("byTimestamp");
+
+    // Age cut off
+    const ageCutoff = Date.now() - minAge * 60 * 1000;
+
+    // Determine cutoff point based on minLogs
+    let countCursor = await index.openCursor(null, "prev");
+    for (let i = 0; i < minLogs - 1 && countCursor; i++) {
+        countCursor = await countCursor.continue();
+    }
+
+    // Use the earlier timestamp between age cutoff and minLogs cutoff
+    const cutoffTime = Math.min(
+        ageCutoff,
+        countCursor ? countCursor.value.timestamp : 0,
+    );
+
+    // Delete logs older than the cutoff time
+    let deleteCursor = await index.openCursor(
+        IDBKeyRange.upperBound(cutoffTime, true),
+    );
+    let deleteCount = 0;
+    while (deleteCursor) {
+        await deleteCursor.delete();
+        deleteCount++;
+        deleteCursor = await deleteCursor.continue();
+    }
+
+    await tx.done;
+
+    return deleteCount;
+};
 
 // // TODO
 // // Initialize

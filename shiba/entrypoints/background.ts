@@ -23,8 +23,13 @@ export default defineBackground({
                 const logSettings = await loadLoggingSettings();
 
                 logger.debug(`Setting up log cleanup interval for ${logSettings.cleanupInterval} minutes`);
-                setInterval(() => {
-                    doLogCleanup(logSettings.minLogs, logSettings.minAge);
+                setInterval(async () => {
+                    try {
+                        await doLogCleanup(logSettings.minLogs, logSettings.minAge);
+                        console.log("cleanupLogs");
+                    } catch (cleanupError) {
+                        logger.error("Error during log cleanup", cleanupError);
+                    }
                     console.log("cleanupLogs");
                 }, logSettings.cleanupInterval * 60 * 1000);
 
@@ -52,8 +57,12 @@ export default defineBackground({
                 logger.debug("Snapshot settings", snapshotSettings);
                 
                 logger.debug(`Setting up snapshot interval for ${snapshotSettings.reconciliationInterval} minutes`);
-                setInterval(() => {
-                    updateSnapshots(snapshotSettings.retentionPolicies)
+                setInterval(async () => {
+                    try {
+                        await updateSnapshots(snapshotSettings.retentionPolicies);
+                    } catch (snapshotError) {
+                        logger.error("Error during snapshot generation", snapshotError);
+                    }
                 }, snapshotSettings.reconciliationInterval * 60 * 1000);
 
                 updateSnapshots(snapshotSettings.retentionPolicies);
