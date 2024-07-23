@@ -91,7 +91,7 @@ export interface SnapshotSettings {
      * Retention policies for snapshots
      * Having more policy has negligible performance impact
      */
-    retentionPolicies: RetentionPolicy[],
+    retentionPolicies: RetentionPolicy[];
 }
 
 export const DEFAULT_SNAPSHOT_SETTINGS: SnapshotSettings = {
@@ -110,13 +110,16 @@ export const DEFAULT_SNAPSHOT_SETTINGS: SnapshotSettings = {
     ],
 } as const;
 
-export const saveSnapshotSettings = async (snapshotSettings: SnapshotSettings) => {
+export const saveSnapshotSettings = async (
+    snapshotSettings: SnapshotSettings,
+) => {
     await browser.storage.sync.set({ snapshotSettings });
     logger.info("Snapshot settings saved", snapshotSettings);
 };
 
 export const loadSnapshotSettings = async (): Promise<SnapshotSettings> => {
-    const { snapshotSettings } = await browser.storage.sync.get("snapshotSettings");
+    const { snapshotSettings } =
+        await browser.storage.sync.get("snapshotSettings");
     return (snapshotSettings || DEFAULT_SNAPSHOT_SETTINGS) as SnapshotSettings;
 };
 
@@ -132,17 +135,17 @@ export interface LoggingSettings {
     /**
      * Minimum log level to log
      */
-    logLevel: LevelFilter, // TODO: Not being used currently. Need to be hooked into logger initialization
+    logLevel: LevelFilter; // TODO: Not being used currently. Need to be hooked into logger initialization
 
     /**
      * Minimum number of logs to keep
      */
-    minLogs: number,
+    minLogs: number;
 
     /**
      * Minimum age in minutes to keep logs
      */
-    minAge: number,
+    minAge: number;
 }
 
 export const DEFAULT_LOGGING_SETTINGS: LoggingSettings = {
@@ -158,6 +161,7 @@ export const saveLoggingSettings = async (loggingSettings: LoggingSettings) => {
 };
 
 export const loadLoggingSettings = async (): Promise<LoggingSettings> => {
-    const { loggingSettings } = await browser.storage.sync.get("loggingSettings");
+    const { loggingSettings } =
+        await browser.storage.sync.get("loggingSettings");
     return (loggingSettings || DEFAULT_LOGGING_SETTINGS) as LoggingSettings;
 };

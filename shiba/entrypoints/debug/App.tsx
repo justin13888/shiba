@@ -55,9 +55,7 @@ export const App = () => {
             <div class="pb-4 align-middle">
                 <h1 class="text-4xl font-extrabold">Shiba Debug</h1>
             </div>
-            <Button onClick={addTestLogs}>
-                Add test logs
-            </Button>
+            <Button onClick={addTestLogs}>Add test logs</Button>
             <div class="flex flex-col">
                 <Show
                     when={logs.state === "ready"}
@@ -137,10 +135,7 @@ export const App = () => {
             </div>
             <p>Page count: {page()}</p>
             <div class="flex flex-row space-x-6">
-                <Button
-                    onClick={handlePreviousPage}
-                    disabled={page() === 1}
-                >
+                <Button onClick={handlePreviousPage} disabled={page() === 1}>
                     Previous Page
                 </Button>
                 <Button

@@ -1,10 +1,10 @@
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tab, TabGroup } from "@/types/model";
-import { addTabBundle, clearTabs } from "@/utils/db";
-import { saveAllTabs, saveCurrentTab } from "@/utils/tabs";
 import { switchToOrOpenTab } from "@/utils";
 import { URLS } from "@/utils/constants";
+import { addTabBundle, clearTabs } from "@/utils/db";
 import { tabCount, tabDBRefetch } from "@/utils/store";
+import { saveAllTabs, saveCurrentTab } from "@/utils/tabs";
 
 // TODO: Style
 function App() {
@@ -16,9 +16,7 @@ function App() {
                         tabCount.state === "ready" ||
                         tabCount.state === "refreshing"
                     }
-                    fallback={
-                        <Skeleton height={72} width={62} radius={10} />
-                    }
+                    fallback={<Skeleton height={72} width={62} radius={10} />}
                 >
                     <p class="text-7xl font-extrabold text-gray-800">
                         {tabCount()}
@@ -35,8 +33,7 @@ function App() {
                             [
                                 "Save Current Tab",
                                 async () => {
-                                    const savedTabId =
-                                        await saveCurrentTab();
+                                    const savedTabId = await saveCurrentTab();
                                     tabDBRefetch();
                                     await switchToOrOpenTab(URLS.SAVED);
                                     if (savedTabId !== undefined) {
@@ -98,7 +95,6 @@ function App() {
                                     const newTabGroup = new TabGroup({
                                         tabs: newTabs.map((tab) => tab.id),
                                     });
-                                    
 
                                     addTabBundle([newTabGroup, newTabs]);
 
