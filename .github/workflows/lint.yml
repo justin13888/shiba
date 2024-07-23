@@ -1,4 +1,4 @@
-name: Biome code quality
+name: Code quality
 
 on:
   push:
