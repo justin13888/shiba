@@ -1,5 +1,5 @@
-import type { DBSchema } from "idb";
 import type { Tab, TabGroup } from "@/types/model";
+import type { DBSchema } from "idb";
 
 export interface TabDB extends DBSchema {
     tabGroups: {

@@ -1,4 +1,4 @@
-import { createAsync, Navigate, useParams } from "@solidjs/router";
+import { Navigate, createAsync, useParams } from "@solidjs/router";
 import { type Component, Show } from "solid-js";
 
 const SnapshotPreview: Component = () => {
@@ -9,7 +9,8 @@ const SnapshotPreview: Component = () => {
     }
 
     const [snapshot, { refetch: snapshotRefetch }] = createResource(
-        () => id, getSnapshot
+        () => id,
+        getSnapshot,
     ); // TODO: Replace with solid infintie query and virtual
     // TODO: Because snapshot could be undefined, errors and loading states both are undefined. (Solve by not using createResource)
 
@@ -17,7 +18,9 @@ const SnapshotPreview: Component = () => {
     return (
         <div class="flex min-h-screen w-full flex-col items-center bg-background px-4 py-12 md:px-6">
             <div class="w-full max-w-screen-lg space-y-6">
-                <h1 class="text-3xl font-bold tracking-tighter">Snapshot Preview</h1>
+                <h1 class="text-3xl font-bold tracking-tighter">
+                    Snapshot Preview
+                </h1>
 
                 <Show
                     when={snapshot()}
@@ -25,21 +28,42 @@ const SnapshotPreview: Component = () => {
                 >
                     {(snapshot) => {
                         // Dictionary of Tab ID to Tab
-                        const tabRecord: Record<string, Tab> = snapshot().tabs.reduce((acc, tab) => {
-                            acc[tab.id] = tab;                                
-                            return acc;
-                        }, {} as Record<string, Tab>);
+                        const tabRecord: Record<string, Tab> =
+                            snapshot().tabs.reduce(
+                                (acc, tab) => {
+                                    acc[tab.id] = tab;
+                                    return acc;
+                                },
+                                {} as Record<string, Tab>,
+                            );
 
                         // Tab Group sorted in descending order
-                        const tabGroups = snapshot().tabGroups.sort((a, b) => b.timeCreated - a.timeCreated);
+                        const tabGroups = snapshot().tabGroups.sort(
+                            (a, b) => b.timeCreated - a.timeCreated,
+                        );
 
                         return (
                             <>
-                                <h2 class="text-lg font-medium text-gray-600">{snapshot().id}</h2>
+                                <h2 class="text-lg font-medium text-gray-600">
+                                    {snapshot().id}
+                                </h2>
                                 <div class="flex flex-col">
-                                    <p><strong>Identifier:</strong> {snapshot().identifier}</p>
-                                    <p><strong>Timestamp:</strong> {dateFormatter.format(snapshot().timestamp)}</p>
-                                    <p><strong>Triggers:</strong> {snapshot().triggers.length > 0 ? snapshot().triggers.join(", ") : "Manual"}</p>
+                                    <p>
+                                        <strong>Identifier:</strong>{" "}
+                                        {snapshot().identifier}
+                                    </p>
+                                    <p>
+                                        <strong>Timestamp:</strong>{" "}
+                                        {dateFormatter.format(
+                                            snapshot().timestamp,
+                                        )}
+                                    </p>
+                                    <p>
+                                        <strong>Triggers:</strong>{" "}
+                                        {snapshot().triggers.length > 0
+                                            ? snapshot().triggers.join(", ")
+                                            : "Manual"}
+                                    </p>
                                 </div>
 
                                 <div class="flex flex-grow">
@@ -47,7 +71,9 @@ const SnapshotPreview: Component = () => {
                                     <Switch
                                         fallback={
                                             <div class="flex justify-center w-full">
-                                                <p class="text-xl font-medium pt-4">There are no tabs...</p>
+                                                <p class="text-xl font-medium pt-4">
+                                                    There are no tabs...
+                                                </p>
                                             </div>
                                         }
                                     >
@@ -55,25 +81,26 @@ const SnapshotPreview: Component = () => {
                                             <div class="flex-col space-y-6">
                                                 <For each={tabGroups}>
                                                     {(tabGroup) => {
-                                                        const tabs = tabRecord[tabGroup.groupId];
+                                                        const tabs =
+                                                            tabRecord[
+                                                                tabGroup.groupId
+                                                            ];
                                                         // {/* TODO: Display Tab.notes */}
                                                         return (
                                                             <>
                                                                 <div class="flex flex-row items-center space-x-4">
                                                                     <span class="pr-2 align-middle">
-                                                                        {
-                                                                            tabGroup.name ? (
-                                                                                <p class="font-semibold">
-                                                                                    {
-                                                                                        tabGroup.name
-                                                                                    }
-                                                                                </p>
-                                                                            ) : (
-                                                                                <p class="font-semibold italic">
-                                                                                    Unnamed
-                                                                                </p>
-                                                                            )
-                                                                        }
+                                                                        {tabGroup.name ? (
+                                                                            <p class="font-semibold">
+                                                                                {
+                                                                                    tabGroup.name
+                                                                                }
+                                                                            </p>
+                                                                        ) : (
+                                                                            <p class="font-semibold italic">
+                                                                                Unnamed
+                                                                            </p>
+                                                                        )}
                                                                     </span>
                                                                     <p>
                                                                         {diffDate(
@@ -83,8 +110,14 @@ const SnapshotPreview: Component = () => {
                                                                 </div>
                                                                 {/* TODO: Display timeCreated */}
                                                                 <ul class="pl-2 space-y-1">
-                                                                    <For each={tabs}>
-                                                                        {(tab) => (
+                                                                    <For
+                                                                        each={
+                                                                            tabs
+                                                                        }
+                                                                    >
+                                                                        {(
+                                                                            tab,
+                                                                        ) => (
                                                                             <li>
                                                                                 <span class="flex flex-row items-center space-x-4">
                                                                                     <SuspenseImage
@@ -119,7 +152,7 @@ const SnapshotPreview: Component = () => {
                                                                     </For>
                                                                 </ul>
                                                             </>
-                                                        )
+                                                        );
                                                     }}
                                                 </For>
                                             </div>
@@ -128,13 +161,12 @@ const SnapshotPreview: Component = () => {
                                 </div>
                             </>
                             // TODO: Implement infinite list
-                        )
+                        );
                     }}
                 </Show>
-
             </div>
         </div>
-    )
-}
+    );
+};
 
 export default SnapshotPreview;

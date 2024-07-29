@@ -1,6 +1,6 @@
+import type { Tab, TabGroup } from "@/types/model";
 import { type DBSchema, openDB } from "idb";
 import { nanoid } from "nanoid";
-import type {Tab, TabGroup} from "@/types/model";
 
 const logger = new Logger(import.meta.url);
 
@@ -29,13 +29,20 @@ export class ShibaSnapshot implements ShibaExport {
     timestamp: number;
     /** Retention policies triggered by ID */
     triggers: string[];
-    
+
     /** Tabs */
     tabs: Tab[];
     /** Tab Groups */
     tabGroups: TabGroup[];
 
-    constructor({ id, identifier, timestamp, triggers, tabs, tabGroups }: ShibaSnapshotOptions) {
+    constructor({
+        id,
+        identifier,
+        timestamp,
+        triggers,
+        tabs,
+        tabGroups,
+    }: ShibaSnapshotOptions) {
         this.id = id || nanoid();
         this.identifier = identifier;
         this.timestamp = timestamp;
@@ -52,7 +59,7 @@ export interface RetentionPolicyOptions {
     frequency: number;
     /** Time to retain snapshots in minutes */
     retain: number;
-};
+}
 
 export class RetentionPolicy {
     /** Unique ID */
@@ -67,10 +74,12 @@ export class RetentionPolicy {
             throw new Error("Frequency must be positive");
         }
         if (retain < frequency) {
-            throw new Error("Retention must be greater than or equal to frequency");
+            throw new Error(
+                "Retention must be greater than or equal to frequency",
+            );
         }
-        
-        this.id = id  || nanoid();
+
+        this.id = id || nanoid();
         this.frequency = frequency;
         this.retain = retain;
     }
@@ -100,14 +109,16 @@ interface SnapshotDB extends DBSchema {
         value: ShibaSnapshot;
         indexes: {
             byTimestamp: number;
-        }
+        };
     };
 }
 
 // Initialize IndexedDB
 const dbPromise = openDB<SnapshotDB>("snapshots", 1, {
     upgrade(db) {
-        const snapshotStore = db.createObjectStore("snapshots", { keyPath: "id" });
+        const snapshotStore = db.createObjectStore("snapshots", {
+            keyPath: "id",
+        });
         snapshotStore.createIndex("byTimestamp", "timestamp");
     },
 });
@@ -119,7 +130,7 @@ const dbPromise = openDB<SnapshotDB>("snapshots", 1, {
  */
 const addSnapshot = async (snapshot: ShibaSnapshot) => {
     logger.trace("Adding snapshot", snapshot);
-    
+
     const db = await dbPromise;
     const tx = db.transaction("snapshots", "readwrite");
     const store = tx.objectStore("snapshots");
@@ -128,13 +139,15 @@ const addSnapshot = async (snapshot: ShibaSnapshot) => {
 
     await tx.done;
     logger.trace("Snapshot added successfully:", snapshot);
-}
+};
 
 /**
  * @param id Snapshot ID
  * @returns Snapshot with ID if found
  */
-export const getSnapshot = async (id: string): Promise<ShibaSnapshot | undefined> => {
+export const getSnapshot = async (
+    id: string,
+): Promise<ShibaSnapshot | undefined> => {
     const db = await dbPromise;
     return db.get("snapshots", id);
 };
@@ -152,7 +165,7 @@ export const getSnapshots = async (): Promise<ShibaSnapshot[]> => {
 
     const snapshots: ShibaSnapshot[] = [];
 
-    let cursor = await index.openCursor(null, 'prev'); // 'prev' for descending order
+    let cursor = await index.openCursor(null, "prev"); // 'prev' for descending order
     while (cursor) {
         snapshots.push(cursor.value);
         cursor = await cursor.continue();
@@ -160,7 +173,7 @@ export const getSnapshots = async (): Promise<ShibaSnapshot[]> => {
 
     await tx.done;
     return snapshots;
-}
+};
 
 /**
  * Generate manual snapshot
@@ -174,7 +187,7 @@ export const generateManualSnapshot = async () => {
         tabGroups: await getAllTabGroups(),
     });
     await addSnapshot(snapshot);
-}
+};
 
 // TODO: Test
 /**
@@ -189,18 +202,20 @@ const deleteSnapshot = async (id: string) => {
     await store.delete(id);
 
     await tx.done;
-}
+};
 
 // TODO: Test
 /**
  * Generate and clean up snapshots based on TabDB, SnapshotDB and RetentionPolicy[]
  * @param retentionPolicies Retention policies to trigger snapshots
  */
-export const runSnapshot = async (retentionPolicies: RetentionPolicy[]): Promise<ShibaSnapshot | undefined> => {
+export const runSnapshot = async (
+    retentionPolicies: RetentionPolicy[],
+): Promise<ShibaSnapshot | undefined> => {
     if (retentionPolicies.length === 0) {
         throw new Error("No retention policies provided");
     }
-    
+
     // Fetch all snapshots and tabs
     const snapshots = await getSnapshots();
     await snapshots.sort((a, b) => b.timestamp - a.timestamp);
@@ -213,7 +228,7 @@ export const runSnapshot = async (retentionPolicies: RetentionPolicy[]): Promise
         newSnapshot = new ShibaSnapshot({
             identifier: "unknown", // TODO: Fetch identifier from settings
             timestamp: Date.now(),
-            triggers: retentionPolicies.map(policy => policy.id),
+            triggers: retentionPolicies.map((policy) => policy.id),
             tabs: await getAllTabs(),
             tabGroups: await getAllTabGroups(),
         });
@@ -224,8 +239,13 @@ export const runSnapshot = async (retentionPolicies: RetentionPolicy[]): Promise
         // Since browser is not consistently open, snapshots are taken eagerly
         // We take a snapshot if last one is too old
         // We retrain snapshots if it follows the retention policy
-        const triggers = retentionPolicies.filter(policy => policy.getNextTimestamp(snapshots[0].timestamp) < Date.now())
-            .map(policy => policy.id);
+        const triggers = retentionPolicies
+            .filter(
+                (policy) =>
+                    policy.getNextTimestamp(snapshots[0].timestamp) <
+                    Date.now(),
+            )
+            .map((policy) => policy.id);
         if (triggers.length > 0) {
             newSnapshot = new ShibaSnapshot({
                 identifier: "unknown", // TODO: Fetch identifier from settings
@@ -242,10 +262,11 @@ export const runSnapshot = async (retentionPolicies: RetentionPolicy[]): Promise
     // Clean up old snapshots
     const expiredSnapshots: ShibaSnapshot[] = [];
     for (const snapshot of snapshots) {
-        const isValid = retentionPolicies.some(policy => (
-            policy.isTriggered(snapshot)
-            && policy.retain * 60 * 1000 + snapshot.timestamp > Date.now()
-        ));
+        const isValid = retentionPolicies.some(
+            (policy) =>
+                policy.isTriggered(snapshot) &&
+                policy.retain * 60 * 1000 + snapshot.timestamp > Date.now(),
+        );
         if (!isValid) {
             expiredSnapshots.push(snapshot);
         }

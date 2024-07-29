@@ -151,7 +151,10 @@ const logger = new Logger(import.meta.url);
 // Initialize IndexedDB
 const dbPromise = openDB<LogDB>("logs", 1, {
     upgrade(db) {
-        const logsStore = db.createObjectStore("logs", { keyPath: "id", autoIncrement: true });
+        const logsStore = db.createObjectStore("logs", {
+            keyPath: "id",
+            autoIncrement: true,
+        });
         logsStore.createIndex("byTimestamp", "timestamp");
     },
 });

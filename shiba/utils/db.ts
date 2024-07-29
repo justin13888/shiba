@@ -1,4 +1,4 @@
-import type { TabBundle, Tab, TabGroup } from "@/types/model";
+import type { Tab, TabBundle, TabGroup } from "@/types/model";
 import type { TabDB } from "@/types/schema";
 import { openDB } from "idb";
 
@@ -129,10 +129,10 @@ export const getTabsByIds = async (tabIds: string[]): Promise<Tab[]> => {
     const db = await dbPromise;
     const tx = db.transaction("tabs", "readonly");
     const store = tx.objectStore("tabs");
-    
-    const tabs = await Promise.all(tabIds.map(tabId => store.get(tabId)));
-    
-    return tabs.filter(tab => tab !== undefined) as Tab[];
+
+    const tabs = await Promise.all(tabIds.map((tabId) => store.get(tabId)));
+
+    return tabs.filter((tab) => tab !== undefined) as Tab[];
 };
 
 /**
@@ -140,10 +140,12 @@ export const getTabsByIds = async (tabIds: string[]): Promise<Tab[]> => {
  * @param tabGroupId Tab Group ID
  * @returns Array of tabs
  */
-export const getTabGroupById = async (tabGroupId: string): Promise<TabGroup | undefined> => {
+export const getTabGroupById = async (
+    tabGroupId: string,
+): Promise<TabGroup | undefined> => {
     const db = await dbPromise;
     return db.get("tabGroups", tabGroupId);
-}
+};
 
 /**
  * @returns List of all tab groups

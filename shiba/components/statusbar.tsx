@@ -17,9 +17,7 @@ const SyncStatus: Component<SyncStatusProps> = ({ status }) => {
     const colourError = "text-red-500";
     return (
         <span
-            class={
-                `flex flex-row items-center space-x-2 text-xs"`
-            }
+            class={`flex flex-row items-center space-x-2 text-xs"`}
             aria-label="Sync status"
         >
             <Switch fallback={<p>Unknown...</p>}>

@@ -207,7 +207,6 @@ export const parseBetterOneTabUrl = async (
                 timeCreated: group.time,
                 tabs: tabs.map((tab) => tab.id),
             });
-            
 
             return [tabGroup, tabs];
         }),

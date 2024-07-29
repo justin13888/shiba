@@ -44,12 +44,12 @@ export class TabGroup {
 
     /** Name of the group */
     name?: string;
-    
+
     /**
      * Time created in milliseconds since epoch
      */
     timeCreated: number;
-    
+
     /**
      * Time last modified in milliseconds since epoch
      */
@@ -65,7 +65,14 @@ export class TabGroup {
      */
     categories: string[];
 
-    constructor({ groupId, name, timeCreated, timeModified, tabs, categories }: TabGroupOptions = {}) {
+    constructor({
+        groupId,
+        name,
+        timeCreated,
+        timeModified,
+        tabs,
+        categories,
+    }: TabGroupOptions = {}) {
         this.groupId = groupId || nanoid();
         this.name = name;
         this.timeCreated = timeCreated || Date.now();
