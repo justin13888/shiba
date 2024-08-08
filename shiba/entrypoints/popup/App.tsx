@@ -4,7 +4,7 @@ import { switchToOrOpenTab } from "@/utils";
 import { URLS } from "@/utils/constants";
 import { addTabBundle, clearTabs } from "@/utils/db";
 import { tabCount, tabDBRefetch } from "@/utils/store";
-import { saveAllTabs, saveCurrentTab } from "@/utils/tabs";
+import { saveCurrentWindow, saveCurrentTab } from "@/utils/tabs";
 
 // TODO: Style
 function App() {
@@ -45,7 +45,7 @@ function App() {
                             [
                                 "Save All Tabs",
                                 async () => {
-                                    const savedTabIds = await saveAllTabs();
+                                    const savedTabIds = await saveCurrentWindow();
                                     tabDBRefetch();
                                     await switchToOrOpenTab(URLS.SAVED);
                                     for (const tabId of savedTabIds) {
@@ -81,22 +81,77 @@ function App() {
                             [
                                 "Seed",
                                 async () => {
-                                    // TODO: Remove this later after testing
-                                    const newTabs = Array.from(
-                                        { length: 10 },
-                                        () => {
-                                            const tab = new Tab({
-                                                title: "Test Tab",
-                                                url: "https://example.com",
-                                            });
-                                            return tab;
+                                    const testUrls = [
+                                        {
+                                            "favicon": "https://www.typescriptlang.org/favicon-32x32.png?v=8944a05a8b601855de116c8a56d3b3ae",
+                                            "title": "TypeScript: JavaScript With Syntax For Types.",
+                                            "url": "https://www.typescriptlang.org/"
                                         },
+                                        {
+                                            "favicon": "https://huggingface.co/favicon.ico",
+                                            "title": "sentence-transformers (Sentence Transformers)",
+                                            "url": "https://huggingface.co/sentence-transformers"
+                                        },
+                                        {
+                                            "favicon": "https://vitejs.dev/logo.svg",
+                                            "title": "Vite | Next Generation Frontend Tooling",
+                                            "url": "https://vitejs.dev/"
+                                        },
+                                        {
+                                            "favicon": "https://www.rust-lang.org/static/images/favicon.svg",
+                                            "title": "Rust Programming Language",
+                                            "url": "https://www.rust-lang.org/"
+                                        },
+                                        {
+                                            "favicon": "https://www.sbert.net/_static/favicon.ico",
+                                            "title": "SentenceTransformers Documentation — Sentence Transformers documentation",
+                                            "url": "https://www.sbert.net/"
+                                        },
+                                        {
+                                            "favicon": "https://github.githubassets.com/favicons/favicon-dark.svg",
+                                            "title": "GitHub Packages: Your packages, at home with their code · GitHub",
+                                            "url": "https://github.com/features/packages"
+                                        },
+                                        {
+                                            "favicon": "https://www.youtube.com/s/desktop/d44eab58/img/favicon_32x32.png",
+                                            "title": "Meet Llama 3.1 - YouTube",
+                                            "url": "https://www.youtube.com/watch?v=kv1qGLlw9yg"
+                                        },
+                                        {
+                                            "favicon": "https://docs.astral.sh/ruff/assets/ruff-favicon.png",
+                                            "title": "Ruff",
+                                            "url": "https://docs.astral.sh/ruff/"
+                                        },
+                                        {
+                                            "favicon": "https://biomejs.dev/img/favicon.svg",
+                                            "title": "Biome, toolchain of the web",
+                                            "url": "https://biomejs.dev/"
+                                        },
+                                        {
+                                            "favicon": "https://posthog.com/favicon.svg?v=6e5ac8d4a5b381b5caa29396fbf7c955",
+                                            "title": "PostHog - How developers build successful products",
+                                            "url": "https://posthog.com/"
+                                        },
+                                        {
+                                            "favicon": "https://www.solidjs.com/img/favicons/favicon-32x32.png",
+                                            "title": "SolidJS · Reactive Javascript Library",
+                                            "url": "https://www.solidjs.com/"
+                                        }
+                                    ] as const;
+
+                                    const savedTabs: Tab[] = testUrls.map(
+                                        ({ favicon, title, url }) =>
+                                            new Tab({
+                                                favicon,
+                                                title,
+                                                url,
+                                            })
                                     );
                                     const newTabGroup = new TabGroup({
-                                        tabs: newTabs.map((tab) => tab.id),
+                                        tabs: savedTabs.map((tab) => tab.id),
                                     });
 
-                                    addTabBundle([newTabGroup, newTabs]);
+                                    await addTabBundle([newTabGroup, savedTabs]);
 
                                     tabDBRefetch();
                                     await switchToOrOpenTab(URLS.SAVED);

@@ -163,6 +163,7 @@ export const getTabCount = async (): Promise<number> => {
     return await store.count();
 };
 
+// TODO: Deprecate this function
 export const addTabBundle = ([tabGroup, tabs]: TabBundle) => {
     addTabGroup(tabGroup);
     addTabs(tabs);
