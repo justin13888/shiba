@@ -146,6 +146,12 @@ function TabGroupList({ tabGroup, tabGroupsRefetch }: TabGroupProps) {
                                         }
                                         deleteTabGroup(tabGroup.id);
                                         tabGroupsRefetch();
+                                        queryClient.invalidateQueries({
+                                            queryKey: ["tabgroups"],
+                                        });
+                                        queryClient.invalidateQueries({
+                                            queryKey: ["tabs", tabGroup.id],
+                                        });
                                         showToast({
                                             title: (
                                                 <p>
@@ -180,6 +186,12 @@ function TabGroupList({ tabGroup, tabGroupsRefetch }: TabGroupProps) {
                                         });
                                         deleteTabGroup(tabGroup.id);
                                         tabGroupsRefetch();
+                                        queryClient.invalidateQueries({
+                                            queryKey: ["tabgroups"],
+                                        });
+                                        queryClient.invalidateQueries({
+                                            queryKey: ["tabs", tabGroup.id],
+                                        });
                                         showToast({
                                             title: (
                                                 <p>
@@ -212,6 +224,12 @@ function TabGroupList({ tabGroup, tabGroupsRefetch }: TabGroupProps) {
                                     onClick={() => {
                                         deleteTabGroup(tabGroup.id);
                                         tabGroupsRefetch();
+                                        queryClient.invalidateQueries({
+                                            queryKey: ["tabgroups"],
+                                        });
+                                        queryClient.invalidateQueries({
+                                            queryKey: ["tabs", tabGroup.id],
+                                        });
                                         showToast({
                                             title: (
                                                 <p>
