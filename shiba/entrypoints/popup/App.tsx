@@ -81,7 +81,7 @@ function App() {
                             [
                                 "Seed",
                                 async () => {
-                                    const testUrls = [
+                                    const testUrls = Object.freeze([
                                         {
                                             "favicon": "https://www.typescriptlang.org/favicon-32x32.png?v=8944a05a8b601855de116c8a56d3b3ae",
                                             "title": "TypeScript: JavaScript With Syntax For Types.",
@@ -137,21 +137,21 @@ function App() {
                                             "title": "SolidJS · Reactive Javascript Library",
                                             "url": "https://www.solidjs.com/"
                                         }
-                                    ] as const;
+                                    ]);
 
-                                    const savedTabs: Tab[] = testUrls.map(
+                                    const newTabGroup = new TabGroup();
+
+                                    const newTabs: Tab[] = testUrls.map(
                                         ({ favicon, title, url }) =>
                                             new Tab({
+                                                groupId: newTabGroup.id,
                                                 favicon,
                                                 title,
                                                 url,
                                             })
                                     );
-                                    const newTabGroup = new TabGroup({
-                                        tabs: savedTabs.map((tab) => tab.id),
-                                    });
 
-                                    await addTabBundle([newTabGroup, savedTabs]);
+                                    await addTabBundle([newTabGroup, newTabs]);
 
                                     tabDBRefetch();
                                     await switchToOrOpenTab(URLS.SAVED);

@@ -59,9 +59,8 @@ export const saveTabs = async (tabs: Tabs.Tab[]): Promise<number[]> => {
     const savedBrowserTabIds: number[] = [];
 
     for (const tab of tabs) {
-        const [currentTab, browserTabId] = browserTabToShibaTab(tab);
+        const [currentTab, browserTabId] = browserTabToShibaTab(tab, newTabGroup.id);
         savedTabs.push(currentTab);
-        newTabGroup.tabs.push(currentTab.id);
         if (browserTabId !== undefined) {
             savedBrowserTabIds.push(browserTabId);
         }
@@ -77,13 +76,14 @@ export const saveTabs = async (tabs: Tabs.Tab[]): Promise<number[]> => {
  * @param tab Browser Tab
  * @returns [Shiba Tab, browser Tab ID]
  */
-const browserTabToShibaTab = (tab: Tabs.Tab): [Tab, number | undefined] => {
+const browserTabToShibaTab = (tab: Tabs.Tab, tabGroupId: string): [Tab, number | undefined] => {
     const title = tab.title;
     const url = tab.url;
     const favicon = tab.favIconUrl;
     if (title && url) {
         return [
             new Tab({
+                groupId: tabGroupId,
                 title,
                 url,
                 favicon,

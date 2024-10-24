@@ -2,6 +2,7 @@ import { nanoid } from "nanoid";
 
 export interface TabOptions {
     id?: string;
+    groupId: string;
     favicon?: string;
     title: string;
     url: string;
@@ -11,6 +12,8 @@ export interface TabOptions {
 export class Tab {
     /** Unique id */
     id: string;
+    /** Group ID */
+    groupId: string;
     /** Favicon image (URL or data encoded URL) */
     favicon?: string;
     /** Title of the tab */
@@ -20,8 +23,9 @@ export class Tab {
     /** Notes */
     notes?: string;
 
-    constructor({ id, favicon, title, url, notes }: TabOptions) {
+    constructor({ id, groupId, favicon, title, url, notes }: TabOptions) {
         this.id = id || nanoid();
+        this.groupId = groupId;
         this.favicon = favicon;
         this.title = title;
         this.url = url;
@@ -34,13 +38,12 @@ export interface TabGroupOptions {
     name?: string;
     timeCreated?: number;
     timeModified?: number;
-    tabs?: string[];
     categories?: string[];
 }
 
 export class TabGroup {
-    /** Unique group ID */
-    groupId: string;
+    /** Unique ID */
+    id: string;
 
     /** Name of the group */
     name?: string;
@@ -56,11 +59,6 @@ export class TabGroup {
     timeModified: number;
 
     /**
-     * Tabs in the group by ID
-     */
-    tabs: string[];
-
-    /**
      * Categories by ID
      */
     categories: string[];
@@ -70,14 +68,12 @@ export class TabGroup {
         name,
         timeCreated,
         timeModified,
-        tabs,
         categories,
     }: TabGroupOptions = {}) {
-        this.groupId = groupId || nanoid();
+        this.id = groupId || nanoid();
         this.name = name;
         this.timeCreated = timeCreated || Date.now();
         this.timeModified = timeModified || this.timeCreated;
-        this.tabs = tabs || [];
         this.categories = categories || [];
     }
 }
