@@ -39,7 +39,10 @@ export const saveCurrentWindow = async (): Promise<number[]> => {
  * @return Saved tab IDs or undefined if no tabs are highlighted.
  */
 export const saveSelectedTabs = async (): Promise<number[] | undefined> => {
-    const tabs = await browser.tabs.query({ highlighted: true, currentWindow: true });
+    const tabs = await browser.tabs.query({
+        highlighted: true,
+        currentWindow: true,
+    });
     if (tabs.length > 0) {
         return saveTabs(tabs);
     }
@@ -48,7 +51,7 @@ export const saveSelectedTabs = async (): Promise<number[] | undefined> => {
 };
 
 /**
- * 
+ *
  * @param tabs Tabs to save
  * @returns Saved tab IDs
  */
@@ -59,7 +62,10 @@ export const saveTabs = async (tabs: Tabs.Tab[]): Promise<number[]> => {
     const savedBrowserTabIds: number[] = [];
 
     for (const tab of tabs) {
-        const [currentTab, browserTabId] = browserTabToShibaTab(tab, newTabGroup.id);
+        const [currentTab, browserTabId] = browserTabToShibaTab(
+            tab,
+            newTabGroup.id,
+        );
         savedTabs.push(currentTab);
         if (browserTabId !== undefined) {
             savedBrowserTabIds.push(browserTabId);
@@ -76,7 +82,10 @@ export const saveTabs = async (tabs: Tabs.Tab[]): Promise<number[]> => {
  * @param tab Browser Tab
  * @returns [Shiba Tab, browser Tab ID]
  */
-const browserTabToShibaTab = (tab: Tabs.Tab, tabGroupId: string): [Tab, number | undefined] => {
+const browserTabToShibaTab = (
+    tab: Tabs.Tab,
+    tabGroupId: string,
+): [Tab, number | undefined] => {
     const title = tab.title;
     const url = tab.url;
     const favicon = tab.favIconUrl;

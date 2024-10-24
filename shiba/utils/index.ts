@@ -61,8 +61,11 @@ export const dateFormatter = new Intl.DateTimeFormat(DEFAULT_SETTINGS.locale, {
  * Convert unix timestamp to human readable diff date
  * @param timestamp
  */
-export const diffDate = (timestamp: number, currentTimestamp?: number): string => {
-    const now  = currentTimestamp || Date.now();
+export const diffDate = (
+    timestamp: number,
+    currentTimestamp?: number,
+): string => {
+    const now = currentTimestamp || Date.now();
     const seconds = Math.floor((now - timestamp) / 1000);
 
     let interval = Math.floor(seconds / 3600);

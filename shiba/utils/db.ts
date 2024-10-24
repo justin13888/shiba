@@ -113,7 +113,7 @@ export const deleteTab = async (tabId: string): Promise<boolean> => {
     await tx.done;
 
     return true;
-}
+};
 
 /**
  * Delete all tabs from the database.
