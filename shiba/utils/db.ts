@@ -61,6 +61,7 @@ export const addTabs = async (tabs: Tab[]) => {
  * @returns True if tab group was deleted, false if tab group was not found.
  */
 export const deleteTabGroup = async (tabGroupId: string) => {
+    // TODO: Implement trash for tab and tab groups
     const tabGroup = await getTabGroupById(tabGroupId);
     if (tabGroup === undefined) {
         return;
@@ -182,8 +183,12 @@ export const getTabGroupById = async (
  * @returns List of all tab groups
  */
 export const getAllTabGroups = async (): Promise<TabGroup[]> => {
+    // TODO: Make it possible to paginate, sort, filter, etc.
     const db = await dbPromise;
-    return db.getAll("tabGroups");
+    const tx = db.transaction("tabGroups", "readonly");
+    const store = tx.objectStore("tabGroups");
+    const index = store.index("byTimeCreated");
+    return index.getAll();
 };
 
 export const getTabCount = async (): Promise<number> => {
