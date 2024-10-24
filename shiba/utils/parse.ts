@@ -207,7 +207,6 @@ export const parseBetterOneTabUrl = async (
                 timeCreated: group.time,
                 tabs: tabs.map((tab) => tab.id),
             });
-            
 
             return [tabGroup, tabs];
         }),
@@ -237,7 +236,7 @@ export const exportTabBundlesOneTab = async (): Promise<string> => {
     let output = "";
     const tabGroups = await getAllTabGroups();
     for (const tabGroup of tabGroups) {
-        const tabs = await getTabsByGroup(tabGroup.groupId);
+        const tabs = await getTabsByGroup(tabGroup.id);
         for (const tab of tabs) {
             output += `${tab.url} | ${tab.title}\n`;
         }

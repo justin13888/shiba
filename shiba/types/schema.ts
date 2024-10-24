@@ -1,5 +1,5 @@
-import type { DBSchema } from "idb";
 import type { Tab, TabGroup } from "@/types/model";
+import type { DBSchema } from "idb";
 
 export interface TabDB extends DBSchema {
     tabGroups: {
@@ -13,5 +13,9 @@ export interface TabDB extends DBSchema {
     tabs: {
         key: string;
         value: Tab;
+        indexes: {
+            byGroupId: string;
+        };
+        // TODO: Enforce foreign key constraint for groupId
     };
 }

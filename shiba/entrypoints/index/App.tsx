@@ -1,3 +1,4 @@
+import { queryClient } from "@/utils/query";
 import { MetaProvider, Title } from "@solidjs/meta";
 import { HashRouter, Navigate, Route } from "@solidjs/router";
 import {
@@ -5,8 +6,7 @@ import {
     QueryClientProvider,
     createQuery,
 } from "@tanstack/solid-query";
-
-const queryClient = new QueryClient();
+import { SolidQueryDevtools } from "@tanstack/solid-query-devtools";
 
 export const App = () => {
     return (
@@ -43,6 +43,8 @@ export const App = () => {
                         component={() => <Navigate href="/saved" />}
                     />
                 </HashRouter>
+
+                <SolidQueryDevtools initialIsOpen={false} />
             </QueryClientProvider>
         </MetaProvider>
     );

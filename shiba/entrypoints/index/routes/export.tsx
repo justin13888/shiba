@@ -39,13 +39,13 @@ const Export: Component = () => {
                 setFeedbackType("error");
             }
 
-            logger.log("Export string:", exportString());
+            logger.info("Export string:", exportString());
         } catch (error) {
             setFeedbackMessage(
                 `Error exporting tabs: ${error instanceof Error ? error.message : error}`,
             );
             setFeedbackType("error");
-            logger.error(error);
+            logger.error("Error exporting tabs", error);
         }
     };
 

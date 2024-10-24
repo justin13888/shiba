@@ -1,4 +1,4 @@
-import type { TabBundle, Tab, TabGroup } from "@/types/model";
+import type { Tab, TabBundle, TabGroup } from "@/types/model";
 import type { TabDB } from "@/types/schema";
 import { openDB } from "idb";
 
@@ -9,12 +9,13 @@ const logger = new Logger(import.meta.url);
 const dbPromise = openDB<TabDB>("tabs", 1, {
     upgrade(db) {
         const tabGroupStore = db.createObjectStore("tabGroups", {
-            keyPath: "groupId",
+            keyPath: "id",
         });
         tabGroupStore.createIndex("byTimeCreated", "timeCreated");
         tabGroupStore.createIndex("byTimeModified", "timeModified");
 
         const tabStore = db.createObjectStore("tabs", { keyPath: "id" });
+        tabStore.createIndex("byGroupId", "groupId");
     },
 });
 
@@ -60,6 +61,7 @@ export const addTabs = async (tabs: Tab[]) => {
  * @returns True if tab group was deleted, false if tab group was not found.
  */
 export const deleteTabGroup = async (tabGroupId: string) => {
+    // TODO: Implement trash for tab and tab groups
     const tabGroup = await getTabGroupById(tabGroupId);
     if (tabGroup === undefined) {
         return;
@@ -67,10 +69,10 @@ export const deleteTabGroup = async (tabGroupId: string) => {
 
     const db = await dbPromise;
 
-    // Delete tabs with tabGroupId
+    // Delete tabs with tab.groupId === tabGroupId
     const tabsTx = db.transaction("tabs", "readwrite");
     const tabsStore = tabsTx.objectStore("tabs");
-    for (const tabId of tabGroup.tabs) {
+    for (const { id: tabId } of await getTabsById(tabGroupId)) {
         await tabsStore.delete(tabId);
     }
 
@@ -81,6 +83,37 @@ export const deleteTabGroup = async (tabGroupId: string) => {
 
     await tabsTx.done;
     await tabGroupsTx.done;
+};
+
+/**
+ * Delete a tab from the database.
+ * @param tabId Tab ID
+ * @returns True if tab was deleted, false if tab was not found.
+ */
+export const deleteTab = async (tabId: string): Promise<boolean> => {
+    const db = await dbPromise;
+    // Check if tab exists
+    const tab = await getTabById(tabId);
+    if (tab === undefined) {
+        return false;
+    }
+
+    const tx = db.transaction("tabs", "readwrite");
+    const store = tx.objectStore("tabs");
+    await store.delete(tabId);
+
+    // Delete tab group if it is empty
+    const tabs = await getTabsById(tab.groupId);
+    const tabGroupsTx = db.transaction("tabGroups", "readwrite");
+    const tabGroupsStore = tabGroupsTx.objectStore("tabGroups");
+    if (!tabs) {
+        await tabGroupsStore.delete(tab.groupId);
+    }
+
+    await tabGroupsTx.done;
+    await tx.done;
+
+    return true;
 };
 
 /**
@@ -125,14 +158,13 @@ export const getTabById = async (tabId: string): Promise<Tab | undefined> => {
  * @param tabIds Tab IDs
  * @return Tab object
  */
-export const getTabsByIds = async (tabIds: string[]): Promise<Tab[]> => {
+export const getTabsById = async (tabGroupId: string): Promise<Tab[]> => {
     const db = await dbPromise;
     const tx = db.transaction("tabs", "readonly");
     const store = tx.objectStore("tabs");
-    
-    const tabs = await Promise.all(tabIds.map(tabId => store.get(tabId)));
-    
-    return tabs.filter(tab => tab !== undefined) as Tab[];
+    const index = store.index("byGroupId");
+
+    return index.getAll(IDBKeyRange.only(tabGroupId));
 };
 
 /**
@@ -140,17 +172,23 @@ export const getTabsByIds = async (tabIds: string[]): Promise<Tab[]> => {
  * @param tabGroupId Tab Group ID
  * @returns Array of tabs
  */
-export const getTabGroupById = async (tabGroupId: string): Promise<TabGroup | undefined> => {
+export const getTabGroupById = async (
+    tabGroupId: string,
+): Promise<TabGroup | undefined> => {
     const db = await dbPromise;
     return db.get("tabGroups", tabGroupId);
-}
+};
 
 /**
  * @returns List of all tab groups
  */
 export const getAllTabGroups = async (): Promise<TabGroup[]> => {
+    // TODO: Make it possible to paginate, sort, filter, etc.
     const db = await dbPromise;
-    return db.getAll("tabGroups");
+    const tx = db.transaction("tabGroups", "readonly");
+    const store = tx.objectStore("tabGroups");
+    const index = store.index("byTimeCreated");
+    return index.getAll();
 };
 
 export const getTabCount = async (): Promise<number> => {
@@ -161,6 +199,7 @@ export const getTabCount = async (): Promise<number> => {
     return await store.count();
 };
 
+// TODO: Deprecate this function
 export const addTabBundle = ([tabGroup, tabs]: TabBundle) => {
     addTabGroup(tabGroup);
     addTabs(tabs);

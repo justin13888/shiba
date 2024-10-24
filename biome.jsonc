@@ -18,6 +18,6 @@
     },
     "vcs": {
         "enabled": true,
-        "clientKind":"git"
+        "clientKind": "git"
     }
 }

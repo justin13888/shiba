@@ -8,6 +8,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
+import { queryClient } from "@/utils/query";
 import {
     DarkMode,
     Locale,
@@ -31,23 +32,17 @@ const Options: Component = () => {
     const [successMessage, setSuccessMessage] = createSignal("");
     const [errorMessage, setErrorMessage] = createSignal("");
 
-    // TODO: Finish implementation after solid query bugs are fixed upstream.
-    const {
-        data: settings,
-        isSuccess,
-        isPending,
-        isError,
-        error,
-    } = createQuery(() => ({
+    // TODO: Finish implementation with solid query
+    const query = createQuery(() => ({
         queryKey: ["settings"],
         queryFn: loadSettings,
     }));
     const [formState, setFormState] = createSignal<Settings>(
-        settings || DEFAULT_SETTINGS,
+        query.data || DEFAULT_SETTINGS,
     );
     createEffect(() => {
-        console.log("Settings:", settings);
-        console.log("isSuccess", isSuccess);
+        console.log("Settings:", query.data);
+        console.log("isSuccess", query.isSuccess);
     }); // TODO: REMOVE
 
     const mutation = createMutation(() => ({
@@ -89,12 +84,12 @@ const Options: Component = () => {
                     <CardContent class="grid gap-6 m-4">
                         <Switch fallback={<p>Loading...</p>}>
                             {/* TODO: Change fallback */}
-                            <Match when={isSuccess}>
+                            <Match when={query.isSuccess}>
                                 <form onSubmit={handleFormSubmit}>
                                     <div class="grid gap-2">
                                         <Label for="darkmode">Dark Mode</Label>
                                         <Select
-                                            value={settings?.darkMode}
+                                            value={query.data?.darkMode}
                                             onChange={
                                                 (value) => {}
                                                 // TODO
@@ -128,7 +123,7 @@ const Options: Component = () => {
                                     <div class="grid gap-2">
                                         <Label for="theme">Theme</Label>
                                         <Select
-                                            value={settings?.theme}
+                                            value={query.data?.theme}
                                             onChange={
                                                 (value) => {}
                                                 // TODO
@@ -161,7 +156,7 @@ const Options: Component = () => {
                                     <div class="grid gap-2">
                                         <Label for="locale">Locale</Label>
                                         <Select
-                                            value={settings?.locale}
+                                            value={query.data?.locale}
                                             onChange={
                                                 (value) => {}
                                                 // TODO
@@ -212,7 +207,6 @@ const Options: Component = () => {
     // );
 };
 
-const queryClient = new QueryClient();
 const App = () => {
     return (
         <QueryClientProvider client={queryClient}>
