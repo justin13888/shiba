@@ -7,6 +7,7 @@ import {
     createQuery,
 } from "@tanstack/solid-query";
 import { SolidQueryDevtools } from "@tanstack/solid-query-devtools";
+import { lazy } from "solid-js";
 
 export const App = () => {
     return (

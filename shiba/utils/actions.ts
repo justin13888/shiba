@@ -1,5 +1,11 @@
 import { Tab, TabGroup } from "@/types/model";
+import { browser } from "wxt/browser";
+import { switchToOrOpenTab } from ".";
+import { URLS } from "./constants";
+import { addTabBundle } from "./db";
+import { queryClient } from "./query";
 import { tabDBRefetch } from "./store";
+import { saveCurrentWindow, storeSelectedTabs } from "./tabs";
 
 /**
  * Save selected tabs

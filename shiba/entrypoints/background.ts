@@ -1,6 +1,11 @@
+import { switchToOrOpenTab } from "@/utils";
 import { saveAllTabs, saveSelectedTabs } from "@/utils/actions";
-import { Logger } from "@/utils/logger";
-import type { RetentionPolicy } from "@/utils/snapshot";
+import { URLS } from "@/utils/constants";
+import { Logger, cleanupLogs } from "@/utils/logger";
+import { loadLoggingSettings, loadSnapshotSettings } from "@/utils/settings";
+import { type RetentionPolicy, runSnapshot } from "@/utils/snapshot";
+import { browser } from "wxt/browser";
+import { defineBackground } from "wxt/sandbox";
 
 export default defineBackground({
     main() {

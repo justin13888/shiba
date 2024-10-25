@@ -1,5 +1,12 @@
+import { tabCount } from "@/utils/store";
 import { Check, CircleX, Loader } from "lucide-solid";
-import type { Accessor, Component } from "solid-js";
+import {
+    type Accessor,
+    type Component,
+    Match,
+    Switch,
+    createSignal,
+} from "solid-js";
 
 // TODO: Implement with sync status
 
