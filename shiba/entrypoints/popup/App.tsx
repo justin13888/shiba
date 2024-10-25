@@ -43,6 +43,10 @@ function App() {
                                 "Open History",
                                 () => switchToOrOpenTab(URLS.HISTORY),
                             ],
+                            [
+                                "Open Import",
+                                () => switchToOrOpenTab(URLS.IMPORT),
+                            ],
                             ["Seed", addSeedTabs],
                             [
                                 "Clear All",

@@ -108,9 +108,10 @@ export async function addSeedTabs() {
     const newTabGroup = new TabGroup();
 
     const newTabs: Tab[] = testUrls.map(
-        ({ favicon, title, url }) =>
+        ({ favicon, title, url }, index) =>
             new Tab({
                 groupId: newTabGroup.id,
+                order: index,
                 favicon,
                 title,
                 url,

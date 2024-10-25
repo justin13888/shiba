@@ -1,9 +1,10 @@
 import { switchToOrOpenTab } from "@/utils";
 import { URLS } from "@/utils/constants";
 import { addTabBundle } from "@/utils/db";
-import { parseOneTabUrl } from "@/utils/parse";
+import { Logger } from "@/utils/logger";
+import { parseBetterOneTabUrl, parseOneTabUrl } from "@/utils/parse";
 import { Title } from "@solidjs/meta";
-import { type Component, createSignal } from "solid-js";
+import { type Component, createEffect, createSignal } from "solid-js";
 
 const logger = new Logger(import.meta.url);
 
@@ -60,7 +61,9 @@ const Import: Component = () => {
             setFeedbackType("success");
         } catch (error) {
             setFeedbackMessage(
-                `Error importing tabs: ${error instanceof Error ? error.message : error}`,
+                `Error importing tabs: ${
+                    error instanceof Error ? error.message : error
+                }`,
             );
             setFeedbackType("error");
             console.error(error);
@@ -97,7 +100,11 @@ const Import: Component = () => {
                             <button
                                 type="submit"
                                 onClick={() => setImportOption("oneTab")}
-                                class={`bg-blue-500 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline ${isDisabled() ? "opacity-50 cursor-not-allowed" : "hover:bg-blue-700"}`}
+                                class={`bg-blue-500 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline ${
+                                    isDisabled()
+                                        ? "opacity-50 cursor-not-allowed"
+                                        : "hover:bg-blue-700"
+                                }`}
                                 disabled={isDisabled()}
                             >
                                 Import as OneTab
@@ -105,7 +112,11 @@ const Import: Component = () => {
                             <button
                                 type="submit"
                                 onClick={() => setImportOption("betterOneTab")}
-                                class={`bg-blue-500 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline ${isDisabled() ? "opacity-50 cursor-not-allowed" : "hover:bg-blue-700"}`}
+                                class={`bg-blue-500 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline ${
+                                    isDisabled()
+                                        ? "opacity-50 cursor-not-allowed"
+                                        : "hover:bg-blue-700"
+                                }`}
                                 disabled={isDisabled()}
                             >
                                 Import as Better OneTab (JSON)
@@ -115,7 +126,11 @@ const Import: Component = () => {
                         {/* Feedback Message */}
                         {feedbackMessage() && (
                             <div
-                                class={`mt-4 p-4 rounded ${feedbackType() === "success" ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}`}
+                                class={`mt-4 p-4 rounded ${
+                                    feedbackType() === "success"
+                                        ? "bg-green-100 text-green-800"
+                                        : "bg-red-100 text-red-800"
+                                }`}
                             >
                                 {feedbackMessage()}
                             </div>

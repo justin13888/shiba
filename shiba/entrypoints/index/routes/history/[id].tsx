@@ -38,14 +38,14 @@ const SnapshotPreview: Component = () => {
                     fallback={<p>Loading...</p>} // TODO: Make it look better
                 >
                     {(snapshot) => {
-                        // Dictionary of Tab ID to Tab
-                        const tabRecord: Record<string, Tab> =
+                        // Dictionary of tab group ID to Tab(s)
+                        const tabRecord: Record<string, Tab[]> =
                             snapshot().tabs.reduce(
                                 (acc, tab) => {
-                                    acc[tab.id] = tab;
+                                    (acc[tab.groupId] ||= []).push(tab);
                                     return acc;
                                 },
-                                {} as Record<string, Tab>,
+                                {} as Record<string, Tab[]>,
                             );
 
                         // Tab Group sorted in descending order
