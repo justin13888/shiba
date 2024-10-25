@@ -3,6 +3,7 @@
 import { nanoid } from "nanoid";
 import { Tab, type TabBundle, TabGroup } from "../types/model";
 import { getAllTabGroups, getAllTabs } from "./db";
+import { Logger } from "./logger";
 
 const logger = new Logger(import.meta.url);
 

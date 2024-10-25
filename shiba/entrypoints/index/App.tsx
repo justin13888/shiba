@@ -1,11 +1,7 @@
 import { queryClient } from "@/utils/query";
 import { MetaProvider, Title } from "@solidjs/meta";
 import { HashRouter, Navigate, Route } from "@solidjs/router";
-import {
-    QueryClient,
-    QueryClientProvider,
-    createQuery,
-} from "@tanstack/solid-query";
+import { QueryClientProvider } from "@tanstack/solid-query";
 import { SolidQueryDevtools } from "@tanstack/solid-query-devtools";
 import { lazy } from "solid-js";
 

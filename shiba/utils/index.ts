@@ -1,12 +1,14 @@
 import type { ClassValue } from "clsx";
 import { clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
+import { browser } from "wxt/browser";
 
 export function cn(...inputs: ClassValue[]) {
     return twMerge(clsx(inputs));
 }
 
 import type { Tabs } from "webextension-polyfill";
+import { DEFAULT_SETTINGS } from "./settings";
 
 // const logger = new Logger(import.meta.url);
 

@@ -1,4 +1,6 @@
 import { nanoid } from "nanoid";
+import { browser } from "wxt/browser";
+import { LevelFilter, Logger } from "./logger";
 import { RetentionPolicy } from "./snapshot";
 
 const logger = new Logger(import.meta.url);

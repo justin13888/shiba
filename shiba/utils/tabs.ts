@@ -1,6 +1,7 @@
 import { Tab, type TabBundle, TabGroup } from "@/types/model";
 import { addTabBundle } from "@/utils/db";
 import type { Tabs } from "webextension-polyfill";
+import { browser } from "wxt/browser";
 
 // TODO: Implement filtering (blocking certain URL matches like extension pages)
 

@@ -1,6 +1,9 @@
 import type { Tab, TabGroup } from "@/types/model";
 import { type DBSchema, openDB } from "idb";
 import { nanoid } from "nanoid";
+import { getAllTabGroups, getAllTabs } from "./db";
+import { Logger } from "./logger";
+import type { ShibaExport } from "./parse";
 
 const logger = new Logger(import.meta.url);
 

@@ -4,11 +4,25 @@ import { Button } from "@/components/ui/button";
 import { Toaster, showToast } from "@/components/ui/toast";
 import type { TabGroup } from "@/types/model";
 import { diffDate } from "@/utils";
-import { deleteTabGroup, getTabsByIds } from "@/utils/db";
+import {
+    deleteTab,
+    deleteTabGroup,
+    getAllTabGroups,
+    getTabsById,
+} from "@/utils/db";
+import { queryClient } from "@/utils/query";
 import { Title } from "@solidjs/meta";
 import { createQuery } from "@tanstack/solid-query";
 import { X } from "lucide-solid";
-import { type Component, Show } from "solid-js";
+import {
+    type Component,
+    For,
+    Match,
+    Show,
+    Switch,
+    createSignal,
+} from "solid-js";
+import { browser } from "wxt/browser";
 
 // TODO: Implement style
 // TODO: Implement search bar

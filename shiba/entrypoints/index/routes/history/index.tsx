@@ -8,11 +8,20 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table";
-import { dateFormatter } from "@/utils";
-import { getSnapshots } from "@/utils/snapshot";
+import { dateFormatter, diffDate } from "@/utils";
+import { generateManualSnapshot, getSnapshots } from "@/utils/snapshot";
 import { Title } from "@solidjs/meta";
 import { useNavigate } from "@solidjs/router";
-import { type Component, Show } from "solid-js";
+import {
+    type Component,
+    For,
+    Match,
+    Show,
+    Switch,
+    createEffect,
+    createResource,
+    createSignal,
+} from "solid-js";
 
 // TODO: Implement list displaying past snapshots and card viewer for each snapshot, allowing restoration
 // For version timeline, display date and number of tabs and changes

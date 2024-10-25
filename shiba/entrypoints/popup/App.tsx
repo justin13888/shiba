@@ -1,10 +1,11 @@
 import { Skeleton } from "@/components/ui/skeleton";
 import { switchToOrOpenTab } from "@/utils";
+import { addSeedTabs, saveAllTabs } from "@/utils/actions";
 import { URLS } from "@/utils/constants";
-import { addTabBundle, clearTabs } from "@/utils/db";
-import { queryClient } from "@/utils/query";
+import { clearTabs } from "@/utils/db";
 import { tabCount, tabDBRefetch } from "@/utils/store";
-import { saveCurrentWindow, saveSelectedTabs } from "@/utils/tabs";
+import { saveSelectedTabs } from "@/utils/tabs";
+import { For, Show } from "solid-js";
 
 // TODO: Style
 function App() {

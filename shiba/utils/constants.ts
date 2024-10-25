@@ -1,3 +1,5 @@
+import { browser } from "wxt/browser";
+
 export const URLS = {
     ANALYTICS: browser.runtime.getURL("/index.html#/analytics"),
     EXPORT: browser.runtime.getURL("/index.html#/export"),

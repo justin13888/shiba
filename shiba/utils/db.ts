@@ -1,6 +1,7 @@
 import type { Tab, TabBundle, TabGroup } from "@/types/model";
 import type { TabDB } from "@/types/schema";
 import { openDB } from "idb";
+import { Logger } from "./logger";
 
 // TODO: Implement db versioning
 // TODO: Implement trash for tab and tab groups

@@ -1,3 +1,4 @@
+import { Logger } from "@/utils/logger";
 import { exportTabBundles, exportTabBundlesOneTab } from "@/utils/parse";
 import { Title } from "@solidjs/meta";
 import { type Component, createSignal } from "solid-js";

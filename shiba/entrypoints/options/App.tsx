@@ -8,13 +8,18 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
+import { Logger } from "@/utils/logger";
 import { queryClient } from "@/utils/query";
 import {
+    DEFAULT_SETTINGS,
     DarkMode,
     Locale,
+    type Settings,
     Theme,
     darkModeToString,
+    loadSettings,
     localeToString,
+    saveSettings,
     themeToString,
 } from "@/utils/settings";
 import {
@@ -23,7 +28,7 @@ import {
     createMutation,
     createQuery,
 } from "@tanstack/solid-query";
-import type { Component } from "solid-js";
+import { type Component, Match, Switch, createSignal } from "solid-js";
 
 const logger = new Logger(import.meta.url);
 
