@@ -2,23 +2,19 @@ import { Tab, type TabBundle, TabGroup } from "@/types/model";
 import { addTabBundle } from "@/utils/db";
 import type { Tabs } from "webextension-polyfill";
 
+// TODO: Implement filtering (blocking certain URL matches like extension pages)
+
 /**
- * Save the current tab to the database.
- * @returns Browser tab ID of current tab.
- * @throws If the tab title or URL is undefined.
+ * Save the selected tab to the database.
+ * @returns Browser tab IDs of selected tabs.
  */
-export const saveCurrentTab = async (): Promise<number | undefined> => {
+export const storeSelectedTabs = async (): Promise<number[]> => {
     const tabs = await browser.tabs.query({
-        active: true,
+        highlighted: true,
         currentWindow: true,
     });
 
-    if (tabs.length > 0) {
-        const tab = tabs[0];
-        return (await saveTabs([tab]))[0];
-    }
-
-    return undefined;
+    return saveTabs(tabs);
 };
 
 /**
@@ -28,7 +24,6 @@ export const saveCurrentTab = async (): Promise<number | undefined> => {
  */
 export const saveCurrentWindow = async (): Promise<number[]> => {
     // TODO: Finish working implementation
-    // TODO: Implement filtering (blocking certain URL matches like extension pages)
     const tabs = await browser.tabs.query({ currentWindow: true });
 
     return saveTabs(tabs);

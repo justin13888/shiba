@@ -1,3 +1,4 @@
+import { saveAllTabs, saveSelectedTabs } from "@/utils/actions";
 import { Logger } from "@/utils/logger";
 import type { RetentionPolicy } from "@/utils/snapshot";
 
@@ -5,6 +6,26 @@ export default defineBackground({
     main() {
         const logger = new Logger("background.ts");
         logger.debug("Started Shiba background script");
+
+        browser.commands.onCommand.addListener((command) => {
+            switch (command) {
+                case "save-selected-tabs":
+                    logger.debug("Saving selected tabs");
+                    saveSelectedTabs();
+                    break;
+                case "save-all-tabs":
+                    logger.debug("Saving all tabs");
+                    saveAllTabs();
+                    break;
+                case "open-lists":
+                    logger.debug("Opening lists");
+                    switchToOrOpenTab(URLS.SAVED);
+                    break;
+                default:
+                    logger.debug("Unknown command", command);
+                    break;
+            }
+        });
 
         // Do log cleanup
         const doLogCleanup = async (minLogs: number, minAge: number) => {

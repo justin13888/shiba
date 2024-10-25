@@ -8,8 +8,9 @@ export function cn(...inputs: ClassValue[]) {
 
 import type { Tabs } from "webextension-polyfill";
 
-const logger = new Logger(import.meta.url);
+// const logger = new Logger(import.meta.url);
 
+// TODO: This doesn't work
 /**
  * Switch to or open tab
  * @param url
