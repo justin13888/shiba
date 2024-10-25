@@ -1,11 +1,13 @@
 import { SuspenseImage } from "@/components/image";
 import { StatusBar } from "@/components/statusbar";
+import { Button } from "@/components/ui/button";
 import { Toaster, showToast } from "@/components/ui/toast";
 import type { TabGroup } from "@/types/model";
 import { diffDate } from "@/utils";
 import { deleteTabGroup, getTabsByIds } from "@/utils/db";
 import { Title } from "@solidjs/meta";
 import { createQuery } from "@tanstack/solid-query";
+import { X } from "lucide-solid";
 import { type Component, Show } from "solid-js";
 
 // TODO: Implement style
@@ -221,35 +223,38 @@ function TabGroupList({ tabGroup, tabGroupsRefetch }: TabGroupProps) {
                                 <button
                                     class="p-2 rounded-sm text-red-600 hover:bg-red-300"
                                     type="button"
-                                    onClick={() => {
-                                        deleteTabGroup(tabGroup.id);
-                                        tabGroupsRefetch();
-                                        queryClient.invalidateQueries({
-                                            queryKey: ["tabgroups"],
-                                        });
-                                        queryClient.invalidateQueries({
-                                            queryKey: ["tabs", tabGroup.id],
-                                        });
-                                        showToast({
-                                            title: (
-                                                <p>
-                                                    Deleted tabs{" "}
-                                                    {
-                                                        <Show
-                                                            when={tabGroup.name}
-                                                        >
-                                                            {(name) => (
-                                                                <span class="font-bold">
-                                                                    {name()}
-                                                                </span>
-                                                            )}
-                                                        </Show>
-                                                    }
-                                                </p>
-                                            ),
-                                            duration: 3000,
-                                            variant: "destructive",
-                                        }); // TODO: Make toast allow undo
+                                    onClick={async () => {
+                                        if (await deleteTabGroup(tabGroup.id)) {
+                                            tabGroupsRefetch();
+                                            queryClient.invalidateQueries({
+                                                queryKey: ["tabgroups"],
+                                            });
+                                            queryClient.invalidateQueries({
+                                                queryKey: ["tabs", tabGroup.id],
+                                            });
+                                            showToast({
+                                                title: (
+                                                    <p>
+                                                        Deleted tabs{" "}
+                                                        {
+                                                            <Show
+                                                                when={
+                                                                    tabGroup.name
+                                                                }
+                                                            >
+                                                                {(name) => (
+                                                                    <span class="font-bold">
+                                                                        {name()}
+                                                                    </span>
+                                                                )}
+                                                            </Show>
+                                                        }
+                                                    </p>
+                                                ),
+                                                duration: 3000,
+                                                variant: "destructive",
+                                            }); // TODO: Make toast allow undo
+                                        }
                                     }}
                                 >
                                     Delete All
@@ -269,7 +274,7 @@ function TabGroupList({ tabGroup, tabGroupsRefetch }: TabGroupProps) {
                                     {/* TODO: Display tab group categories properly */}
                                     {/* TODO: Display notes */}
                                     {(tab) => (
-                                        <li>
+                                        <li class="group">
                                             <span class="flex flex-row items-center space-x-4">
                                                 <SuspenseImage
                                                     src={tab.favicon}
@@ -286,8 +291,7 @@ function TabGroupList({ tabGroup, tabGroupsRefetch }: TabGroupProps) {
                                                     class="text-blue-600"
                                                     onClick={async (event) => {
                                                         if (!event.shiftKey) {
-                                                            // TODO: check if tab is already open
-                                                            // Remove the tab from the group
+                                                            // Remove the tab from the group unless shift is pressed
                                                             await deleteTab(
                                                                 tab.id,
                                                             );
@@ -297,6 +301,26 @@ function TabGroupList({ tabGroup, tabGroupsRefetch }: TabGroupProps) {
                                                 >
                                                     {tab.title}
                                                 </a>
+                                                <X
+                                                    class="invisible group-hover:visible h-4 w-4 m-1 text-red-600"
+                                                    onClick={async () => {
+                                                        if (
+                                                            await deleteTab(
+                                                                tab.id,
+                                                            )
+                                                        ) {
+                                                            tabsQuery.refetch();
+                                                            queryClient.invalidateQueries(
+                                                                {
+                                                                    queryKey: [
+                                                                        "tabgroups",
+                                                                    ],
+                                                                },
+                                                            ); // TODO: Figure out how to update this more finely
+                                                        }
+                                                    }}
+                                                />
+                                                {/* TODO: style X button */}
                                             </span>
                                         </li>
                                     )}

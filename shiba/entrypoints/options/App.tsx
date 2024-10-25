@@ -40,10 +40,6 @@ const Options: Component = () => {
     const [formState, setFormState] = createSignal<Settings>(
         query.data || DEFAULT_SETTINGS,
     );
-    createEffect(() => {
-        console.log("Settings:", query.data);
-        console.log("isSuccess", query.isSuccess);
-    }); // TODO: REMOVE
 
     const mutation = createMutation(() => ({
         mutationKey: ["settings"],
