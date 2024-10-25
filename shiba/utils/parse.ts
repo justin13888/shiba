@@ -2,7 +2,7 @@
 
 import { nanoid } from "nanoid";
 import { Tab, type TabBundle, TabGroup } from "../types/model";
-import { getAllTabGroups, getAllTabs } from "./db";
+import { getAllTabGroups, getAllTabs, getTabsById } from "./db";
 import { Logger } from "./logger";
 
 const logger = new Logger(import.meta.url);
@@ -61,11 +61,12 @@ export const parseOneTabUrl = (input: string): TabBundle[] => {
             // Create tab object
             const tab: Tab = {
                 id: nanoid(),
+                groupId: currentGroup.id,
+                order: 0,
                 title: trimmedTitle,
                 url: trimmedUrl,
             };
             currentTabs.push(tab);
-            currentGroup.tabs.push(tab.id);
         }
     }
 
@@ -193,21 +194,23 @@ export const parseBetterOneTabUrl = async (
 
     return Promise.all(
         parsedJSON.map(async (group) => {
+            const tabGroup = new TabGroup({
+                timeCreated: group.time,
+            });
+
             const tabs = await Promise.all(
-                group.tabs.map(async (tab) => {
+                group.tabs.map(async (tab, index) => {
                     const favicon = await faviconFromString(tab.favIconUrl);
 
                     return new Tab({
+                        groupId: tabGroup.id,
+                        order: index,
                         favicon,
                         title: tab.title,
                         url: tab.url,
                     });
                 }),
             );
-            const tabGroup = new TabGroup({
-                timeCreated: group.time,
-                tabs: tabs.map((tab) => tab.id),
-            });
 
             return [tabGroup, tabs];
         }),
@@ -237,7 +240,7 @@ export const exportTabBundlesOneTab = async (): Promise<string> => {
     let output = "";
     const tabGroups = await getAllTabGroups();
     for (const tabGroup of tabGroups) {
-        const tabs = await getTabsByGroup(tabGroup.id);
+        const tabs = await getTabsById(tabGroup.id);
         for (const tab of tabs) {
             output += `${tab.url} | ${tab.title}\n`;
         }

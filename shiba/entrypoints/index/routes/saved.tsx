@@ -31,9 +31,7 @@ const Saved: Component = () => {
     //     console.log("a",await faviconFromString("https://tanstack.com/favicon.ico"));
     // console.log("b",await faviconFromString("https://github.githubassets.com/favicons/favicon-dark.svg"));
     // })
-    const [maxTabGroups, setMaxTabGroups] = createSignal<number | undefined>(
-        10,
-    ); // TODO: Make UI edit it
+    // TODO: Implement infinite virtual list
     // TODO: Fix loading issue when maxTabGroups is undefined
     // TODO: Make custom order (not in order of date) possible by modifying data structure and adding UI
     //   const {
@@ -291,6 +289,7 @@ function TabGroupList({ tabGroup, tabGroupsRefetch }: TabGroupProps) {
                                     {/* TODO: Display tab group categories properly */}
                                     {/* TODO: Display notes */}
                                     {(tab) => (
+                                        // TODO: Make this draggable and optimistically update tab order (need to implement updateTab function)
                                         <li class="group">
                                             <span class="flex flex-row items-center space-x-4">
                                                 <SuspenseImage

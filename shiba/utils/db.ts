@@ -18,6 +18,7 @@ const dbPromise = openDB<TabDB>("tabs", 1, {
 
         const tabStore = db.createObjectStore("tabs", { keyPath: "id" });
         tabStore.createIndex("byGroupId", "groupId");
+        tabStore.createIndex("byGroupIdOrder", ["groupId", "order"]);
     },
 });
 
@@ -43,6 +44,7 @@ export const addTabGroup = async (tabGroup: TabGroup) => {
  * @param tabs
  */
 export const addTabs = async (tabs: Tab[]) => {
+    // TODO: might want to omit `order` field
     logger.debug("Adding tabs:", tabs);
 
     const db = await dbPromise;
@@ -152,7 +154,7 @@ export const getTabById = async (tabId: string): Promise<Tab | undefined> => {
 
 /**
  * Get tabs by IDs.
- * @param tabIds Tab IDs
+ * @param tabGroupId Tab Group ID
  * @return Tab object
  */
 export const getTabsById = async (tabGroupId: string): Promise<Tab[]> => {

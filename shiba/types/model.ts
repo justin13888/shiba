@@ -3,6 +3,7 @@ import { nanoid } from "nanoid";
 export interface TabOptions {
     id?: string;
     groupId: string;
+    order: number;
     favicon?: string;
     title: string;
     url: string;
@@ -14,6 +15,9 @@ export class Tab {
     id: string;
     /** Group ID */
     groupId: string;
+    /** Order */
+    order: number;
+
     /** Favicon image (URL or data encoded URL) */
     favicon?: string;
     /** Title of the tab */
@@ -23,9 +27,18 @@ export class Tab {
     /** Notes */
     notes?: string;
 
-    constructor({ id, groupId, favicon, title, url, notes }: TabOptions) {
+    constructor({
+        id,
+        groupId,
+        order,
+        favicon,
+        title,
+        url,
+        notes,
+    }: TabOptions) {
         this.id = id || nanoid();
         this.groupId = groupId;
+        this.order = order;
         this.favicon = favicon;
         this.title = title;
         this.url = url;
