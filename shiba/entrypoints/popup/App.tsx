@@ -31,8 +31,8 @@ function App() {
                 <For
                     each={
                         [
-                            ["Save Current Tab", saveSelectedTabs],
-                            ["Save All Tabs", saveAllTabs],
+                            ["Save Current Tab", saveSelectedTabs], // TODO: Wrap this with a function in actions.ts and make it close exisitng tab, redirect, force refetch, etc.
+                            ["Save All Tabs", saveAllTabs], // TODO: Wrap this with a function in actions.ts and make it close exisitng tab, redirect, force refetch, etc.
                             ["Open Debug", () => switchToOrOpenTab(URLS.DEBUG)],
                             ["Open Saved", () => switchToOrOpenTab(URLS.SAVED)],
                             [

@@ -1,8 +1,16 @@
-import { Component, ComponentProps, createSignal } from "solid-js";
+import { type Component, type ComponentProps, createSignal } from "solid-js";
 import { CardTitle } from "./ui/card";
 
 // TODO: Doesn't unfocus later
-export const EditableCardTitle: Component<Omit<ComponentProps<"h3"> & { initialValue?: string, onUpdateValue: (val: string) => any }, 'children'>> = (props) => {
+export const EditableCardTitle: Component<
+    Omit<
+        ComponentProps<"h3"> & {
+            initialValue?: string;
+            onUpdateValue: (val: string) => any;
+        },
+        "children"
+    >
+> = (props) => {
     const [isEditing, setIsEditing] = createSignal(false);
     const [value, setValue] = createSignal(props.initialValue); // use children as initial value
 

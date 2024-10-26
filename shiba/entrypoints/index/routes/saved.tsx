@@ -95,6 +95,7 @@ const Saved: Component = () => {
                         class="w-full max-w-4xl mx-auto"
                     >
                         <div class="flex justify-between items-center mb-6">
+                            {/* TODO: Responsiveness looks funny */}
                             <TabsList class="bg-transparent border rounded-lg">
                                 <For each={workspaces}>
                                     {(workspace) => (
@@ -340,12 +341,12 @@ function TabGroupCard({ tabGroup, tabGroupsRefetch }: TabGroupCardProps) {
                                             }
                                             deleteTabGroup(tabGroup.id);
                                             tabGroupsRefetch();
-                                            queryClient.invalidateQueries({
-                                                queryKey: ["tabgroups"],
-                                            });
-                                            queryClient.invalidateQueries({
-                                                queryKey: ["tabs", tabGroup.id],
-                                            });
+                                            // queryClient.invalidateQueries({
+                                            //     queryKey: ["tabgroups"],
+                                            // });
+                                            // queryClient.invalidateQueries({
+                                            //     queryKey: ["tabs", tabGroup.id],
+                                            // });
                                             showToast({
                                                 title: (
                                                     <p>
@@ -385,12 +386,12 @@ function TabGroupCard({ tabGroup, tabGroupsRefetch }: TabGroupCardProps) {
                                             });
                                             deleteTabGroup(tabGroup.id);
                                             tabGroupsRefetch();
-                                            queryClient.invalidateQueries({
-                                                queryKey: ["tabgroups"],
-                                            });
-                                            queryClient.invalidateQueries({
-                                                queryKey: ["tabs", tabGroup.id],
-                                            });
+                                            // queryClient.invalidateQueries({
+                                            //     queryKey: ["tabgroups"],
+                                            // });
+                                            // queryClient.invalidateQueries({
+                                            //     queryKey: ["tabs", tabGroup.id],
+                                            // });
                                             showToast({
                                                 title: (
                                                     <p>
@@ -417,7 +418,7 @@ function TabGroupCard({ tabGroup, tabGroupsRefetch }: TabGroupCardProps) {
                                         }}
                                     >
                                         <ExternalLink class="h-4 w-4 mr-2" />
-                                        Restore in new Window
+                                        Restore in new window
                                     </Button>
                                     <Button
                                         variant="outline"
@@ -430,15 +431,15 @@ function TabGroupCard({ tabGroup, tabGroupsRefetch }: TabGroupCardProps) {
                                                 )
                                             ) {
                                                 tabGroupsRefetch();
-                                                queryClient.invalidateQueries({
-                                                    queryKey: ["tabgroups"],
-                                                });
-                                                queryClient.invalidateQueries({
-                                                    queryKey: [
-                                                        "tabs",
-                                                        tabGroup.id,
-                                                    ],
-                                                });
+                                                // queryClient.invalidateQueries({
+                                                //     queryKey: ["tabgroups"],
+                                                // });
+                                                // queryClient.invalidateQueries({
+                                                //     queryKey: [
+                                                //         "tabs",
+                                                //         tabGroup.id,
+                                                //     ],
+                                                // });
                                                 showToast({
                                                     title: (
                                                         <p>
