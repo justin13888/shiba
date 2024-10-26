@@ -9,8 +9,9 @@ export function cn(...inputs: ClassValue[]) {
 
 import type { Tabs } from "webextension-polyfill";
 import { DEFAULT_SETTINGS } from "./settings";
+import { Logger } from "./logger";
 
-// const logger = new Logger(import.meta.url);
+const logger = new Logger(import.meta.url);
 
 // TODO: This doesn't work
 /**
@@ -20,8 +21,8 @@ import { DEFAULT_SETTINGS } from "./settings";
 export const switchToOrOpenTab = async (url: string): Promise<Tabs.Tab> => {
     const existingTab = await (async () => {
         // Check if current tab is url
-        const currentTab = await browser.tabs.getCurrent();
-        if (currentTab && currentTab.url === url) {
+        const currentTab = await browser.tabs.query({ active: true, currentWindow: true }).then(tabs => tabs[0]); // TODO: what does type not say undefined?
+        if (currentTab && currentTab.url?.startsWith(url)) {
             return currentTab;
         }
 
