@@ -1,3 +1,4 @@
+import { EditableCardTitle } from "@/components/editable-card-title";
 import { SuspenseImage } from "@/components/image";
 import { StatusBar } from "@/components/statusbar";
 import { Badge } from "@/components/ui/badge";
@@ -37,6 +38,7 @@ import {
 } from "lucide-solid";
 import {
     type Component,
+    ComponentProps,
     For,
     Match,
     Show,
@@ -279,7 +281,6 @@ interface TabGroupCardProps {
     tabGroupsRefetch: () => any;
 }
 
-// TODO: Use tabGroupsRefetch
 function TabGroupCard({ tabGroup, tabGroupsRefetch }: TabGroupCardProps) {
     const tabsQuery = createQuery(() => ({
         queryKey: ["tabs", tabGroup.id],
@@ -298,12 +299,11 @@ function TabGroupCard({ tabGroup, tabGroupsRefetch }: TabGroupCardProps) {
                     {(tabs) => (
                         <Card class="mb-6 shadow-lg hover:shadow-xl transition-shadow duration-200">
                             <CardHeader class="flex flex-row items-center justify-between space-y-0 pb-2">
-                                <CardTitle class="text-xl font-semibold">
-                                    {tabGroup.name || (
-                                        <span class="italic">Untitled</span>
-                                    )}
-                                    {/* TODO: Make name box editable */}
-                                </CardTitle>
+                                <EditableCardTitle
+                                    initialValue={tabGroup.name}
+                                    onUpdateValue={() => null}
+                                    class="text-xl font-semibold"
+                                />
                                 <Grip
                                     class="text-muted-foreground cursor-move"
                                     size={20}

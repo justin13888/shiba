@@ -27,7 +27,7 @@ export default defineBackground({
                     switchToOrOpenTab(URLS.SAVED);
                     break;
                 default:
-                    logger.debug("Unknown command", command);
+                    logger.error("Unknown command", command);
                     break;
             }
         });
