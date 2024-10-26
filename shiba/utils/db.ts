@@ -161,9 +161,20 @@ export const getTabsById = async (tabGroupId: string): Promise<Tab[]> => {
     const db = await dbPromise;
     const tx = db.transaction("tabs", "readonly");
     const store = tx.objectStore("tabs");
-    const index = store.index("byGroupId");
+    const index = store.index("byGroupIdOrder");
+    const range = IDBKeyRange.bound([tabGroupId, -Infinity], [tabGroupId, Infinity]);
+    const items = [];
 
-    return index.getAll(IDBKeyRange.only(tabGroupId));
+    let cursor = await index.openCursor(range);
+
+    while (cursor) {
+        items.push(cursor.value);
+        cursor = await cursor.continue();
+    }
+
+    await tx.done;
+
+    return items;
 };
 
 /**

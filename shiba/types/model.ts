@@ -86,7 +86,7 @@ export class TabGroup {
         this.id = groupId || nanoid();
         this.name = name;
         this.timeCreated = timeCreated || Date.now();
-        this.timeModified = timeModified || this.timeCreated;
+        this.timeModified = timeModified || this.timeCreated; // TODO: make sure any function updating this also updates timeModified
         this.categories = categories || [];
     }
 }

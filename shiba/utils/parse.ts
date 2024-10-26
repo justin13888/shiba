@@ -27,8 +27,13 @@ export const parseOneTabUrl = (input: string): TabBundle[] => {
 
     const lines = input.split("\n");
     const groups: TabBundle[] = [];
-    let currentGroup: TabGroup = new TabGroup();
+    const currentTime = Date.now();
+    let i = 0;
+    let currentGroup: TabGroup = new TabGroup({
+        timeCreated: currentTime,
+    });
     let currentTabs: Tab[] = [];
+    let order = 0;
 
     let lineCount = 0;
     for (const line of lines) {
@@ -38,9 +43,12 @@ export const parseOneTabUrl = (input: string): TabBundle[] => {
         if (l === "") {
             if (currentTabs.length > 0) {
                 groups.push([currentGroup, currentTabs]);
+                i++;
+                currentGroup = new TabGroup({
+                    timeCreated: currentTime - i,
+                });
+                currentTabs = [];
             }
-            currentGroup = new TabGroup();
-            currentTabs = [];
         } else {
             // Line should be of format: "url | title"
             // Note: title can contain "|"
@@ -62,10 +70,11 @@ export const parseOneTabUrl = (input: string): TabBundle[] => {
             const tab: Tab = {
                 id: nanoid(),
                 groupId: currentGroup.id,
-                order: 0,
+                order,
                 title: trimmedTitle,
                 url: trimmedUrl,
             };
+            order++;
             currentTabs.push(tab);
         }
     }

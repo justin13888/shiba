@@ -24,6 +24,7 @@ import {
 } from "solid-js";
 import { browser } from "wxt/browser";
 
+// TODO: Make entire page layout not scrollable besides the interior list
 // TODO: Implement style
 // TODO: Implement search bar
 const Saved: Component = () => {
@@ -121,7 +122,6 @@ interface TabGroupProps {
 }
 
 function TabGroupList({ tabGroup, tabGroupsRefetch }: TabGroupProps) {
-    console.log("tabGroup", tabGroup);
     const tabsQuery = createQuery(() => ({
         queryKey: ["tabs", tabGroup.id],
         queryFn: () => getTabsById(tabGroup.id),
@@ -291,6 +291,7 @@ function TabGroupList({ tabGroup, tabGroupsRefetch }: TabGroupProps) {
                                     {(tab) => (
                                         // TODO: Make this draggable and optimistically update tab order (need to implement updateTab function)
                                         <li class="group">
+                                            {/* TODO: move group to something tighter */}
                                             <span class="flex flex-row items-center space-x-4">
                                                 <SuspenseImage
                                                     src={tab.favicon}

@@ -15,7 +15,7 @@ export interface TabDB extends DBSchema {
         value: Tab;
         indexes: {
             byGroupId: string;
-            byGroupIdOrder: string;
+            byGroupIdOrder: [string, number];
         };
         // TODO: Enforce foreign key constraint for groupId
     };

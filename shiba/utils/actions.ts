@@ -122,7 +122,7 @@ export async function addSeedTabs() {
 
     queryClient.invalidateQueries({
         queryKey: ["tabgroups"],
-    });
+    }); // TODO: Figure out why dependent components are not re-rendering
     tabDBRefetch(); // TODO: Replace this
     await switchToOrOpenTab(URLS.SAVED);
 }
