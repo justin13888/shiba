@@ -44,6 +44,8 @@ const LEVEL_FILTER_MAP: Record<LevelFilter, number> = {
 };
 
 export interface LogEntry {
+    /** Unique ID */
+    id: number;
     /** Unix timstamp in milliseconds */
     timestamp: number;
     /**
@@ -102,7 +104,7 @@ export class Logger {
             return;
         }
 
-        const logEntry: LogEntry = {
+        const logEntry: Omit<LogEntry, 'id'> = {
             timestamp: Date.now(),
             level,
             identifier: this.identifier,
@@ -112,7 +114,7 @@ export class Logger {
 
         // Save to IndexedDB
         dbPromise.then(async (db) => {
-            await db.add("logs", logEntry);
+            await db.add("logs", logEntry as LogEntry);
         });
     }
 

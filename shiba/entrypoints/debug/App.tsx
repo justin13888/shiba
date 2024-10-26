@@ -9,8 +9,7 @@ import {
     createSignal,
 } from "solid-js";
 
-// TODO: Implement
-// TODO: View database
+// TODO: Implement log viewing with tanstack virtual, query
 export const App = () => {
     const logger = new Logger(import.meta.url);
     const addTestLogs = async () => {
@@ -43,8 +42,6 @@ export const App = () => {
             return result;
         },
     );
-    // TODO: Test behaviour when page, pageLimit are changed
-    // TODO: Test behaviour after refetch()
 
     const handleNextPage = () => {
         if (logs()?.length === pageLimit()) {
@@ -119,7 +116,7 @@ export const App = () => {
                                                 <Match
                                                     when={
                                                         level ===
-                                                            LogLevel.ERROR ||
+                                                        LogLevel.ERROR ||
                                                         level === LogLevel.FATAL
                                                     }
                                                 >
@@ -159,7 +156,7 @@ export const App = () => {
                 </Button>
             </div>
             {/* TODO: Add Download logs button */}
-            {/* TODO: Add ability to filter out sensitive logs (e.g. PII) */}
+            {/* TODO: Add ability to filter out sensitive logs (e.g. PII), make sure to retain relative log position */}
         </div>
     );
 };
