@@ -1,4 +1,4 @@
-import type { Tab, TabGroup } from "@/types/model";
+import type { Tab, TabGroup, Workspace } from "@/types/model";
 import type { DBSchema } from "idb";
 
 export interface TabDB extends DBSchema {
@@ -18,5 +18,12 @@ export interface TabDB extends DBSchema {
             byGroupIdOrder: [string, number];
         };
         // TODO: Enforce foreign key constraint for groupId
+    };
+    workspace: {
+        key: string;
+        value: Workspace;
+        indexes: {
+            byOrder: number;
+        };
     };
 }

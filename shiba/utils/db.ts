@@ -10,6 +10,11 @@ const logger = new Logger(import.meta.url);
 
 const dbPromise = openDB<TabDB>("tabs", 1, {
     upgrade(db) {
+        const workspaceStore = db.createObjectStore("workspace", {
+            keyPath: "id",
+        });
+        workspaceStore.createIndex("byOrder", "order");
+
         const tabGroupStore = db.createObjectStore("tabGroups", {
             keyPath: "id",
         });
@@ -162,7 +167,10 @@ export const getTabsById = async (tabGroupId: string): Promise<Tab[]> => {
     const tx = db.transaction("tabs", "readonly");
     const store = tx.objectStore("tabs");
     const index = store.index("byGroupIdOrder");
-    const range = IDBKeyRange.bound([tabGroupId, -Infinity], [tabGroupId, Infinity]);
+    const range = IDBKeyRange.bound(
+        [tabGroupId, Number.NEGATIVE_INFINITY],
+        [tabGroupId, Number.POSITIVE_INFINITY],
+    );
     const items = [];
 
     let cursor = await index.openCursor(range);

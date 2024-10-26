@@ -1,4 +1,5 @@
 import { nanoid } from "nanoid";
+import type { JSX } from "solid-js";
 
 export interface TabOptions {
     id?: string;
@@ -47,7 +48,8 @@ export class Tab {
 }
 
 export interface TabGroupOptions {
-    groupId?: string;
+    id?: string;
+    workspaceId?: string;
     name?: string;
     timeCreated?: number;
     timeModified?: number;
@@ -57,6 +59,8 @@ export interface TabGroupOptions {
 export class TabGroup {
     /** Unique ID */
     id: string;
+    /** Workspace ID. Undefined indicates default */
+    workspaceId?: string;
 
     /** Name of the group */
     name?: string;
@@ -77,13 +81,15 @@ export class TabGroup {
     categories: string[];
 
     constructor({
-        groupId,
+        id,
+        workspaceId,
         name,
         timeCreated,
         timeModified,
         categories,
     }: TabGroupOptions = {}) {
-        this.id = groupId || nanoid();
+        this.id = id || nanoid();
+        this.workspaceId = workspaceId;
         this.name = name;
         this.timeCreated = timeCreated || Date.now();
         this.timeModified = timeModified || this.timeCreated; // TODO: make sure any function updating this also updates timeModified
@@ -92,3 +98,29 @@ export class TabGroup {
 }
 
 export type TabBundle = [TabGroup, Tab[]];
+
+export interface WorkspaceOptions {
+    id?: string;
+    order: number;
+    name: string;
+    icon?: () => JSX.Element;
+}
+
+export class Workspace {
+    /** Unique ID */
+    id: string;
+    /** Order */
+    order: number;
+
+    /** Name of the workspace */
+    name: string;
+    /** JSX Icon */
+    icon?: () => JSX.Element;
+
+    constructor({ id, order, name, icon }: WorkspaceOptions) {
+        this.id = id || nanoid();
+        this.order = order;
+        this.name = name;
+        this.icon = icon;
+    }
+}
