@@ -74,17 +74,18 @@ const Saved: Component = () => {
         workspaces[0].id,
     );
 
+    // TODO: Fix overall layout so status layout works
     return (
         <>
             <Title>Saved | Shiba</Title>
-            <div class="min-h-screen bg-background p-8">
+            <div class="h-screen bg-background p-8">
                 {/* Header */}
                 {/* TODO: Complete header */}
                 <header class="flex-none">
                     <div class="flex flex-row flex-none items-baseline space-x-4 pb-4">
                         <p class="text-4xl font-extrabold">Shiba</p>
                     </div>
-                    {/* Add search bar */}
+                    {/* TODO: Add search bar */}
                 </header>
 
                 {/* Workspace section */}
