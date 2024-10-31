@@ -4,17 +4,17 @@ import { CardTitle } from "./ui/card";
 export const EditableCardTitle: Component<
     Omit<
         ComponentProps<"h3"> & {
-            initialValue?: string;
+            initialValue: string;
             onUpdateValue: (val: string) => any;
         },
         "children"
     >
 > = (props) => {
+    let lastValue = props.initialValue;
     const [isEditing, setIsEditing] = createSignal(false);
     const [value, setValue] = createSignal(props.initialValue); // use children as initial value
 
     const handleDoubleClick = () => {
-        setValue("Untitled");
         setIsEditing(true);
     };
 
@@ -23,8 +23,14 @@ export const EditableCardTitle: Component<
         const currentValue = value();
         if (props.onUpdateValue && currentValue) {
             props.onUpdateValue(currentValue);
+            lastValue = currentValue;
         }
     };
+
+    const handleReset = () => {
+        setIsEditing(false);
+        setValue(props.initialValue);
+    }
 
     return (
         <CardTitle
@@ -43,7 +49,7 @@ export const EditableCardTitle: Component<
                         if (e.key === "Enter") {
                             handleBlur();
                         } else if (e.key === "Escape") {
-                            setIsEditing(false);
+                            handleReset();
                         }
                     }}
                     onBlur={handleBlur}

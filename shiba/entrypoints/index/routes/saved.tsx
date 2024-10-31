@@ -47,6 +47,8 @@ import {
     createSignal,
 } from "solid-js";
 import { browser } from "wxt/browser";
+import { fromUnixTime, format } from 'date-fns';
+import { DarkModeSwitcher } from "@/components/dark-mode-switcher";
 
 // TODO: Make entire page layout not scrollable besides the interior list
 // TODO: Implement style
@@ -81,22 +83,28 @@ const Saved: Component = () => {
             <div class="h-screen bg-background p-8">
                 {/* Header */}
                 {/* TODO: Complete header */}
-                <header class="flex-none">
-                    <div class="flex flex-row flex-none items-baseline space-x-4 pb-4">
+                <header class="flex-none flex items-center justify-center">
+                    <div class="container flex flex-row flex-none items-center space-x-4 pb-4">
                         <p class="text-4xl font-extrabold">Shiba</p>
+                        <div class="flex-grow">
+
+                        </div>
+                        <div class="flex-shrink-0 flex space-x-2">
+                            <DarkModeSwitcher />
+                        </div>
                     </div>
                     {/* TODO: Add search bar */}
                 </header>
 
                 {/* Workspace section */}
                 {/* TODO: Check overflow style here */}
-                <main class="flex flex-grow overflow-auto">
+                <main class="flex flex-grow">
                     <Tabs
                         defaultValue={activeWorkspace()}
                         onChange={setActiveWorkspace}
-                        class="w-full max-w-4xl mx-auto"
+                        class="w-full mx-auto flex flex-col justify-between items-center"
                     >
-                        <div class="flex justify-between items-center mb-6">
+                        <div class="flex max-w-4xl justify-between items-center mb-6 space-x-8">
                             {/* TODO: Responsiveness looks funny */}
                             <TabsList class="bg-transparent border rounded-lg">
                                 <For each={workspaces}>
@@ -115,22 +123,27 @@ const Saved: Component = () => {
                                     )}
                                 </For>
                             </TabsList>
-                            <Button>
-                                <Plus class="w-4 h-4 mr-2" /> New Tab Group
+                            <Button
+                                class="justify-center items-center aspect-square"
+                                size="icon"
+                            >
+                                <Plus class="w-4 h-4" />
                             </Button>
                         </div>
-                        <For each={workspaces}>
-                            {/* URGENT */}
-                            {(workspace) => (
-                                <TabsContent value={workspace.id} class="mt-0">
-                                    <div class="h-[calc(100vh-8rem)] overflow-y-auto">
-                                        <WorkspaceContent
-                                            workspaceId={workspace.id}
-                                        />
-                                    </div>
-                                </TabsContent>
-                            )}
-                        </For>
+                        <div class="overflow-y-auto">
+                            <For each={workspaces}>
+                                {/* URGENT */}
+                                {(workspace) => (
+                                    <TabsContent value={workspace.id} class="mt-0">
+                                        <div class="h-[calc(100vh-8rem)]">
+                                            <WorkspaceContent
+                                                workspaceId={workspace.id}
+                                            />
+                                        </div>
+                                    </TabsContent>
+                                )}
+                            </For>
+                        </div>
                     </Tabs>
                 </main>
 
@@ -194,7 +207,7 @@ function WorkspaceContent({ workspaceId }: WorkspaceTabProps) {
 
 interface TabItemProps {
     tab: Tab;
-    tabRefetch: () => any;
+    tabRefetch: () => any; // TODO: REmove this in favour of using global invalidation (in tanstack query)
 }
 
 function TabItem({ tab, tabRefetch }: TabItemProps) {
@@ -300,10 +313,11 @@ function TabGroupCard({ tabGroup, tabGroupsRefetch }: TabGroupCardProps) {
                     fallback={<p>There are no tabs...</p>}
                 >
                     {(tabs) => (
+                        // TODO: Add right click context menus for actions (e.g. move workspace, delete tab group)
                         <Card class="mb-6 shadow-lg hover:shadow-xl transition-shadow duration-200">
                             <CardHeader class="flex flex-row items-center justify-between space-y-0 pb-2">
                                 <EditableCardTitle
-                                    initialValue={tabGroup.name}
+                                    initialValue={tabGroup.name || `Untitled ${format(fromUnixTime(tabGroup.timeCreated / 1000), 'yyyy-MM-dd HH:mm:ss')}`}
                                     onUpdateValue={async (name) => {
                                         const isUpdated = await updateTabGroup(
                                             tabGroup.id,
@@ -334,7 +348,7 @@ function TabGroupCard({ tabGroup, tabGroupsRefetch }: TabGroupCardProps) {
                                 </p>
                                 {/* TODO: Display tab group categories properly */}
                                 {/* TODO: Display notes */}
-                                <ul class="space-y-1 mb-4">
+                                <ul class="max-h-[300px] overflow-y-auto space-y-1 mb-4">
                                     <For each={tabs()}>
                                         {(tab) => (
                                             <TabItem

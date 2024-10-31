@@ -30,10 +30,12 @@
         "@tanstack/solid-virtual": "^3.8.3",
         "class-variance-authority": "^0.7.0",
         "clsx": "^2.1.1",
+        "date-fns": "^4.1.0",
         "idb": "^8.0.0",
         "lucide-solid": "^0.411.0",
         "nanoid": "^5.0.7",
         "solid-js": "^1.8.18",
+        "solid-motionone": "^1.0.2",
         "tailwind-merge": "^2.4.0",
         "tailwindcss-animate": "^1.0.7",
         "webext-bridge": "^6.0.1"
