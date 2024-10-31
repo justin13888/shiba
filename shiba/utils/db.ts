@@ -45,6 +45,31 @@ export const addTabGroup = async (tabGroup: TabGroup) => {
 };
 
 /**
+ * Update a tab group to the database.
+ * @param id Tab Group ID
+ * @param updates Updates to apply
+ * @returns True if tab group was updated, false if tab group was not found.
+ */
+export const updateTabGroup = async (id: string, updates: Partial<TabGroup>) => {
+    logger.debug("Updating tab group:", id, updates);
+
+    const db = await dbPromise;
+    const tx = db.transaction("tabGroups", "readwrite");
+    const store = tx.objectStore("tabGroups");
+
+    const tabGroup = await store.get(id);
+    if (tabGroup) {
+        Object.assign(tabGroup, updates);
+        store.put(tabGroup);
+    } else {
+        return false;
+    }
+
+    await tx.done;
+    return true;
+};
+
+/**
  * Add tabs to the database.
  * @param tabs
  */

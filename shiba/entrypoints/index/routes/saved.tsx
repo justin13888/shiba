@@ -19,6 +19,7 @@ import {
     deleteTabGroup,
     getAllTabGroups,
     getTabsById,
+    updateTabGroup,
 } from "@/utils/db";
 import { queryClient } from "@/utils/query";
 import type { DropdownMenuSubTriggerProps } from "@kobalte/core/dropdown-menu";
@@ -302,7 +303,21 @@ function TabGroupCard({ tabGroup, tabGroupsRefetch }: TabGroupCardProps) {
                             <CardHeader class="flex flex-row items-center justify-between space-y-0 pb-2">
                                 <EditableCardTitle
                                     initialValue={tabGroup.name}
-                                    onUpdateValue={() => null}
+                                    onUpdateValue={async (name) => {
+                                        const isUpdated = await updateTabGroup(
+                                            tabGroup.id,
+                                            {
+                                                name,
+                                            },
+                                        );
+                                        if (!isUpdated) {
+                                            showToast({
+                                                title: "Failed to title",
+                                                duration: 3000,
+                                                variant: "destructive",
+                                            });
+                                        }
+                                    }}
                                     class="text-xl font-semibold"
                                 />
                                 <Grip

@@ -40,6 +40,11 @@ export const EditableCardTitle: Component<
                     onInput={(e) => {
                         setValue(e.target.value);
                     }}
+                    onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                            handleBlur();
+                        }
+                    }}
                     onBlur={handleBlur}
                     class="w-full border rounded px-2 py-1"
                     autofocus
