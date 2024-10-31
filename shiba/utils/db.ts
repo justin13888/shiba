@@ -60,6 +60,7 @@ export const updateTabGroup = async (id: string, updates: Partial<TabGroup>) => 
     const tabGroup = await store.get(id);
     if (tabGroup) {
         Object.assign(tabGroup, updates);
+        tabGroup.timeModified = Date.now();
         store.put(tabGroup);
     } else {
         return false;
@@ -221,6 +222,28 @@ export const getTabGroupById = async (
     const db = await dbPromise;
     return db.get("tabGroups", tabGroupId);
 };
+
+/**
+ * Get tab group IDs by workspace ID.
+ * @param workspaceId Workspace ID
+ * @returns Array of tab group IDs if workspace exists. Otherwise, undefined.
+ */
+export const getTabGroupIdsByWorkspaceId = async (workspaceId: string): Promise<string[] | undefined> => {
+    // Check if workspace ID exists
+    const db = await dbPromise;
+    const workspace = await db.get("workspace", workspaceId);
+
+    if (workspace) {
+        const tx = db.transaction("tabGroups", "readonly");
+        const store = tx.objectStore("tabGroups");
+        const index = store.index("byTimeCreated");
+        const tabGroups = await index.getAll();
+
+        return tabGroups.map((tabGroup) => tabGroup.id);
+    }
+
+    return undefined;
+}
 
 /**
  * @returns List of all tab groups
