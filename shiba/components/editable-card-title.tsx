@@ -1,7 +1,6 @@
 import { type Component, type ComponentProps, createSignal } from "solid-js";
 import { CardTitle } from "./ui/card";
 
-// TODO: Doesn't unfocus later
 export const EditableCardTitle: Component<
     Omit<
         ComponentProps<"h3"> & {
@@ -43,6 +42,8 @@ export const EditableCardTitle: Component<
                     onKeyDown={(e) => {
                         if (e.key === "Enter") {
                             handleBlur();
+                        } else if (e.key === "Escape") {
+                            setIsEditing(false);
                         }
                     }}
                     onBlur={handleBlur}
