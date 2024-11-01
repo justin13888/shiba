@@ -32,12 +32,6 @@ export function SearchBar() {
         );
     };
 
-    // TODO: Remove
-    createEffect(() => {
-        console.log("showSuggestions", showSuggestions());
-        console.log("data", suggestionsQuery.data);
-    })
-
     const suggestionsQuery = createQuery(() => ({
         queryKey: ['suggestions', search()],
         queryFn: () => fetchSuggestions(search()),
@@ -120,6 +114,7 @@ export function SearchBar() {
                                     fallback={<div>No suggestions found</div>}>
                                     {(filteredSuggestions) => (
                                         <Show when={filteredSuggestions().length > 0}
+                                            // TODO: This fallback causes layout shift
                                             fallback={<Motion.span>No suggestions...</Motion.span>}>
                                             <Motion.ul
                                                 id="search-suggestions"

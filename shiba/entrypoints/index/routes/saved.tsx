@@ -185,23 +185,25 @@ function WorkspaceContent({ workspaceId }: WorkspaceTabProps) {
             <Match when={tabGroupsQuery.isSuccess}>
                 <Show
                     when={tabGroupsQuery.data}
-                    fallback={<div>There are no tab groups...</div>}
                 >
                     {(tabGroups) => (
-                        // {/* TODO: State of length seem to not correctly update to nothing. Only fixed after hard refresh */}
-                        <div class="flex-col space-y-6">
-                            <For each={tabGroups()}>
-                                {(tabGroup) => (
-                                    <TabGroupCard
-                                        {...{
-                                            tabGroup,
-                                            tabGroupsRefetch:
-                                                tabGroupsQuery.refetch,
-                                        }}
-                                    />
-                                )}
-                            </For>
-                        </div>
+                        <Show when={tabGroups().length > 0}
+                            fallback={<div>There are no tab groups...</div>}>
+                            {/* TODO: State of length seem to not correctly update to nothing. Only fixed after hard refresh */}
+                            <div class="flex-col space-y-6">
+                                <For each={tabGroups()}>
+                                    {(tabGroup) => (
+                                        <TabGroupCard
+                                            {...{
+                                                tabGroup,
+                                                tabGroupsRefetch:
+                                                    tabGroupsQuery.refetch,
+                                            }}
+                                        />
+                                    )}
+                                </For>
+                            </div>
+                        </Show>
                     )}
                 </Show>
             </Match>
