@@ -1,18 +1,28 @@
-import { TextField, TextFieldRoot } from "@/components/ui/text-field";
-import { Search } from "lucide-solid";
-import { createEffect, createSignal, For, JSX, Match, onCleanup, Show, Switch } from "solid-js";
-import type { DOMElement } from "solid-js/jsx-runtime";
-import { Motion, Presence } from "solid-motionone";
-import { debounce } from 'lodash';
 import { Button } from "@/components/ui/button";
+import { TextField, TextFieldRoot } from "@/components/ui/text-field";
 import { cn } from "@/utils";
 import { createQuery } from "@tanstack/solid-query";
+import { debounce } from "lodash";
+import { Search } from "lucide-solid";
+import {
+    For,
+    type JSX,
+    Match,
+    Show,
+    Switch,
+    createEffect,
+    createSignal,
+    onCleanup,
+} from "solid-js";
+import type { DOMElement } from "solid-js/jsx-runtime";
+import { Motion, Presence } from "solid-motionone";
 
 const normalizeSearchTerm = (term: string) => term.trim().toLowerCase();
 
 export function SearchBar() {
     const [search, setSearch] = createSignal("");
-    const updateSearch = (value: string) => setSearch(normalizeSearchTerm(value));
+    const updateSearch = (value: string) =>
+        setSearch(normalizeSearchTerm(value));
     const [showSuggestions, setShowSuggestions] = createSignal(false);
     const [activeSuggestion, setActiveSuggestion] = createSignal(-1);
     let inputRef!: HTMLInputElement;
@@ -33,12 +43,15 @@ export function SearchBar() {
     };
 
     const suggestionsQuery = createQuery(() => ({
-        queryKey: ['suggestions', search()],
+        queryKey: ["suggestions", search()],
         queryFn: () => fetchSuggestions(search()),
         enabled: search().length > 0,
     }));
 
-    const handleInputChange: JSX.ChangeEventHandlerUnion<HTMLInputElement, Event> = debounce((e) => {
+    const handleInputChange: JSX.ChangeEventHandlerUnion<
+        HTMLInputElement,
+        Event
+    > = debounce((e) => {
         updateSearch(e.target.value);
         setShowSuggestions(true);
         setActiveSuggestion(-1);
@@ -50,7 +63,10 @@ export function SearchBar() {
         inputRef.focus();
     };
 
-    const handleKeyDown: JSX.EventHandlerUnion<HTMLInputElement, KeyboardEvent> = (e) => {
+    const handleKeyDown: JSX.EventHandlerUnion<
+        HTMLInputElement,
+        KeyboardEvent
+    > = (e) => {
         if (e.key === "ArrowDown") {
             e.preventDefault();
             if (suggestionsQuery.data) {
@@ -73,7 +89,11 @@ export function SearchBar() {
 
     createEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
-            if (inputRef && event.target && !inputRef.contains(event.target as Node)) {
+            if (
+                inputRef &&
+                event.target &&
+                !inputRef.contains(event.target as Node)
+            ) {
                 setShowSuggestions(false);
             }
         };
@@ -98,7 +118,6 @@ export function SearchBar() {
                     placeholder="Search..."
                     class="pl-8 w-full"
                     value={search()}
-
                     onChange={handleInputChange}
                     onKeyDown={handleKeyDown}
                     aria-autocomplete="list"
@@ -111,11 +130,20 @@ export function SearchBar() {
                             <Match when={suggestionsQuery.isSuccess}>
                                 <Show
                                     when={suggestionsQuery.data}
-                                    fallback={<div>No suggestions found</div>}>
+                                    fallback={<div>No suggestions found</div>}
+                                >
                                     {(filteredSuggestions) => (
-                                        <Show when={filteredSuggestions().length > 0}
+                                        <Show
+                                            when={
+                                                filteredSuggestions().length > 0
+                                            }
                                             // TODO: This fallback causes layout shift
-                                            fallback={<Motion.span>No suggestions...</Motion.span>}>
+                                            fallback={
+                                                <Motion.span>
+                                                    No suggestions...
+                                                </Motion.span>
+                                            }
+                                        >
                                             <Motion.ul
                                                 id="search-suggestions"
                                                 class="absolute z-10 w-full mt-1 bg-background border rounded-md shadow-lg"
@@ -124,14 +152,24 @@ export function SearchBar() {
                                                 exit={{ opacity: 0, y: -10 }}
                                                 transition={{ duration: 0.2 }}
                                             >
-                                                <For each={filteredSuggestions()}>
+                                                <For
+                                                    each={filteredSuggestions()}
+                                                >
                                                     {(suggestion, index) => (
                                                         <Motion.li
-                                                            initial={{ opacity: 0, y: -10 }}
-                                                            animate={{ opacity: 1, y: 0 }}
+                                                            initial={{
+                                                                opacity: 0,
+                                                                y: -10,
+                                                            }}
+                                                            animate={{
+                                                                opacity: 1,
+                                                                y: 0,
+                                                            }}
                                                             transition={{
                                                                 duration: 0.1,
-                                                                delay: index() * 0.05,
+                                                                delay:
+                                                                    index() *
+                                                                    0.05,
                                                             }}
                                                         >
                                                             <Button
@@ -139,8 +177,8 @@ export function SearchBar() {
                                                                 class={cn(
                                                                     "w-full justify-start rounded-none",
                                                                     index() ===
-                                                                    activeSuggestion() &&
-                                                                    "bg-accent",
+                                                                        activeSuggestion() &&
+                                                                        "bg-accent",
                                                                 )}
                                                                 onClick={() =>
                                                                     handleSuggestionClick(
@@ -159,12 +197,16 @@ export function SearchBar() {
                                 </Show>
                             </Match>
                             <Match when={suggestionsQuery.isError}>
-                                <div>Error: {suggestionsQuery.error?.message || "unknown"}</div>
+                                <div>
+                                    Error:{" "}
+                                    {suggestionsQuery.error?.message ||
+                                        "unknown"}
+                                </div>
                             </Match>
                         </Switch>
                     </Show>
                 </Presence>
             </form>
-        </TextFieldRoot >
+        </TextFieldRoot>
     );
 }

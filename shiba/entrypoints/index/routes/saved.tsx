@@ -124,7 +124,9 @@ const Saved: Component = () => {
                                             ) : (
                                                 <Home class="w-4 h-4 mr-2" />
                                             )}
-                                            <span class="max-w-20 truncate block">{workspace.name}</span>
+                                            <span class="max-w-20 truncate block">
+                                                {workspace.name}
+                                            </span>
                                         </TabsTrigger>
                                     )}
                                 </For>
@@ -183,12 +185,12 @@ function WorkspaceContent({ workspaceId }: WorkspaceTabProps) {
     return (
         <Switch fallback={<div>Loading...</div>}>
             <Match when={tabGroupsQuery.isSuccess}>
-                <Show
-                    when={tabGroupsQuery.data}
-                >
+                <Show when={tabGroupsQuery.data}>
                     {(tabGroups) => (
-                        <Show when={tabGroups().length > 0}
-                            fallback={<div>There are no tab groups...</div>}>
+                        <Show
+                            when={tabGroups().length > 0}
+                            fallback={<div>There are no tab groups...</div>}
+                        >
                             {/* TODO: State of length seem to not correctly update to nothing. Only fixed after hard refresh */}
                             <div class="flex-col space-y-6">
                                 <For each={tabGroups()}>
@@ -524,7 +526,6 @@ function TabGroupCard({ tabGroup, tabGroupsRefetch }: TabGroupCardProps) {
         </Switch>
     );
 }
-
 
 export default Saved;
 // TODO: Implement loading as Skeleton
