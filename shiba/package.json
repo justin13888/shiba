@@ -32,6 +32,7 @@
         "clsx": "^2.1.1",
         "date-fns": "^4.1.0",
         "idb": "^8.0.0",
+        "lodash": "^4.17.21",
         "lucide-solid": "^0.411.0",
         "nanoid": "^5.0.7",
         "solid-js": "^1.8.18",
@@ -42,6 +43,7 @@
     },
     "devDependencies": {
         "@biomejs/biome": "1.8.3",
+        "@types/lodash": "^4.17.13",
         "@types/webextension-polyfill": "^0.10.7",
         "@wxt-dev/module-solid": "^1.1.1",
         "autoprefixer": "^10.4.19",

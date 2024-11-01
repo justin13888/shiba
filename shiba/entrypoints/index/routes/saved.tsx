@@ -1,3 +1,4 @@
+import { DarkModeSwitcher } from "@/components/dark-mode-switcher";
 import { EditableCardTitle } from "@/components/editable-card-title";
 import { SuspenseImage } from "@/components/image";
 import { StatusBar } from "@/components/statusbar";
@@ -11,9 +12,10 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { TextField, TextFieldRoot } from "@/components/ui/text-field";
 import { Toaster, showToast } from "@/components/ui/toast";
 import type { Tab, TabGroup, Workspace } from "@/types/model";
-import { diffDate } from "@/utils";
+import { cn, diffDate } from "@/utils";
 import {
     deleteTab,
     deleteTabGroup,
@@ -22,9 +24,11 @@ import {
     updateTabGroup,
 } from "@/utils/db";
 import { queryClient } from "@/utils/query";
+import { FormControlContext } from "@kobalte/core";
 import type { DropdownMenuSubTriggerProps } from "@kobalte/core/dropdown-menu";
 import { Title } from "@solidjs/meta";
 import { createQuery } from "@tanstack/solid-query";
+import { format, fromUnixTime } from "date-fns";
 import {
     Briefcase,
     ExternalLink,
@@ -33,6 +37,7 @@ import {
     Home,
     MoreHorizontal,
     Plus,
+    Search,
     Trash2,
     Undo,
     X,
@@ -44,11 +49,11 @@ import {
     Match,
     Show,
     Switch,
+    createEffect,
     createSignal,
 } from "solid-js";
 import { browser } from "wxt/browser";
-import { fromUnixTime, format } from 'date-fns';
-import { DarkModeSwitcher } from "@/components/dark-mode-switcher";
+import { SearchBar } from "./saved/searchbar";
 
 // TODO: Make entire page layout not scrollable besides the interior list
 // TODO: Implement style
@@ -74,7 +79,7 @@ const Saved: Component = () => {
 
     const [activeWorkspace, setActiveWorkspace] = createSignal(
         workspaces[0].id,
-    );
+    ); // TODO: Hook this up to global state backed by local storage
 
     // TODO: Fix overall layout so status layout works
     return (
@@ -83,17 +88,18 @@ const Saved: Component = () => {
             <div class="h-screen bg-background p-8">
                 {/* Header */}
                 {/* TODO: Complete header */}
-                <header class="flex-none flex items-center justify-center">
-                    <div class="container flex flex-row flex-none items-center space-x-4 pb-4">
-                        <p class="text-4xl font-extrabold">Shiba</p>
-                        <div class="flex-grow">
-
+                <header class="mb-4">
+                    <div class="container grid h-16 grid-cols-3 items-center px-4">
+                        <div class="flex items-center">
+                            <p class="text-4xl font-extrabold">Shiba</p>
                         </div>
-                        <div class="flex-shrink-0 flex space-x-2">
+                        <div class="flex justify-center">
+                            <SearchBar />
+                        </div>
+                        <div class="flex justify-end space-x-2">
                             <DarkModeSwitcher />
                         </div>
                     </div>
-                    {/* TODO: Add search bar */}
                 </header>
 
                 {/* Workspace section */}
@@ -104,21 +110,21 @@ const Saved: Component = () => {
                         onChange={setActiveWorkspace}
                         class="w-full mx-auto flex flex-col justify-between items-center"
                     >
-                        <div class="flex max-w-4xl justify-between items-center mb-6 space-x-8">
+                        <div class="flex justify-between items-center mb-6 space-x-8">
                             {/* TODO: Responsiveness looks funny */}
                             <TabsList class="bg-transparent border rounded-lg">
                                 <For each={workspaces}>
                                     {(workspace) => (
                                         <TabsTrigger
                                             value={workspace.id}
-                                            class="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+                                            class="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground px-10"
                                         >
                                             {workspace.icon ? (
                                                 <workspace.icon />
                                             ) : (
                                                 <Home class="w-4 h-4 mr-2" />
                                             )}
-                                            <span>{workspace.name}</span>
+                                            <span class="max-w-20 truncate block">{workspace.name}</span>
                                         </TabsTrigger>
                                     )}
                                 </For>
@@ -134,7 +140,10 @@ const Saved: Component = () => {
                             <For each={workspaces}>
                                 {/* URGENT */}
                                 {(workspace) => (
-                                    <TabsContent value={workspace.id} class="mt-0">
+                                    <TabsContent
+                                        value={workspace.id}
+                                        class="mt-0"
+                                    >
                                         <div class="h-[calc(100vh-8rem)]">
                                             <WorkspaceContent
                                                 workspaceId={workspace.id}
@@ -197,7 +206,7 @@ function WorkspaceContent({ workspaceId }: WorkspaceTabProps) {
                 </Show>
             </Match>
             <Match when={tabGroupsQuery.isError}>
-                <div>Error: {tabGroupsQuery.error?.message}</div>
+                <div>Error: {tabGroupsQuery.error?.message || "unknown"}</div>
             </Match>
         </Switch>
     );
@@ -317,7 +326,10 @@ function TabGroupCard({ tabGroup, tabGroupsRefetch }: TabGroupCardProps) {
                         <Card class="mb-6 shadow-lg hover:shadow-xl transition-shadow duration-200">
                             <CardHeader class="flex flex-row items-center justify-between space-y-0 pb-2">
                                 <EditableCardTitle
-                                    initialValue={tabGroup.name || `Untitled ${format(fromUnixTime(tabGroup.timeCreated / 1000), 'yyyy-MM-dd HH:mm:ss')}`}
+                                    initialValue={
+                                        tabGroup.name ||
+                                        `Untitled ${format(fromUnixTime(tabGroup.timeCreated / 1000), "yyyy-MM-dd HH:mm:ss")}`
+                                    }
                                     onUpdateValue={async (name) => {
                                         const isUpdated = await updateTabGroup(
                                             tabGroup.id,
@@ -505,11 +517,12 @@ function TabGroupCard({ tabGroup, tabGroupsRefetch }: TabGroupCardProps) {
                 </Show>
             </Match>
             <Match when={tabsQuery.isError}>
-                <div>Error: {tabsQuery.error?.message}</div>
+                <div>Error: {tabsQuery.error?.message || "unknown"}</div>
             </Match>
         </Switch>
     );
 }
+
 
 export default Saved;
 // TODO: Implement loading as Skeleton

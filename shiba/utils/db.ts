@@ -50,7 +50,10 @@ export const addTabGroup = async (tabGroup: TabGroup) => {
  * @param updates Updates to apply
  * @returns True if tab group was updated, false if tab group was not found.
  */
-export const updateTabGroup = async (id: string, updates: Partial<TabGroup>) => {
+export const updateTabGroup = async (
+    id: string,
+    updates: Partial<TabGroup>,
+) => {
     logger.debug("Updating tab group:", id, updates);
 
     const db = await dbPromise;
@@ -228,7 +231,9 @@ export const getTabGroupById = async (
  * @param workspaceId Workspace ID
  * @returns Array of tab group IDs if workspace exists. Otherwise, undefined.
  */
-export const getTabGroupIdsByWorkspaceId = async (workspaceId: string): Promise<string[] | undefined> => {
+export const getTabGroupIdsByWorkspaceId = async (
+    workspaceId: string,
+): Promise<string[] | undefined> => {
     // Check if workspace ID exists
     const db = await dbPromise;
     const workspace = await db.get("workspace", workspaceId);
@@ -243,7 +248,7 @@ export const getTabGroupIdsByWorkspaceId = async (workspaceId: string): Promise<
     }
 
     return undefined;
-}
+};
 
 /**
  * @returns List of all tab groups

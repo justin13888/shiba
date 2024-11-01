@@ -30,7 +30,7 @@ export const EditableCardTitle: Component<
     const handleReset = () => {
         setIsEditing(false);
         setValue(props.initialValue);
-    }
+    };
 
     return (
         <CardTitle

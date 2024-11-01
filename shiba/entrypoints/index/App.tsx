@@ -1,19 +1,22 @@
 import { queryClient } from "@/utils/query";
+import { ColorModeProvider, ColorModeScript } from "@kobalte/core";
 import { MetaProvider, Title } from "@solidjs/meta";
-import { HashRouter, Navigate, Route, RouteSectionProps } from "@solidjs/router";
+import {
+    HashRouter,
+    Navigate,
+    Route,
+    type RouteSectionProps,
+} from "@solidjs/router";
 import { QueryClientProvider } from "@tanstack/solid-query";
 import { SolidQueryDevtools } from "@tanstack/solid-query-devtools";
-import { lazy, Suspense } from "solid-js";
-import { ColorModeProvider, ColorModeScript } from "@kobalte/core";
+import { Suspense, lazy } from "solid-js";
 
 const Layout = (props: RouteSectionProps) => (
     <MetaProvider>
         <ColorModeScript />
         <QueryClientProvider client={queryClient}>
             <Title>Shiba</Title>
-            <ColorModeProvider>
-                {props.children}
-            </ColorModeProvider>
+            <ColorModeProvider>{props.children}</ColorModeProvider>
             <SolidQueryDevtools initialIsOpen={false} />
         </QueryClientProvider>
     </MetaProvider>
@@ -21,10 +24,7 @@ const Layout = (props: RouteSectionProps) => (
 
 export const App = () => (
     <HashRouter root={Layout}>
-        <Route
-            path="/saved"
-            component={lazy(() => import("./routes/saved"))}
-        />
+        <Route path="/saved" component={lazy(() => import("./routes/saved"))} />
         <Route
             path="/import"
             component={lazy(() => import("./routes/import"))}
@@ -45,9 +45,6 @@ export const App = () => (
             path="/history"
             component={lazy(() => import("./routes/history"))}
         />
-        <Route
-            path="*"
-            component={() => <Navigate href="/saved" />}
-        />
+        <Route path="*" component={() => <Navigate href="/saved" />} />
     </HashRouter>
 );

@@ -104,7 +104,7 @@ export class Logger {
             return;
         }
 
-        const logEntry: Omit<LogEntry, 'id'> = {
+        const logEntry: Omit<LogEntry, "id"> = {
             timestamp: Date.now(),
             level,
             identifier: this.identifier,

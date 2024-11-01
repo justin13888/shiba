@@ -116,7 +116,7 @@ export const App = () => {
                                                 <Match
                                                     when={
                                                         level ===
-                                                        LogLevel.ERROR ||
+                                                            LogLevel.ERROR ||
                                                         level === LogLevel.FATAL
                                                     }
                                                 >

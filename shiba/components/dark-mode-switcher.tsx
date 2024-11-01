@@ -1,7 +1,7 @@
 import { ColorModeContext } from "@kobalte/core";
 import { Moon, Sun } from "lucide-solid";
-import { Component, useContext } from "solid-js";
 import { Motion } from "solid-Motionone";
+import { type Component, useContext } from "solid-js";
 
 export const DarkModeSwitcher: Component = () => {
     const { colorMode, toggleColorMode } = useContext(ColorModeContext)!;
@@ -10,7 +10,11 @@ export const DarkModeSwitcher: Component = () => {
         <button
             onClick={toggleColorMode}
             class="p-2 rounded-full bg-gray-200 dark:bg-gray-800 transition-colors duration-300"
-            aria-label={colorMode() === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+            aria-label={
+                colorMode() === "dark"
+                    ? "Switch to light mode"
+                    : "Switch to dark mode"
+            }
         >
             <Motion.div
                 animate={{ rotate: colorMode() === "dark" ? 360 : 0 }}
@@ -35,5 +39,5 @@ export const DarkModeSwitcher: Component = () => {
                 </Motion.div>
             </Motion.div>
         </button>
-    )
-}
+    );
+};
