@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { TextField, TextFieldRoot } from "@/components/ui/text-field";
 import { cn } from "@/utils";
+import { useSearchParams } from "@solidjs/router";
 import { createQuery } from "@tanstack/solid-query";
 import { debounce } from "lodash";
 import { Search } from "lucide-solid";
@@ -14,15 +15,16 @@ import {
     createSignal,
     onCleanup,
 } from "solid-js";
-import type { DOMElement } from "solid-js/jsx-runtime";
 import { Motion, Presence } from "solid-motionone";
 
 const normalizeSearchTerm = (term: string) => term.trim().toLowerCase();
 
 export function SearchBar() {
-    const [search, setSearch] = createSignal("");
-    const updateSearch = (value: string) =>
+    const [searchParams, setSearchParams] = useSearchParams();
+    const [search, setSearch] = createSignal(searchParams.search || "");
+    const updateSearch = (value: string) => {
         setSearch(normalizeSearchTerm(value));
+    };
     const [showSuggestions, setShowSuggestions] = createSignal(false);
     const [activeSuggestion, setActiveSuggestion] = createSignal(-1);
     let inputRef!: HTMLInputElement;
@@ -53,6 +55,10 @@ export function SearchBar() {
         Event
     > = debounce((e) => {
         updateSearch(e.target.value);
+        // Store search term in URL but maintain case
+        setSearchParams({
+            search: e.target.value,
+        });
         setShowSuggestions(true);
         setActiveSuggestion(-1);
     }, 100);
@@ -84,6 +90,8 @@ export function SearchBar() {
             setShowSuggestions(false);
         } else if (e.key === "Escape") {
             setShowSuggestions(false);
+        } else {
+            updateSearch(e.currentTarget.value);
         }
     };
 
@@ -177,8 +185,8 @@ export function SearchBar() {
                                                                 class={cn(
                                                                     "w-full justify-start rounded-none",
                                                                     index() ===
-                                                                        activeSuggestion() &&
-                                                                        "bg-accent",
+                                                                    activeSuggestion() &&
+                                                                    "bg-accent",
                                                                 )}
                                                                 onClick={() =>
                                                                     handleSuggestionClick(
