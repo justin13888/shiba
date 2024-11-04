@@ -54,10 +54,10 @@ import {
 } from "solid-js";
 import { browser } from "wxt/browser";
 import { SearchBar } from "./saved/searchbar";
+import { makePersisted } from "@solid-primitives/storage";
 
 // TODO: Make entire page layout not scrollable besides the interior list
 // TODO: Implement style
-// TODO: Implement search bar
 
 const Saved: Component = () => {
     // TODO: Replace with query
@@ -77,9 +77,9 @@ const Saved: Component = () => {
         },
     ];
 
-    const [activeWorkspace, setActiveWorkspace] = createSignal(
+    const [activeWorkspace, setActiveWorkspace] = makePersisted(createSignal(
         workspaces[0].id,
-    ); // TODO: Hook this up to global state backed by local storage
+    ), { storage: sessionStorage });
 
     // TODO: Fix overall layout so status layout works
     return (
@@ -134,6 +134,7 @@ const Saved: Component = () => {
                             <Button
                                 class="justify-center items-center aspect-square"
                                 size="icon"
+                                // TODO: Hook it into add more workspaces
                             >
                                 <Plus class="w-4 h-4" />
                             </Button>
