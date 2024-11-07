@@ -1,5 +1,6 @@
 import { type Component, type ComponentProps, createSignal } from "solid-js";
 import { CardTitle } from "./ui/card";
+import { cn } from "@/utils";
 
 export const EditableCardTitle: Component<
     Omit<
@@ -57,7 +58,10 @@ export const EditableCardTitle: Component<
                     autofocus
                 />
             ) : (
-                value() || <span class="italic">Untitled</span>
+                <span class={cn(
+                    "py-[14px]",
+                    value() && "italic",
+                )}>{value() || "Untitled"}</span>
             )}
         </CardTitle>
     );
