@@ -1,3 +1,7 @@
+import { createResource } from "solid-js";
+import { getTabCount } from "./db";
+import { Logger } from "./logger";
+
 const logger = new Logger(import.meta.url);
 
 export const [tabCount, { refetch: tabCountRefetch }] =

@@ -2,7 +2,8 @@
 
 import { nanoid } from "nanoid";
 import { Tab, type TabBundle, TabGroup } from "../types/model";
-import { getAllTabGroups, getAllTabs } from "./db";
+import { getAllTabGroups, getAllTabs, getTabsById } from "./db";
+import { Logger } from "./logger";
 
 const logger = new Logger(import.meta.url);
 
@@ -26,8 +27,13 @@ export const parseOneTabUrl = (input: string): TabBundle[] => {
 
     const lines = input.split("\n");
     const groups: TabBundle[] = [];
-    let currentGroup: TabGroup = new TabGroup();
+    const currentTime = Date.now();
+    let i = 0;
+    let currentGroup: TabGroup = new TabGroup({
+        timeCreated: currentTime,
+    });
     let currentTabs: Tab[] = [];
+    let order = 0;
 
     let lineCount = 0;
     for (const line of lines) {
@@ -37,9 +43,12 @@ export const parseOneTabUrl = (input: string): TabBundle[] => {
         if (l === "") {
             if (currentTabs.length > 0) {
                 groups.push([currentGroup, currentTabs]);
+                i++;
+                currentGroup = new TabGroup({
+                    timeCreated: currentTime - i,
+                });
+                currentTabs = [];
             }
-            currentGroup = new TabGroup();
-            currentTabs = [];
         } else {
             // Line should be of format: "url | title"
             // Note: title can contain "|"
@@ -60,11 +69,13 @@ export const parseOneTabUrl = (input: string): TabBundle[] => {
             // Create tab object
             const tab: Tab = {
                 id: nanoid(),
+                groupId: currentGroup.id,
+                order,
                 title: trimmedTitle,
                 url: trimmedUrl,
             };
+            order++;
             currentTabs.push(tab);
-            currentGroup.tabs.push(tab.id);
         }
     }
 
@@ -192,22 +203,23 @@ export const parseBetterOneTabUrl = async (
 
     return Promise.all(
         parsedJSON.map(async (group) => {
+            const tabGroup = new TabGroup({
+                timeCreated: group.time,
+            });
+
             const tabs = await Promise.all(
-                group.tabs.map(async (tab) => {
+                group.tabs.map(async (tab, index) => {
                     const favicon = await faviconFromString(tab.favIconUrl);
 
                     return new Tab({
+                        groupId: tabGroup.id,
+                        order: index,
                         favicon,
                         title: tab.title,
                         url: tab.url,
                     });
                 }),
             );
-            const tabGroup = new TabGroup({
-                timeCreated: group.time,
-                tabs: tabs.map((tab) => tab.id),
-            });
-            
 
             return [tabGroup, tabs];
         }),
@@ -237,7 +249,7 @@ export const exportTabBundlesOneTab = async (): Promise<string> => {
     let output = "";
     const tabGroups = await getAllTabGroups();
     for (const tabGroup of tabGroups) {
-        const tabs = await getTabsByGroup(tabGroup.groupId);
+        const tabs = await getTabsById(tabGroup.id);
         for (const tab of tabs) {
             output += `${tab.url} | ${tab.title}\n`;
         }

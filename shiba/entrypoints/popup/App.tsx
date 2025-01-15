@@ -1,10 +1,11 @@
 import { Skeleton } from "@/components/ui/skeleton";
-import { Tab, TabGroup } from "@/types/model";
-import { addTabBundle, clearTabs } from "@/utils/db";
-import { saveAllTabs, saveCurrentTab } from "@/utils/tabs";
 import { switchToOrOpenTab } from "@/utils";
+import { addSeedTabs, saveAllTabs } from "@/utils/actions";
 import { URLS } from "@/utils/constants";
+import { clearTabs } from "@/utils/db";
 import { tabCount, tabDBRefetch } from "@/utils/store";
+import { saveSelectedTabs } from "@/utils/tabs";
+import { For, Show } from "solid-js";
 
 // TODO: Style
 function App() {
@@ -16,9 +17,7 @@ function App() {
                         tabCount.state === "ready" ||
                         tabCount.state === "refreshing"
                     }
-                    fallback={
-                        <Skeleton height={72} width={62} radius={10} />
-                    }
+                    fallback={<Skeleton height={72} width={62} radius={10} />}
                 >
                     <p class="text-7xl font-extrabold text-gray-800">
                         {tabCount()}
@@ -32,80 +31,23 @@ function App() {
                 <For
                     each={
                         [
-                            [
-                                "Save Current Tab",
-                                async () => {
-                                    const savedTabId =
-                                        await saveCurrentTab();
-                                    tabDBRefetch();
-                                    await switchToOrOpenTab(URLS.SAVED);
-                                    if (savedTabId !== undefined) {
-                                        browser.tabs.remove(savedTabId);
-                                    }
-                                    // TODO: Force refresh all saved pages (since the DB has been replaced)
-                                },
-                            ],
-                            [
-                                "Save All Tabs",
-                                async () => {
-                                    const savedTabIds = await saveAllTabs();
-                                    tabDBRefetch();
-                                    await switchToOrOpenTab(URLS.SAVED);
-                                    for (const tabId of savedTabIds) {
-                                        browser.tabs.remove(tabId);
-                                    }
-                                    // TODO: Force refresh all saved pages (since the DB has been replaced)
-                                },
-                            ],
-                            [
-                                "Open Debug",
-                                () => {
-                                    switchToOrOpenTab(URLS.DEBUG);
-                                },
-                            ],
-                            [
-                                "Open Saved",
-                                () => {
-                                    switchToOrOpenTab(URLS.SAVED);
-                                },
-                            ],
+                            ["Save Current Tab", saveSelectedTabs], // TODO: Wrap this with a function in actions.ts and make it close exisitng tab, redirect, force refetch, etc.
+                            ["Save All Tabs", saveAllTabs], // TODO: Wrap this with a function in actions.ts and make it close exisitng tab, redirect, force refetch, etc.
+                            ["Open Debug", () => switchToOrOpenTab(URLS.DEBUG)],
+                            ["Open Saved", () => switchToOrOpenTab(URLS.SAVED)],
                             [
                                 "Open Options",
-                                () => {
-                                    switchToOrOpenTab(URLS.OPTIONS);
-                                },
+                                () => switchToOrOpenTab(URLS.OPTIONS),
                             ],
                             [
                                 "Open History",
-                                () => {
-                                    switchToOrOpenTab(URLS.HISTORY);
-                                },
+                                () => switchToOrOpenTab(URLS.HISTORY),
                             ],
                             [
-                                "Seed",
-                                async () => {
-                                    // TODO: Remove this later after testing
-                                    const newTabs = Array.from(
-                                        { length: 10 },
-                                        () => {
-                                            const tab = new Tab({
-                                                title: "Test Tab",
-                                                url: "https://example.com",
-                                            });
-                                            return tab;
-                                        },
-                                    );
-                                    const newTabGroup = new TabGroup({
-                                        tabs: newTabs.map((tab) => tab.id),
-                                    });
-                                    
-
-                                    addTabBundle([newTabGroup, newTabs]);
-
-                                    tabDBRefetch();
-                                    await switchToOrOpenTab(URLS.SAVED);
-                                },
+                                "Open Import",
+                                () => switchToOrOpenTab(URLS.IMPORT),
                             ],
+                            ["Seed", addSeedTabs],
                             [
                                 "Clear All",
                                 async () => {

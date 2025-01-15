@@ -1,20 +1,29 @@
-import type { TabBundle, Tab, TabGroup } from "@/types/model";
+import type { Tab, TabBundle, TabGroup } from "@/types/model";
 import type { TabDB } from "@/types/schema";
 import { openDB } from "idb";
+import { Logger } from "./logger";
 
 // TODO: Implement db versioning
+// TODO: Implement trash for tab and tab groups
 
 const logger = new Logger(import.meta.url);
 
 const dbPromise = openDB<TabDB>("tabs", 1, {
     upgrade(db) {
+        const workspaceStore = db.createObjectStore("workspace", {
+            keyPath: "id",
+        });
+        workspaceStore.createIndex("byOrder", "order");
+
         const tabGroupStore = db.createObjectStore("tabGroups", {
-            keyPath: "groupId",
+            keyPath: "id",
         });
         tabGroupStore.createIndex("byTimeCreated", "timeCreated");
         tabGroupStore.createIndex("byTimeModified", "timeModified");
 
         const tabStore = db.createObjectStore("tabs", { keyPath: "id" });
+        tabStore.createIndex("byGroupId", "groupId");
+        tabStore.createIndex("byGroupIdOrder", ["groupId", "order"]);
     },
 });
 
@@ -36,10 +45,40 @@ export const addTabGroup = async (tabGroup: TabGroup) => {
 };
 
 /**
+ * Update a tab group to the database.
+ * @param id Tab Group ID
+ * @param updates Updates to apply
+ * @returns True if tab group was updated, false if tab group was not found.
+ */
+export const updateTabGroup = async (
+    id: string,
+    updates: Partial<TabGroup>,
+) => {
+    logger.debug("Updating tab group:", id, updates);
+
+    const db = await dbPromise;
+    const tx = db.transaction("tabGroups", "readwrite");
+    const store = tx.objectStore("tabGroups");
+
+    const tabGroup = await store.get(id);
+    if (tabGroup) {
+        Object.assign(tabGroup, updates);
+        tabGroup.timeModified = Date.now();
+        store.put(tabGroup);
+    } else {
+        return false;
+    }
+
+    await tx.done;
+    return true;
+};
+
+/**
  * Add tabs to the database.
  * @param tabs
  */
 export const addTabs = async (tabs: Tab[]) => {
+    // TODO: might want to omit `order` field
     logger.debug("Adding tabs:", tabs);
 
     const db = await dbPromise;
@@ -59,28 +98,55 @@ export const addTabs = async (tabs: Tab[]) => {
  * @param tabGroupId Tab Group ID
  * @returns True if tab group was deleted, false if tab group was not found.
  */
-export const deleteTabGroup = async (tabGroupId: string) => {
-    const tabGroup = await getTabGroupById(tabGroupId);
-    if (tabGroup === undefined) {
-        return;
-    }
-
+export const deleteTabGroup = async (tabGroupId: string): Promise<boolean> => {
     const db = await dbPromise;
+    console.log("Deleting tab group:", tabGroupId);
 
-    // Delete tabs with tabGroupId
-    const tabsTx = db.transaction("tabs", "readwrite");
-    const tabsStore = tabsTx.objectStore("tabs");
-    for (const tabId of tabGroup.tabs) {
-        await tabsStore.delete(tabId);
+    // Delete tabs with tab.groupId === tabGroupId
+    const tabs = await getTabsById(tabGroupId);
+    const tx = db.transaction(["tabs", "tabGroups"], "readwrite");
+    const tabsStore = tx.objectStore("tabs");
+    for (const { id: tabId } of tabs) {
+        console.log("Deleting tab:", tabId);
+        tabsStore.delete(tabId);
+    }
+    // Delete tab group with tabGroupId
+    const tabGroupsStore = tx.objectStore("tabGroups");
+    tabGroupsStore.delete(tabGroupId);
+
+    await tx.done;
+
+    return true;
+};
+
+/**
+ * Delete a tab and tab group if empty from the database.
+ * @param tabId Tab ID
+ * @returns True if tab was deleted, false if tab was not found.
+ */
+export const deleteTab = async (tabId: string): Promise<boolean> => {
+    const db = await dbPromise;
+    // Check if tab exists
+    const tab = await getTabById(tabId);
+    if (tab === undefined) {
+        return false;
     }
 
-    // Delete tab group with tabGroupId
+    const tx = db.transaction("tabs", "readwrite");
+    const store = tx.objectStore("tabs");
+    store.delete(tabId);
+    await tx.done;
+
+    // Delete tab group if it is empty
+    const tabs = await getTabsById(tab.groupId);
     const tabGroupsTx = db.transaction("tabGroups", "readwrite");
     const tabGroupsStore = tabGroupsTx.objectStore("tabGroups");
-    await tabGroupsStore.delete(tabGroupId);
-
-    await tabsTx.done;
+    if (!tabs) {
+        tabGroupsStore.delete(tab.groupId);
+    }
     await tabGroupsTx.done;
+
+    return true;
 };
 
 /**
@@ -122,17 +188,30 @@ export const getTabById = async (tabId: string): Promise<Tab | undefined> => {
 
 /**
  * Get tabs by IDs.
- * @param tabIds Tab IDs
+ * @param tabGroupId Tab Group ID
  * @return Tab object
  */
-export const getTabsByIds = async (tabIds: string[]): Promise<Tab[]> => {
+export const getTabsById = async (tabGroupId: string): Promise<Tab[]> => {
     const db = await dbPromise;
     const tx = db.transaction("tabs", "readonly");
     const store = tx.objectStore("tabs");
-    
-    const tabs = await Promise.all(tabIds.map(tabId => store.get(tabId)));
-    
-    return tabs.filter(tab => tab !== undefined) as Tab[];
+    const index = store.index("byGroupIdOrder");
+    const range = IDBKeyRange.bound(
+        [tabGroupId, Number.NEGATIVE_INFINITY],
+        [tabGroupId, Number.POSITIVE_INFINITY],
+    );
+    const items = [];
+
+    let cursor = await index.openCursor(range);
+
+    while (cursor) {
+        items.push(cursor.value);
+        cursor = await cursor.continue();
+    }
+
+    await tx.done;
+
+    return items;
 };
 
 /**
@@ -140,17 +219,47 @@ export const getTabsByIds = async (tabIds: string[]): Promise<Tab[]> => {
  * @param tabGroupId Tab Group ID
  * @returns Array of tabs
  */
-export const getTabGroupById = async (tabGroupId: string): Promise<TabGroup | undefined> => {
+export const getTabGroupById = async (
+    tabGroupId: string,
+): Promise<TabGroup | undefined> => {
     const db = await dbPromise;
     return db.get("tabGroups", tabGroupId);
-}
+};
+
+/**
+ * Get tab group IDs by workspace ID.
+ * @param workspaceId Workspace ID
+ * @returns Array of tab group IDs if workspace exists. Otherwise, undefined.
+ */
+export const getTabGroupIdsByWorkspaceId = async (
+    workspaceId: string,
+): Promise<string[] | undefined> => {
+    // Check if workspace ID exists
+    const db = await dbPromise;
+    const workspace = await db.get("workspace", workspaceId);
+
+    if (workspace) {
+        const tx = db.transaction("tabGroups", "readonly");
+        const store = tx.objectStore("tabGroups");
+        const index = store.index("byTimeCreated");
+        const tabGroups = await index.getAll();
+
+        return tabGroups.map((tabGroup) => tabGroup.id);
+    }
+
+    return undefined;
+};
 
 /**
  * @returns List of all tab groups
  */
 export const getAllTabGroups = async (): Promise<TabGroup[]> => {
+    // TODO: Make it possible to paginate, sort, filter, etc.
     const db = await dbPromise;
-    return db.getAll("tabGroups");
+    const tx = db.transaction("tabGroups", "readonly");
+    const store = tx.objectStore("tabGroups");
+    const index = store.index("byTimeCreated");
+    return index.getAll().then((obj) => obj.reverse());
 };
 
 export const getTabCount = async (): Promise<number> => {
@@ -161,6 +270,7 @@ export const getTabCount = async (): Promise<number> => {
     return await store.count();
 };
 
+// TODO: Deprecate this function
 export const addTabBundle = ([tabGroup, tabs]: TabBundle) => {
     addTabGroup(tabGroup);
     addTabs(tabs);

@@ -1,3 +1,4 @@
+import { Logger } from "@/utils/logger";
 import { exportTabBundles, exportTabBundlesOneTab } from "@/utils/parse";
 import { Title } from "@solidjs/meta";
 import { type Component, createSignal } from "solid-js";
@@ -39,13 +40,13 @@ const Export: Component = () => {
                 setFeedbackType("error");
             }
 
-            logger.log("Export string:", exportString());
+            logger.info("Export string:", exportString());
         } catch (error) {
             setFeedbackMessage(
                 `Error exporting tabs: ${error instanceof Error ? error.message : error}`,
             );
             setFeedbackType("error");
-            logger.error(error);
+            logger.error("Error exporting tabs", error);
         }
     };
 

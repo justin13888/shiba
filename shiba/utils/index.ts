@@ -1,15 +1,19 @@
 import type { ClassValue } from "clsx";
 import { clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
+import { browser } from "wxt/browser";
 
 export function cn(...inputs: ClassValue[]) {
     return twMerge(clsx(inputs));
 }
 
 import type { Tabs } from "webextension-polyfill";
+import { Logger } from "./logger";
+import { DEFAULT_SETTINGS } from "./settings";
 
 const logger = new Logger(import.meta.url);
 
+// TODO: This doesn't work
 /**
  * Switch to or open tab
  * @param url
@@ -17,8 +21,10 @@ const logger = new Logger(import.meta.url);
 export const switchToOrOpenTab = async (url: string): Promise<Tabs.Tab> => {
     const existingTab = await (async () => {
         // Check if current tab is url
-        const currentTab = await browser.tabs.getCurrent();
-        if (currentTab && currentTab.url === url) {
+        const currentTab = await browser.tabs
+            .query({ active: true, currentWindow: true })
+            .then((tabs) => tabs[0]); // TODO: what does type not say undefined?
+        if (currentTab && currentTab.url?.startsWith(url)) {
             return currentTab;
         }
 
@@ -61,8 +67,12 @@ export const dateFormatter = new Intl.DateTimeFormat(DEFAULT_SETTINGS.locale, {
  * Convert unix timestamp to human readable diff date
  * @param timestamp
  */
-export const diffDate = (timestamp: number): string => {
-    const seconds = Math.floor((Date.now() - timestamp) / 1000);
+export const diffDate = (
+    timestamp: number,
+    currentTimestamp?: number,
+): string => {
+    const now = currentTimestamp || Date.now();
+    const seconds = Math.floor((now - timestamp) / 1000);
 
     let interval = Math.floor(seconds / 3600);
     if (interval >= 1) {

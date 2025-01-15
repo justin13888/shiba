@@ -1,7 +1,10 @@
 import { nanoid } from "nanoid";
+import type { JSX } from "solid-js";
 
 export interface TabOptions {
     id?: string;
+    groupId: string;
+    order: number;
     favicon?: string;
     title: string;
     url: string;
@@ -11,6 +14,11 @@ export interface TabOptions {
 export class Tab {
     /** Unique id */
     id: string;
+    /** Group ID */
+    groupId: string;
+    /** Order */
+    order: number;
+
     /** Favicon image (URL or data encoded URL) */
     favicon?: string;
     /** Title of the tab */
@@ -20,8 +28,18 @@ export class Tab {
     /** Notes */
     notes?: string;
 
-    constructor({ id, favicon, title, url, notes }: TabOptions) {
+    constructor({
+        id,
+        groupId,
+        order,
+        favicon,
+        title,
+        url,
+        notes,
+    }: TabOptions) {
         this.id = id || nanoid();
+        this.groupId = groupId;
+        this.order = order;
         this.favicon = favicon;
         this.title = title;
         this.url = url;
@@ -30,49 +48,79 @@ export class Tab {
 }
 
 export interface TabGroupOptions {
-    groupId?: string;
+    id?: string;
+    workspaceId?: string;
     name?: string;
     timeCreated?: number;
     timeModified?: number;
-    tabs?: string[];
     categories?: string[];
 }
 
 export class TabGroup {
-    /** Unique group ID */
-    groupId: string;
+    /** Unique ID */
+    id: string;
+    /** Workspace ID. Undefined indicates default */
+    workspaceId?: string;
 
     /** Name of the group */
     name?: string;
-    
+
     /**
      * Time created in milliseconds since epoch
      */
     timeCreated: number;
-    
+
     /**
      * Time last modified in milliseconds since epoch
      */
     timeModified: number;
 
     /**
-     * Tabs in the group by ID
-     */
-    tabs: string[];
-
-    /**
      * Categories by ID
      */
     categories: string[];
 
-    constructor({ groupId, name, timeCreated, timeModified, tabs, categories }: TabGroupOptions = {}) {
-        this.groupId = groupId || nanoid();
+    constructor({
+        id,
+        workspaceId,
+        name,
+        timeCreated,
+        timeModified,
+        categories,
+    }: TabGroupOptions = {}) {
+        this.id = id || nanoid();
+        this.workspaceId = workspaceId;
         this.name = name;
         this.timeCreated = timeCreated || Date.now();
-        this.timeModified = timeModified || this.timeCreated;
-        this.tabs = tabs || [];
+        this.timeModified = timeModified || this.timeCreated; // TODO: make sure any function updating this also updates timeModified
         this.categories = categories || [];
     }
 }
 
 export type TabBundle = [TabGroup, Tab[]];
+
+export interface WorkspaceOptions {
+    id?: string;
+    order: number;
+    name: string;
+    icon?: () => JSX.Element;
+}
+
+export class Workspace {
+    /** Unique ID */
+    id: string;
+    /** Order */
+    order: number;
+
+    /** Name of the workspace */
+    name: string;
+    /** JSX Icon */
+    icon?: () => JSX.Element;
+
+    constructor({ id, order, name, icon }: WorkspaceOptions) {
+        this.id = id || nanoid();
+        this.order = order;
+        this.name = name;
+        this.icon = icon;
+    }
+}

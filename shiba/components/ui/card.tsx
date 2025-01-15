@@ -1,5 +1,5 @@
 import type { Component, ComponentProps } from "solid-js";
-import { splitProps } from "solid-js";
+import { createSignal, splitProps } from "solid-js";
 
 import { cn } from "@/utils";
 

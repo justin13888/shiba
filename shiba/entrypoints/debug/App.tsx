@@ -1,8 +1,15 @@
 import { Button } from "@/components/ui/button";
 import { LogLevel, Logger, getLogs } from "@/utils/logger";
+import {
+    For,
+    Match,
+    Show,
+    Switch,
+    createResource,
+    createSignal,
+} from "solid-js";
 
-// TODO: Implement
-// TODO: View database
+// TODO: Implement log viewing with tanstack virtual, query
 export const App = () => {
     const logger = new Logger(import.meta.url);
     const addTestLogs = async () => {
@@ -35,8 +42,6 @@ export const App = () => {
             return result;
         },
     );
-    // TODO: Test behaviour when page, pageLimit are changed
-    // TODO: Test behaviour after refetch()
 
     const handleNextPage = () => {
         if (logs()?.length === pageLimit()) {
@@ -55,9 +60,7 @@ export const App = () => {
             <div class="pb-4 align-middle">
                 <h1 class="text-4xl font-extrabold">Shiba Debug</h1>
             </div>
-            <Button onClick={addTestLogs}>
-                Add test logs
-            </Button>
+            <Button onClick={addTestLogs}>Add test logs</Button>
             <div class="flex flex-col">
                 <Show
                     when={logs.state === "ready"}
@@ -137,10 +140,7 @@ export const App = () => {
             </div>
             <p>Page count: {page()}</p>
             <div class="flex flex-row space-x-6">
-                <Button
-                    onClick={handlePreviousPage}
-                    disabled={page() === 1}
-                >
+                <Button onClick={handlePreviousPage} disabled={page() === 1}>
                     Previous Page
                 </Button>
                 <Button
@@ -156,7 +156,7 @@ export const App = () => {
                 </Button>
             </div>
             {/* TODO: Add Download logs button */}
-            {/* TODO: Add ability to filter out sensitive logs (e.g. PII) */}
+            {/* TODO: Add ability to filter out sensitive logs (e.g. PII), make sure to retain relative log position */}
         </div>
     );
 };
