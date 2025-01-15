@@ -35,7 +35,7 @@
         "idb": "^8.0.0",
         "lodash": "^4.17.21",
         "lucide-solid": "^0.411.0",
-        "nanoid": "^5.0.7",
+        "nanoid": "^5.0.9",
         "solid-js": "^1.8.18",
         "solid-motionone": "^1.0.2",
         "tailwind-merge": "^2.4.0",
