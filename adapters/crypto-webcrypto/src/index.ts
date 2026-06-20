@@ -1,3 +1,4 @@
+/// <reference lib="dom" />
 import type {
     CryptoEngine,
     DataKey,

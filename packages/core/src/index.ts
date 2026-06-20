@@ -16,3 +16,4 @@ export * from "./ordering/fractional-index";
 export * from "./ports";
 export * from "./search";
 export * from "./snapshot";
+export * from "./sync";

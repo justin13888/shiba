@@ -13,6 +13,7 @@
         "test:watch": "vitest"
     },
     "dependencies": {
+        "@shiba/sync-protocol": "workspace:*",
         "fractional-indexing": "^3.2.0",
         "nanoid": "^5.0.9",
         "valibot": "^1.0.0"

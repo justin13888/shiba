@@ -11,11 +11,13 @@
     },
     "dependencies": {
         "@hono/node-server": "^1.13.7",
+        "@hono/node-ws": "^1.1.1",
         "@shiba/core": "workspace:*",
         "@shiba/sync-protocol": "workspace:*",
         "better-sqlite3": "^11.7.0",
         "drizzle-orm": "^0.38.2",
         "hono": "^4.6.14",
+        "nanoid": "^5.0.9",
         "pino": "^9.5.0",
         "pino-pretty": "^13.0.0",
         "valibot": "^1.0.0",

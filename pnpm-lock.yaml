@@ -24,6 +24,12 @@ importers:
         specifier: ^13.6.20
         version: 13.6.31
     devDependencies:
+      '@shiba/crypto-webcrypto':
+        specifier: workspace:*
+        version: link:../crypto-webcrypto
+      '@shiba/sync-protocol':
+        specifier: workspace:*
+        version: link:../../packages/sync-protocol
       typescript:
         specifier: ^5.7.3
         version: 5.9.3
@@ -165,6 +171,9 @@ importers:
       '@hono/node-server':
         specifier: ^1.13.7
         version: 1.19.14(hono@4.12.26)
+      '@hono/node-ws':
+        specifier: ^1.1.1
+        version: 1.3.1(@hono/node-server@1.19.14(hono@4.12.26))(hono@4.12.26)
       '@shiba/core':
         specifier: workspace:*
         version: link:../../packages/core
@@ -180,6 +189,9 @@ importers:
       hono:
         specifier: ^4.6.14
         version: 4.12.26
+      nanoid:
+        specifier: ^5.0.9
+        version: 5.1.14
       pino:
         specifier: ^9.5.0
         version: 9.14.0
@@ -217,6 +229,9 @@ importers:
 
   packages/core:
     dependencies:
+      '@shiba/sync-protocol':
+        specifier: workspace:*
+        version: link:../sync-protocol
       fractional-indexing:
         specifier: ^3.2.0
         version: 3.2.0
@@ -1230,6 +1245,13 @@ packages:
     engines: {node: '>=18.14.1'}
     peerDependencies:
       hono: ^4
+
+  '@hono/node-ws@1.3.1':
+    resolution: {integrity: sha512-vo/MwCnpJAVHBkGzWjCJ28wF45fYHAfbPZcH2rodZODHtch2GHA94KtMfusmVycTUtsLAsaNsHhtY6P8X3RQsA==}
+    engines: {node: '>=18.14.1'}
+    peerDependencies:
+      '@hono/node-server': ^1.19.11
+      hono: ^4.6.0
 
   '@internationalized/date@3.12.2':
     resolution: {integrity: sha512-FY1Y+H64NDs+HAF6omlnWxm3mEpfgaCSWtL5l551ZZfImA+kGjPFgrnJrGjH6lfmLL0g8Z/mBu1R3kufeCp6Jw==}
@@ -4935,6 +4957,15 @@ snapshots:
   '@hono/node-server@1.19.14(hono@4.12.26)':
     dependencies:
       hono: 4.12.26
+
+  '@hono/node-ws@1.3.1(@hono/node-server@1.19.14(hono@4.12.26))(hono@4.12.26)':
+    dependencies:
+      '@hono/node-server': 1.19.14(hono@4.12.26)
+      hono: 4.12.26
+      ws: 8.21.0
+    transitivePeerDependencies:
+      - bufferutil
+      - utf-8-validate
 
   '@internationalized/date@3.12.2':
     dependencies:
