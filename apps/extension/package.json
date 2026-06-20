@@ -26,6 +26,7 @@
         "@shiba/crdt-yjs": "workspace:*",
         "@shiba/crypto-webcrypto": "workspace:*",
         "@shiba/storage-idb": "workspace:*",
+        "@shiba/sync-protocol": "workspace:*",
         "@solid-primitives/storage": "^4.2.1",
         "@solidjs/router": "^0.14.1",
         "@tanstack/solid-virtual": "^3.8.3",

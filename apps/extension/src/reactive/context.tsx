@@ -7,11 +7,12 @@ import {
     useContext,
 } from "solid-js";
 import { createRuntime } from "../runtime/container";
+import { startSync } from "../runtime/sync";
 import { createShibaStore, type ShibaStore } from "./store";
 
 const ShibaContext = createContext<ShibaStore>();
 
-/** Loads the runtime asynchronously, then provides the reactive store. */
+/** Loads the runtime, provides the reactive store, and starts sync if configured. */
 export function ShibaProvider(props: { children: JSX.Element }): JSX.Element {
     const [runtime] = createResource(createRuntime);
     return (
@@ -26,6 +27,13 @@ export function ShibaProvider(props: { children: JSX.Element }): JSX.Element {
             {(rt) => {
                 const store = createShibaStore(rt());
                 onCleanup(store.dispose);
+
+                let sync: { stop(): void } | null = null;
+                void startSync(rt().doc).then((handle) => {
+                    sync = handle;
+                });
+                onCleanup(() => sync?.stop());
+
                 return (
                     <ShibaContext.Provider value={store}>
                         {props.children}

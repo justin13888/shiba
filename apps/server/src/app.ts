@@ -1,6 +1,7 @@
 import { createHash, randomBytes } from "node:crypto";
 import { eq } from "drizzle-orm";
 import { Hono } from "hono";
+import { cors } from "hono/cors";
 import { createMiddleware } from "hono/factory";
 import { nanoid } from "nanoid";
 import * as v from "valibot";
@@ -35,6 +36,7 @@ type Vars = { Variables: { deviceId: string } };
 /** The HTTP surface of the sync server (the WebSocket relay is wired in index.ts). */
 export function createApp(db: Db, secret: string | undefined) {
     const app = new Hono<Vars>();
+    app.use("*", cors());
 
     const requireAuth = createMiddleware<Vars>(async (c, next) => {
         const token = bearer(c.req.header("authorization"));

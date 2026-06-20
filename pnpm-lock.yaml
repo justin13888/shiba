@@ -89,6 +89,9 @@ importers:
       '@shiba/storage-idb':
         specifier: workspace:*
         version: link:../../adapters/storage-idb
+      '@shiba/sync-protocol':
+        specifier: workspace:*
+        version: link:../../packages/sync-protocol
       '@solid-primitives/storage':
         specifier: ^4.2.1
         version: 4.3.4(solid-js@1.9.13)
