@@ -28,7 +28,7 @@ plus cross-cutting tags) and **sync you can actually trust**: offline-first, con
 | Snapshot retention, hybrid search ranking, analytics aggregation | ✅ core logic implemented & tested |
 | Folders / tags / trash / snapshots / analytics **UI**, drag-and-drop, command palette, sync setup UI, semantic-search model, themes | 🚧 integration layer over the finished engine |
 
-Everything green: `pnpm lint && pnpm typecheck && pnpm test` (~95 tests; `@shiba/core` ≥ 90% coverage).
+Everything green: `pnpm lint && pnpm typecheck && pnpm test` (70+ tests; `@shiba/core` ≥ 90% coverage).
 
 ## Architecture & key decisions
 
