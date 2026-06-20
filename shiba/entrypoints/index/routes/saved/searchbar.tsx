@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { TextField, TextFieldRoot } from "@/components/ui/text-field";
 import { cn } from "@/utils";
+import { getAllTabs } from "@/utils/db";
 import { useSearchParams } from "@solidjs/router";
 import { createQuery } from "@tanstack/solid-query";
 import { debounce } from "lodash";
@@ -25,29 +26,28 @@ export function SearchBar() {
     const updateSearch = (value: string) => {
         setSearch(normalizeSearchTerm(value));
     };
-    const [showSuggestions, setShowSuggestions] = createSignal(false);
+    const [showSuggestions, setShowSuggestions] = createSignal(true);
     const [activeSuggestion, setActiveSuggestion] = createSignal(-1);
     let inputRef!: HTMLInputElement;
 
-    const fetchSuggestions = async (query: string) => {
-        // TODO: Implement
-        const suggestions = [
-            "React",
-            "Next.js",
-            "TypeScript",
-            "TailwindCSS",
-            "Framer Motion",
-            "shadcn/ui",
-        ];
-        return suggestions.filter((suggestion) =>
-            suggestion.toLowerCase().includes(query.toLowerCase()),
-        );
-    };
+    const allTabsQuery = createQuery(() => ({
+        queryKey: ["tabs"],
+        queryFn: () => getAllTabs(),
+    }))
 
+    // TODO: hook in BM42 and deep embedding method
     const suggestionsQuery = createQuery(() => ({
         queryKey: ["suggestions", search()],
-        queryFn: () => fetchSuggestions(search()),
-        enabled: search().length > 0,
+        queryFn: () => {
+            if (!allTabsQuery.data) return;
+            return allTabsQuery.data
+                .map((tab) => tab.title)
+                .filter((title) =>
+                    normalizeSearchTerm(title).includes(search()))
+                .sort((a, b) => a.localeCompare(b))
+                .slice(0, 5);
+        },
+        enabled: search().length > 0 && !!allTabsQuery.data,
     }));
 
     const handleInputChange: JSX.ChangeEventHandlerUnion<
@@ -179,6 +179,7 @@ export function SearchBar() {
                                                                     index() *
                                                                     0.05,
                                                             }}
+                                                            class="overflow-hidden"
                                                         >
                                                             <Button
                                                                 variant="ghost"
@@ -187,6 +188,7 @@ export function SearchBar() {
                                                                     index() ===
                                                                     activeSuggestion() &&
                                                                     "bg-accent",
+                                                                    "block overflow-hidden overflow-ellipsis whitespace-nowrap",
                                                                 )}
                                                                 onClick={() =>
                                                                     handleSuggestionClick(

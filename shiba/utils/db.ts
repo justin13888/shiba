@@ -3,9 +3,7 @@ import type { TabDB } from "@/types/schema";
 import { openDB } from "idb";
 import { Logger } from "./logger";
 
-// TODO: Implement db versioning
 // TODO: Implement trash for tab and tab groups
-
 const logger = new Logger(import.meta.url);
 
 const dbPromise = openDB<TabDB>("tabs", 1, {
@@ -275,5 +273,3 @@ export const addTabBundle = ([tabGroup, tabs]: TabBundle) => {
     addTabGroup(tabGroup);
     addTabs(tabs);
 };
-
-// TODO: Handle when tabGroupId in a Tab object is not found
