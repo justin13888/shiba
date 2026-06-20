@@ -134,7 +134,7 @@ const Saved: Component = () => {
                             <Button
                                 class="justify-center items-center aspect-square"
                                 size="icon"
-                                // TODO: Hook it into add more workspaces
+                            // TODO: Hook it into add more workspaces
                             >
                                 <Plus class="w-4 h-4" />
                             </Button>
@@ -313,7 +313,7 @@ interface TabGroupCardProps {
 
 function TabGroupCard({ tabGroup, tabGroupsRefetch }: TabGroupCardProps) {
     const tabsQuery = createQuery(() => ({
-        queryKey: ["tabs", tabGroup.id],
+        queryKey: ["tabs", { tabGroupId: tabGroup.id }],
         queryFn: () => getTabsById(tabGroup.id),
         staleTime: 1000 * 60 * 1,
     }));
