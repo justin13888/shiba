@@ -5,9 +5,14 @@
  * concrete crypto implementation. It defines the model, the ports every adapter
  * implements, and all logic over a {@link DocSnapshot} — unit-testable in Node.
  */
-export const CORE_SCHEMA_VERSION = 2;
 
+export * from "./analytics";
+export { CORE_SCHEMA_VERSION } from "./constants";
 export * from "./doc";
+export * from "./import-export";
+export * from "./migration";
 export * from "./model";
 export * from "./ordering/fractional-index";
 export * from "./ports";
+export * from "./search";
+export * from "./snapshot";

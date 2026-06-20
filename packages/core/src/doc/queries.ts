@@ -1,13 +1,15 @@
-import { notImplemented } from "../internal/errors";
 import type {
     DocSnapshot,
     Folder,
+    FracIndex,
     Group,
     Id,
     Tab,
     Tag,
     Workspace,
 } from "../model";
+import { byOrder } from "../ordering/fractional-index";
+import { collectLive } from "./internal";
 
 /**
  * Pure selectors over a {@link DocSnapshot}. Each filters out soft-deleted
@@ -15,40 +17,85 @@ import type {
  * applies. These are the only place the UI reads document structure.
  */
 
-export function liveWorkspaces(_snap: DocSnapshot): Workspace[] {
-    return notImplemented("queries.liveWorkspaces");
+function pinnedFirst<T extends { pinned: boolean; order: FracIndex; id: Id }>(
+    a: T,
+    b: T,
+): number {
+    if (a.pinned !== b.pinned) return a.pinned ? -1 : 1;
+    return byOrder(a, b);
 }
-export function defaultWorkspace(_snap: DocSnapshot): Workspace | undefined {
-    return notImplemented("queries.defaultWorkspace");
+
+export function liveWorkspaces(snap: DocSnapshot): Workspace[] {
+    return collectLive(Object.values(snap.workspaces), () => true);
 }
+
+export function defaultWorkspace(snap: DocSnapshot): Workspace | undefined {
+    const live = liveWorkspaces(snap);
+    return live.find((w) => w.isDefault) ?? live[0];
+}
+
 export function liveFolders(
-    _snap: DocSnapshot,
-    _workspaceId: Id,
-    _parentId: Id | null,
+    snap: DocSnapshot,
+    workspaceId: Id,
+    parentId: Id | null,
 ): Folder[] {
-    return notImplemented("queries.liveFolders");
+    return collectLive(
+        Object.values(snap.folders),
+        (f) => f.workspaceId === workspaceId && f.parentId === parentId,
+    );
 }
+
 export function liveGroups(
-    _snap: DocSnapshot,
-    _workspaceId: Id,
-    _parentId: Id | null,
+    snap: DocSnapshot,
+    workspaceId: Id,
+    parentId: Id | null,
 ): Group[] {
-    return notImplemented("queries.liveGroups");
+    return Object.values(snap.groups)
+        .filter(
+            (g) =>
+                g.deletedAt === null &&
+                g.archivedAt === null &&
+                g.workspaceId === workspaceId &&
+                g.parentId === parentId,
+        )
+        .sort(pinnedFirst);
 }
-export function liveTabs(_snap: DocSnapshot, _groupId: Id): Tab[] {
-    return notImplemented("queries.liveTabs");
+
+export function liveTabs(snap: DocSnapshot, groupId: Id): Tab[] {
+    return Object.values(snap.tabs)
+        .filter((t) => t.deletedAt === null && t.groupId === groupId)
+        .sort(pinnedFirst);
 }
-export function liveTags(_snap: DocSnapshot): Tag[] {
-    return notImplemented("queries.liveTags");
+
+export function liveTags(snap: DocSnapshot): Tag[] {
+    return Object.values(snap.tags)
+        .filter((t) => t.deletedAt === null)
+        .sort((a, b) => a.name.localeCompare(b.name));
 }
-export function archivedGroups(_snap: DocSnapshot, _workspaceId: Id): Group[] {
-    return notImplemented("queries.archivedGroups");
+
+export function archivedGroups(snap: DocSnapshot, workspaceId: Id): Group[] {
+    return Object.values(snap.groups)
+        .filter(
+            (g) =>
+                g.deletedAt === null &&
+                g.archivedAt !== null &&
+                g.workspaceId === workspaceId,
+        )
+        .sort((a, b) => (b.archivedAt ?? 0) - (a.archivedAt ?? 0));
 }
-export function tabsByTag(_snap: DocSnapshot, _tagId: Id): Tab[] {
-    return notImplemented("queries.tabsByTag");
+
+export function tabsByTag(snap: DocSnapshot, tagId: Id): Tab[] {
+    return Object.values(snap.tabs)
+        .filter((t) => t.deletedAt === null && t.tagIds.includes(tagId))
+        .sort((a, b) => b.updatedAt - a.updatedAt);
 }
-export function groupTabCount(_snap: DocSnapshot, _groupId: Id): number {
-    return notImplemented("queries.groupTabCount");
+
+export function groupTabCount(snap: DocSnapshot, groupId: Id): number {
+    let count = 0;
+    for (const t of Object.values(snap.tabs)) {
+        if (t.deletedAt === null && t.groupId === groupId) count++;
+    }
+    return count;
 }
 
 export interface TrashContents {
@@ -57,6 +104,16 @@ export interface TrashContents {
     groups: Group[];
     tabs: Tab[];
 }
-export function trashed(_snap: DocSnapshot): TrashContents {
-    return notImplemented("queries.trashed");
+
+export function trashed(snap: DocSnapshot): TrashContents {
+    return {
+        workspaces: Object.values(snap.workspaces).filter(
+            (w) => w.deletedAt !== null,
+        ),
+        folders: Object.values(snap.folders).filter(
+            (f) => f.deletedAt !== null,
+        ),
+        groups: Object.values(snap.groups).filter((g) => g.deletedAt !== null),
+        tabs: Object.values(snap.tabs).filter((t) => t.deletedAt !== null),
+    };
 }
