@@ -1,0 +1,21 @@
+{
+    "name": "@shiba/crdt-yjs",
+    "version": "0.0.0",
+    "private": true,
+    "type": "module",
+    "exports": {
+        ".": "./src/index.ts"
+    },
+    "scripts": {
+        "typecheck": "tsc --noEmit",
+        "test": "vitest run"
+    },
+    "dependencies": {
+        "@shiba/core": "workspace:*",
+        "yjs": "^13.6.20"
+    },
+    "devDependencies": {
+        "typescript": "^5.7.3",
+        "vitest": "^3.0.0"
+    }
+}

@@ -15,6 +15,57 @@ importers:
         specifier: ^5.7.3
         version: 5.9.3
 
+  adapters/crdt-yjs:
+    dependencies:
+      '@shiba/core':
+        specifier: workspace:*
+        version: link:../../packages/core
+      yjs:
+        specifier: ^13.6.20
+        version: 13.6.31
+    devDependencies:
+      typescript:
+        specifier: ^5.7.3
+        version: 5.9.3
+      vitest:
+        specifier: ^3.0.0
+        version: 3.2.6(@types/node@22.19.21)(jiti@2.7.0)(tsx@4.22.4)
+
+  adapters/crypto-webcrypto:
+    dependencies:
+      '@shiba/core':
+        specifier: workspace:*
+        version: link:../../packages/core
+      hash-wasm:
+        specifier: ^4.12.0
+        version: 4.12.0
+    devDependencies:
+      typescript:
+        specifier: ^5.7.3
+        version: 5.9.3
+      vitest:
+        specifier: ^3.0.0
+        version: 3.2.6(@types/node@22.19.21)(jiti@2.7.0)(tsx@4.22.4)
+
+  adapters/storage-idb:
+    dependencies:
+      '@shiba/core':
+        specifier: workspace:*
+        version: link:../../packages/core
+      idb:
+        specifier: ^8.0.0
+        version: 8.0.3
+    devDependencies:
+      fake-indexeddb:
+        specifier: ^6.0.0
+        version: 6.2.5
+      typescript:
+        specifier: ^5.7.3
+        version: 5.9.3
+      vitest:
+        specifier: ^3.0.0
+        version: 3.2.6(@types/node@22.19.21)(jiti@2.7.0)(tsx@4.22.4)
+
   apps/extension:
     dependencies:
       '@kobalte/core':
@@ -2296,6 +2347,10 @@ packages:
     engines: {node: '>= 10.17.0'}
     hasBin: true
 
+  fake-indexeddb@6.2.5:
+    resolution: {integrity: sha512-CGnyrvbhPlWYMngksqrSSUT1BAVP49dZocrHuK0SvtR0D5TMs5wP0o3j7jexDJW01KSadjBp1M/71o/KR3nD1w==}
+    engines: {node: '>=18'}
+
   fast-copy@4.0.3:
     resolution: {integrity: sha512-58apWr0GUiDFM8+3afrO6eYwJBn9ZAhDOzG3L+/9llab/haCARS2UIfffmOurYLwbgDRs8n0rfr6qAAPEAuAQw==}
 
@@ -2460,6 +2515,9 @@ packages:
   has-flag@4.0.0:
     resolution: {integrity: sha512-EykJT/Q1KjTWctppgIAgfSO0tKVuZUjhgMr17kqTumMl6Afv3EISleU7qZUzoXDFTAHTDC4NOoG/ZxU3EvlMPQ==}
     engines: {node: '>=8'}
+
+  hash-wasm@4.12.0:
+    resolution: {integrity: sha512-+/2B2rYLb48I/evdOIhP+K/DD2ca2fgBjp6O+GBEnCDk2e4rpeXIK8GvIyRPjTezgmWn9gmKwkQjjx6BtqDHVQ==}
 
   hasown@2.0.4:
     resolution: {integrity: sha512-T2UbfbBEF32wiepXIsMlTW9+dDYC6wMh/t/vYA4tuOMKqWz/n3vr1NFSxQiyP+zk2mXsoMA/i/7qV6LKut1t1A==}
@@ -2666,6 +2724,9 @@ packages:
     resolution: {integrity: sha512-WhB9zCku7EGTj/HQQRz5aUQEUeoQZH2bWcltRErOpymJ4boYE6wL9Tbr23krRPSZ+C5zqNSrSw+Cc7sZZ4b7vg==}
     engines: {node: '>=0.10.0'}
 
+  isomorphic.js@0.2.5:
+    resolution: {integrity: sha512-PIeMbHqMt4DnUP3MA/Flc0HElYjMXArsw1qwJZcm9sqR8mq3l8NYizFMty0pWwE/tzIGH3EKK5+jes5mAr85yw==}
+
   istanbul-lib-coverage@3.2.2:
     resolution: {integrity: sha512-O8dpsF+r0WV/8MNRKfnmrtCWhuKjxrq2w+jpzBL5UZKTi2LeVWnWOmWRxFlesJONmc+wLAGvKQZEOanko0LFTg==}
     engines: {node: '>=8'}
@@ -2737,6 +2798,11 @@ packages:
   latest-version@9.0.0:
     resolution: {integrity: sha512-7W0vV3rqv5tokqkBAFV1LbR7HPOWzXQDpDgEuib/aJ1jsZZx6x3c2mBI+TJhJzOhkGeaLbCKEHXEXLfirtG2JA==}
     engines: {node: '>=18'}
+
+  lib0@0.2.117:
+    resolution: {integrity: sha512-DeXj9X5xDCjgKLU/7RR+/HQEVzuuEUiwldwOGsHK/sfAfELGWEyTcf0x+uOvCvK3O2zPmZePXWL85vtia6GyZw==}
+    engines: {node: '>=16'}
+    hasBin: true
 
   lie@3.3.0:
     resolution: {integrity: sha512-UaiMJzeWRlEujzAuw5LokY1L5ecNQYZKfmyZ9L7wDHb/p5etKaxXhohBcrw0EYby+G/NA52vRSN4N39dxHAIwQ==}
@@ -3958,6 +4024,10 @@ packages:
 
   yauzl@2.10.0:
     resolution: {integrity: sha512-p4a9I6X6nu6IhoGmBqAcbJy1mlC4j27vEPZX9F4L4/vZT3Lyq1VkFHw/V/PUcB9Buo+DG3iHkT0x3Qya58zc3g==}
+
+  yjs@13.6.31:
+    resolution: {integrity: sha512-Eq+5BRfbeGyqGVrTJL3bEcr8gKkxPuyuoHmAwpk52fDb8kOVMrfVSTRPd6yiGgX5Fskb96qCRjzjbRjrL4YEnw==}
+    engines: {node: '>=16.0.0', npm: '>=8.0.0'}
 
   zip-dir@2.0.0:
     resolution: {integrity: sha512-uhlsJZWz26FLYXOD6WVuq+fIcZ3aBPGo/cFdiLlv3KNwpa52IF3ISV8fLhQLiqVu5No3VhlqlgthN6gehil1Dg==}
@@ -5757,6 +5827,8 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
+  fake-indexeddb@6.2.5: {}
+
   fast-copy@4.0.3: {}
 
   fast-glob@3.3.3:
@@ -5914,6 +5986,8 @@ snapshots:
 
   has-flag@4.0.0: {}
 
+  hash-wasm@4.12.0: {}
+
   hasown@2.0.4:
     dependencies:
       function-bind: 1.1.2
@@ -6052,6 +6126,8 @@ snapshots:
 
   isobject@3.0.1: {}
 
+  isomorphic.js@0.2.5: {}
+
   istanbul-lib-coverage@3.2.2: {}
 
   istanbul-lib-report@3.0.1:
@@ -6117,6 +6193,10 @@ snapshots:
   latest-version@9.0.0:
     dependencies:
       package-json: 10.0.1
+
+  lib0@0.2.117:
+    dependencies:
+      isomorphic.js: 0.2.5
 
   lie@3.3.0:
     dependencies:
@@ -7483,6 +7563,10 @@ snapshots:
     dependencies:
       buffer-crc32: 0.2.13
       fd-slicer: 1.1.0
+
+  yjs@13.6.31:
+    dependencies:
+      lib0: 0.2.117
 
   zip-dir@2.0.0:
     dependencies:
