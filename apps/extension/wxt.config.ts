@@ -1,3 +1,4 @@
+import tailwindcss from "@tailwindcss/vite";
 import { defineConfig } from "wxt";
 
 // See https://wxt.dev/api/config.html
@@ -10,6 +11,7 @@ export default defineConfig({
     // `solid-js` on their own. Deduping also prevents duplicate reactive
     // runtimes when bundling workspace dependencies.
     vite: () => ({
+        plugins: [tailwindcss()],
         resolve: { dedupe: ["solid-js", "solid-js/web", "solid-js/store"] },
     }),
     imports: false,
