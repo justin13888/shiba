@@ -2,3 +2,15 @@ packages:
   - "packages/*"
   - "adapters/*"
   - "apps/*"
+
+# Enforce the Node 22 baseline (see "engines" in package.json and .nvmrc):
+# pnpm fails the install when the running Node version is out of range.
+engineStrict: true
+
+# pnpm >=10 blocks dependency install/build scripts by default. Allow the ones
+# this project needs: the server's native better-sqlite3 addon, esbuild's binary
+# (used by tsx/vitest/wxt), and spawn-sync (better-sqlite3 build helper).
+allowBuilds:
+  better-sqlite3: true
+  esbuild: true
+  spawn-sync: true
