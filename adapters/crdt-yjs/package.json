@@ -12,7 +12,7 @@
     },
     "dependencies": {
         "@shiba/core": "workspace:*",
-        "yjs": "^13.6.20"
+        "yjs": "^13.6.31"
     },
     "devDependencies": {
         "@shiba/crypto-webcrypto": "workspace:*",

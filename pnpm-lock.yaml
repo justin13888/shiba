@@ -21,7 +21,7 @@ importers:
         specifier: workspace:*
         version: link:../../packages/core
       yjs:
-        specifier: ^13.6.20
+        specifier: ^13.6.31
         version: 13.6.31
     devDependencies:
       '@shiba/crypto-webcrypto':
@@ -59,7 +59,7 @@ importers:
         specifier: workspace:*
         version: link:../../packages/core
       idb:
-        specifier: ^8.0.0
+        specifier: ^8.0.3
         version: 8.0.3
     devDependencies:
       fake-indexeddb:
@@ -236,13 +236,13 @@ importers:
         specifier: workspace:*
         version: link:../sync-protocol
       fractional-indexing:
-        specifier: ^3.2.0
-        version: 3.2.0
+        specifier: ^3.3.0
+        version: 3.3.0
       nanoid:
-        specifier: ^5.0.9
-        version: 5.1.14
+        specifier: ^5.1.15
+        version: 5.1.15
       valibot:
-        specifier: ^1.0.0
+        specifier: ^1.4.1
         version: 1.4.1(typescript@6.0.3)
     devDependencies:
       '@vitest/coverage-v8':
@@ -258,7 +258,7 @@ importers:
   packages/sync-protocol:
     dependencies:
       valibot:
-        specifier: ^1.0.0
+        specifier: ^1.4.1
         version: 1.4.1(typescript@6.0.3)
     devDependencies:
       typescript:
@@ -2538,8 +2538,8 @@ packages:
   fraction.js@5.3.4:
     resolution: {integrity: sha512-1X1NTtiJphryn/uLQz3whtY6jK3fTqoE3ohKs0tT+Ujr1W59oopxmoEh7Lu5p6vBaPbgoM0bzveAW4Qi5RyWDQ==}
 
-  fractional-indexing@3.2.0:
-    resolution: {integrity: sha512-PcOxmqwYCW7O2ovKRU8OoQQj2yqTfEB/yeTYk4gPid6dN5ODRfU1hXd9tTVZzax/0NkO7AxpHykvZnT1aYp/BQ==}
+  fractional-indexing@3.3.0:
+    resolution: {integrity: sha512-Xggy9QEn0woYG6KNtZmmr4uSjVA09AM7goAzveL8A8VACNGQRNXtI/lUfXCgOa7qOEY/Y8/D9vmFwBorHG/sSQ==}
     engines: {node: ^14.13.1 || >=16.0.0}
 
   fs-constants@1.0.0:
@@ -3129,6 +3129,11 @@ packages:
 
   nanoid@5.1.14:
     resolution: {integrity: sha512-5c8l8kVzqpnDPaicbEop/fV0Q1w16FmbWtVhMqugTozAwYdlIQojWH5a/M7UfziFmGdQRrUdV+EPzc9Xng3VAQ==}
+    engines: {node: ^18 || >=20}
+    hasBin: true
+
+  nanoid@5.1.15:
+    resolution: {integrity: sha512-kBg3RpGtIe+RpTbyXwoI6pk5yD7KUiI3sygUqgeBMRst42KmhB4RZC7eiO9Wa1HIpaCCtpE2DJ6OI4Wi5ebwFw==}
     engines: {node: ^18 || >=20}
     hasBin: true
 
@@ -6161,7 +6166,7 @@ snapshots:
 
   fraction.js@5.3.4: {}
 
-  fractional-indexing@3.2.0: {}
+  fractional-indexing@3.3.0: {}
 
   fs-constants@1.0.0: {}
 
@@ -6671,6 +6676,8 @@ snapshots:
   nanoid@3.3.13: {}
 
   nanoid@5.1.14: {}
+
+  nanoid@5.1.15: {}
 
   napi-build-utils@2.0.0: {}
 

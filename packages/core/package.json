@@ -14,9 +14,9 @@
     },
     "dependencies": {
         "@shiba/sync-protocol": "workspace:*",
-        "fractional-indexing": "^3.2.0",
-        "nanoid": "^5.0.9",
-        "valibot": "^1.0.0"
+        "fractional-indexing": "^3.3.0",
+        "nanoid": "^5.1.15",
+        "valibot": "^1.4.1"
     },
     "devDependencies": {
         "@vitest/coverage-v8": "^4.1.9",

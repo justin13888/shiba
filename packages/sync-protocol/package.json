@@ -11,7 +11,7 @@
         "test": "vitest run --passWithNoTests"
     },
     "dependencies": {
-        "valibot": "^1.0.0"
+        "valibot": "^1.4.1"
     },
     "devDependencies": {
         "typescript": "^6.0.3",
