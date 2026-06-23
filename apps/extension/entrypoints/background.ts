@@ -1,6 +1,6 @@
 import { type BrowserTab, ops, queries } from "@shiba/core";
 import { browser } from "wxt/browser";
-import { defineBackground } from "wxt/sandbox";
+import { defineBackground } from "wxt/utils/define-background";
 import { webextTabs } from "@/src/adapters/tabs";
 import { createRuntime } from "@/src/runtime/container";
 
