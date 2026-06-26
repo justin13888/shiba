@@ -7,7 +7,8 @@
 [tools]
 hk = "1.48.0"                       # git hook manager — https://hk.jdx.dev
 pkl = "0.31.1"                       # config language hk.pkl is written in
-"github:convco/convco" = "0.6.4"    # conventional-commit linter (commit-msg hook)
+"github:convco/convco" = "0.6.4"    # conventional-commit linter + version bumps
+git-cliff = "2.13.1"                # changelog generator — https://git-cliff.org
 
 [hooks]
 # Install hk's git hooks automatically after tools are provisioned. mise runs
