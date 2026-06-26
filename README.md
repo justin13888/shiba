@@ -73,7 +73,7 @@ Decisions, and why:
   types. **Lint/format = Biome.** **Strict TypeScript** with `noUncheckedIndexedAccess`.
 
 Deeper write-ups live in [`docs/`](docs/): `architecture`, `data-model`, `sync`,
-`encryption`, `sync-server`, `search`, `analytics`, `testing`.
+`encryption`, `sync-server`, `search`, `analytics`, `testing`, `releasing`.
 
 ## Getting started (development)
 
@@ -94,6 +94,13 @@ pnpm typecheck   # tsc --noEmit across the workspace
 pnpm test        # vitest across the workspace
 pnpm lint        # biome check
 ```
+
+### Commits & releases
+
+This repo enforces [Conventional Commits](https://www.conventionalcommits.org) and
+automates releases. Run `mise install` once to provision the commit/release tooling
+(`hk`, `convco`, `git-cliff`) and install the git hooks — `commit-msg` validates
+messages, `pre-commit` runs Biome. Full flow in [`docs/releasing.md`](docs/releasing.md).
 
 ## Self-hosting the sync server
 
