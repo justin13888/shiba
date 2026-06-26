@@ -1,0 +1,85 @@
+name: Release PR
+
+# Maintains an automated release PR (release-plz style). Whenever releasable
+# commits land on master, convco computes the next semantic version and git-cliff
+# regenerates the changelog; the bump to package.json + CHANGELOG.md is pushed to
+# a long-lived `release/next` branch and surfaced as a PR. Merging that PR is the
+# signal to tag the release, which triggers release.yml to publish.
+
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: release-pr
+  cancel-in-progress: true
+
+env:
+  HK: "0" # disable hk git hooks during CI git operations
+
+jobs:
+  release-pr:
+    runs-on: ubuntu-latest
+    # Skip the run triggered by the release PR's own merge commit.
+    if: github.event_name == 'workflow_dispatch' || !startsWith(github.event.head_commit.message, 'chore(release):')
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # full history + tags for convco/git-cliff
+
+      - name: Provision release tooling
+        uses: jdx/mise-action@v2
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc # for `npm pkg` version edits
+
+      - name: Compute next version
+        id: version
+        run: |
+          current="$(npm pkg get version | tr -d '"')"
+          next="$(convco version --bump)"
+          echo "current=$current" >>"$GITHUB_OUTPUT"
+          echo "next=$next" >>"$GITHUB_OUTPUT"
+          if [ "$current" = "$next" ]; then
+            echo "No releasable changes ($current); nothing to do."
+            echo "release=false" >>"$GITHUB_OUTPUT"
+          else
+            echo "release=true" >>"$GITHUB_OUTPUT"
+          fi
+
+      - name: Apply version bump and changelog
+        if: steps.version.outputs.release == 'true'
+        run: |
+          next="${{ steps.version.outputs.next }}"
+          npm pkg set version="$next"
+          git-cliff --config cliff.toml --tag "v$next" --output CHANGELOG.md
+
+      - name: Open or update release PR
+        if: steps.version.outputs.release == 'true'
+        uses: peter-evans/create-pull-request@v7
+        with:
+          branch: release/next
+          base: master
+          title: "chore(release): v${{ steps.version.outputs.next }}"
+          commit-message: "chore(release): v${{ steps.version.outputs.next }}"
+          labels: release
+          delete-branch: true
+          body: |
+            Automated release PR maintained by `.github/workflows/release-pr.yml`.
+
+            - **Version:** `${{ steps.version.outputs.current }}` → `${{ steps.version.outputs.next }}`
+            - Updates `package.json` and `CHANGELOG.md`.
+
+            After merging, publish the release by tagging the merge commit:
+
+            ```sh
+            git switch master && git pull
+            git tag v${{ steps.version.outputs.next }}
+            git push origin v${{ steps.version.outputs.next }}
+            ```
