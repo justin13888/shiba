@@ -1,0 +1,50 @@
+/// Git hooks for shiba, managed by hk — https://hk.jdx.dev
+///
+/// These hooks are installed automatically by `mise install` via the
+/// postinstall hook in mise.toml; no separate `hk install` step is needed.
+amends "package://github.com/jdx/hk/releases/download/v1.48.0/hk@1.48.0#/Config.pkl"
+import "package://github.com/jdx/hk/releases/download/v1.48.0/hk@1.48.0#/Builtins.pkl"
+
+/// Formatting/linting steps shared across hooks. Biome reads biome.jsonc for
+/// its own include/ignore rules; the builtin glob only gates which staged
+/// files trigger a run.
+local linters = new Mapping<String, Step> {
+  ["biome"] = (Builtins.biome) {
+    batch = true
+  }
+}
+
+hooks {
+  /// Reject non-conventional commit messages at commit time. convco reads the
+  /// message from stdin; --strip drops the trailing git comment lines so they
+  /// don't interfere with validation.
+  ["commit-msg"] {
+    steps {
+      ["convco"] {
+        check = "convco check --from-stdin --strip < {{commit_msg_file}}"
+      }
+    }
+  }
+
+  /// Format and lint staged files, auto-fixing in place. Unstaged changes are
+  /// stashed first so only what's being committed is touched.
+  ["pre-commit"] {
+    fix = true
+    stash = "git"
+    steps = linters
+  }
+
+  /// Last gate before pushing — check only, never mutate.
+  ["pre-push"] {
+    steps = linters
+  }
+
+  /// `hk check` / `hk fix` for ad-hoc runs over the whole tree.
+  ["check"] {
+    steps = linters
+  }
+  ["fix"] {
+    fix = true
+    steps = linters
+  }
+}
