@@ -169,6 +169,25 @@ describe("ops lifecycle", () => {
         expect(queries.liveTabs(doc.snapshot(), gid)).toHaveLength(3);
     });
 
+    it("a locked group resists direct deletion until unlocked", () => {
+        const { doc, deps, wsId } = workspace();
+        let gid = "";
+        doc.mutate((tx) => {
+            gid = ops.createGroup(tx, deps, { workspaceId: wsId }).id;
+            ops.setLocked(tx, deps, gid, true);
+        });
+        doc.mutate((tx) =>
+            ops.softDelete(tx, deps, { kind: "group", id: gid }),
+        );
+        expect(queries.liveGroups(doc.snapshot(), wsId, null)).toHaveLength(1);
+
+        doc.mutate((tx) => ops.setLocked(tx, deps, gid, false));
+        doc.mutate((tx) =>
+            ops.softDelete(tx, deps, { kind: "group", id: gid }),
+        );
+        expect(queries.liveGroups(doc.snapshot(), wsId, null)).toHaveLength(0);
+    });
+
     it("softDelete on a workspace cascades to folders, groups, and tabs", () => {
         const { doc, deps, wsId } = workspace();
         doc.mutate((tx) => {

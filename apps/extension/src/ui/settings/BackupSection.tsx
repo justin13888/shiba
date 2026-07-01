@@ -18,6 +18,7 @@ import {
     restoreSnapshot,
     setBackupSettings,
 } from "@/src/runtime/bridge/backup";
+import { Switch } from "@/src/ui/components/Switch";
 
 function downloadJson(name: string, text: string): void {
     const url = URL.createObjectURL(
@@ -124,16 +125,12 @@ export const BackupSection: Component = () => {
                 </p>
             </header>
 
-            <label class="flex items-center gap-2 text-sm">
-                <input
-                    type="checkbox"
-                    class="h-4 w-4"
-                    checked={settings()?.enabled ?? true}
-                    disabled={busy() || settings.loading}
-                    onChange={(e) => void toggle(e.currentTarget.checked)}
-                />
-                Automatically snapshot hourly when something changes
-            </label>
+            <Switch
+                checked={settings()?.enabled ?? true}
+                disabled={busy() || settings.loading}
+                onChange={(checked) => void toggle(checked)}
+                label="Automatically snapshot hourly when something changes"
+            />
 
             <div class="flex flex-wrap gap-2">
                 <Button
