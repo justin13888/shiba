@@ -1,4 +1,4 @@
-import { type Group, ops, queries, type Tab } from "@shiba/core";
+import { type Group, queries, type Tab } from "@shiba/core";
 import { makePersisted } from "@solid-primitives/storage";
 import { formatDistanceToNow } from "date-fns";
 import {
@@ -41,17 +41,18 @@ export const SavedView: Component = () => {
         const ws = active();
         if (!ws) return;
         const tabs = await webextTabs.queryCurrentWindow();
-        store.commit((tx) =>
-            ops.saveBrowserTabs(tx, store.deps, tabs, { workspaceId: ws.id }),
-        );
+        await store.dispatch({
+            type: "saveBrowserTabs",
+            tabs,
+            options: { workspaceId: ws.id },
+        });
     };
 
     const addWorkspace = () => {
-        store.commit((tx) =>
-            ops.createWorkspace(tx, store.deps, {
-                name: `Workspace ${workspaces().length + 1}`,
-            }),
-        );
+        void store.dispatch({
+            type: "createWorkspace",
+            input: { name: `Workspace ${workspaces().length + 1}` },
+        });
     };
 
     return (
@@ -129,21 +130,16 @@ const GroupCard: Component<{ group: Group; query: string }> = (props) => {
 
     const restoreAll = () => webextTabs.open(tabs().map((t) => t.url));
     const remove = () =>
-        store.commit((tx) =>
-            ops.softDelete(tx, store.deps, {
-                kind: "group",
-                id: props.group.id,
-            }),
-        );
+        void store.dispatch({
+            type: "softDelete",
+            ref: { kind: "group", id: props.group.id },
+        });
     const rename = (name: string) =>
-        store.commit((tx) =>
-            ops.rename(
-                tx,
-                store.deps,
-                { kind: "group", id: props.group.id },
-                name,
-            ),
-        );
+        void store.dispatch({
+            type: "rename",
+            ref: { kind: "group", id: props.group.id },
+            name,
+        });
 
     return (
         <Show when={props.query === "" || tabs().length > 0}>
@@ -204,9 +200,10 @@ const GroupCard: Component<{ group: Group; query: string }> = (props) => {
 const TabRow: Component<{ tab: Tab }> = (props) => {
     const store = useShiba();
     const remove = () =>
-        store.commit((tx) =>
-            ops.softDelete(tx, store.deps, { kind: "tab", id: props.tab.id }),
-        );
+        void store.dispatch({
+            type: "softDelete",
+            ref: { kind: "tab", id: props.tab.id },
+        });
     return (
         <li class="group flex items-center gap-2 px-4 py-1.5 hover:bg-accent/50">
             <Show

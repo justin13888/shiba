@@ -1,25 +1,31 @@
-import type { DocSnapshot, DocTx } from "@shiba/core";
+import type { Command, CommandResult, DocSnapshot } from "@shiba/core";
 import { createStore, reconcile } from "solid-js/store";
-import type { Runtime } from "../runtime/container";
+import type { BridgeClient } from "../runtime/bridge/client";
 
 /**
- * Bridges the CRDT document to Solid reactivity. Every change — a local commit
- * or an applied remote update — flows through the same `subscribe → reconcile`
- * path, so the UI reacts identically to local and synced edits. `reconcile`
- * structurally diffs the snapshot, so only components reading changed records
- * re-render.
+ * Bridges the mirrored CRDT document to Solid reactivity. Every worker broadcast
+ * flows through the same `subscribe → reconcile` path, so the UI reacts
+ * identically to this page's own edits and to edits from other contexts (or a
+ * restored snapshot). `reconcile` structurally diffs the snapshot, so only
+ * components reading changed records re-render. Mutations go out via `dispatch`.
  */
 export interface ShibaStore {
     readonly snap: DocSnapshot;
-    readonly deps: Runtime["deps"];
-    commit(fn: (tx: DocTx) => void): void;
+    dispatch(cmd: Command): Promise<CommandResult>;
     dispose(): void;
 }
 
-export function createShibaStore(rt: Runtime): ShibaStore {
-    const [snap, setSnap] = createStore<DocSnapshot>(rt.doc.snapshot());
-    const dispose = rt.doc.subscribe(() =>
-        setSnap(reconcile(rt.doc.snapshot())),
+export function createShibaStore(client: BridgeClient): ShibaStore {
+    const [snap, setSnap] = createStore<DocSnapshot>(client.doc.snapshot());
+    const unsubscribe = client.doc.subscribe(() =>
+        setSnap(reconcile(client.doc.snapshot())),
     );
-    return { snap, deps: rt.deps, commit: rt.commit, dispose };
+    return {
+        snap,
+        dispatch: (cmd) => client.dispatch(cmd),
+        dispose: () => {
+            unsubscribe();
+            client.dispose();
+        },
+    };
 }
