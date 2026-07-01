@@ -10,11 +10,16 @@ export interface RetentionPolicy {
 
 const HOUR = 60 * 60 * 1000;
 const DAY = 24 * HOUR;
+const WEEK = 7 * DAY;
 
-/** Stable ids (no per-load regeneration) so retention is deterministic. */
+/**
+ * The shipped policy: capture at most hourly, keep for one week, then auto-evict.
+ * A single stable id keeps retention deterministic (no per-load regeneration).
+ * This backup is a temporary safety-net while the CRDT/sync layer matures — see
+ * docs/backup.md.
+ */
 export const DEFAULT_RETENTION_POLICIES: RetentionPolicy[] = [
-    { id: "hourly", frequencyMs: HOUR, retainMs: DAY },
-    { id: "daily", frequencyMs: DAY, retainMs: 7 * DAY },
+    { id: "hourly", frequencyMs: HOUR, retainMs: WEEK },
 ];
 
 export interface RetentionPlan {
