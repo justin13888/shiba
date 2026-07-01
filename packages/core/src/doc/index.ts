@@ -14,3 +14,4 @@ export * as ops from "./ops";
 export type { TrashContents } from "./queries";
 export * as queries from "./queries";
 export * from "./reconcile";
+export * from "./restore";

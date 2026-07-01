@@ -1,9 +1,11 @@
 import { reconcile } from "@shiba/core";
 import { browser } from "wxt/browser";
 import type { WorkerRuntime } from "./runtime";
+import { runScheduledBackup } from "./snapshots";
 
 const COMPACT_ALARM = "shiba-compact";
 const RECONCILE_ALARM = "shiba-reconcile";
+const SNAPSHOT_ALARM = "shiba-snapshot";
 
 const DAY_MINUTES = 24 * 60;
 /** Hard-purge tombstones this old during the reconcile sweep. */
@@ -31,6 +33,8 @@ async function handleAlarm(
         runtime.doc.mutate((tx) =>
             reconcile(tx, runtime.deps, { tombstoneTtlMs: TOMBSTONE_TTL_MS }),
         );
+    } else if (name === SNAPSHOT_ALARM) {
+        await runScheduledBackup(await getRuntime(), Date.now());
     }
 }
 
@@ -38,8 +42,9 @@ async function handleAlarm(
  * Register the worker's maintenance alarms. Compaction collapses the append-log
  * baseline; the reconcile sweep is the document's self-heal (purge expired
  * tombstones, break folder cycles, re-parent orphans, repair order) that
- * `architecture.md` promised but nothing ran. The `onAlarm` listener is
- * registered synchronously so wake-up events aren't missed.
+ * `architecture.md` promised but nothing ran. The hourly snapshot is the backup
+ * safety-net (see docs/backup.md). The `onAlarm` listener is registered
+ * synchronously so wake-up events aren't missed.
  */
 export function registerMaintenanceAlarms(
     getRuntime: () => Promise<WorkerRuntime>,
@@ -49,4 +54,5 @@ export function registerMaintenanceAlarms(
     });
     void ensureAlarm(COMPACT_ALARM, 60);
     void ensureAlarm(RECONCILE_ALARM, DAY_MINUTES);
+    void ensureAlarm(SNAPSHOT_ALARM, 60);
 }

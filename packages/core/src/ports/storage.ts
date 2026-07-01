@@ -27,6 +27,12 @@ export interface SnapshotMeta {
     triggers: string[];
     tabCount: number;
     groupCount: number;
+    /**
+     * Content hash of {@link Snapshot.state}, for change-detection (skip a capture
+     * when nothing changed). Optional so snapshots from before this field remain
+     * valid — a missing hash simply reads as "changed".
+     */
+    stateHash?: string;
 }
 
 /** An immutable point-in-time export of the document, kept out of the live doc. */

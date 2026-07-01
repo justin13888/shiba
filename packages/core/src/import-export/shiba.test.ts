@@ -1,7 +1,13 @@
 import { describe, expect, it } from "vitest";
 import * as ops from "../doc/ops";
-import { createFakeDoc, testDeps } from "../testing";
-import { exportShiba, parseShiba, serializeShiba } from "./shiba";
+import { materializeDocSnapshot } from "../doc/restore";
+import { createFakeDoc, must, seqIdGen, testDeps } from "../testing";
+import {
+    exportShiba,
+    parseShiba,
+    serializeShiba,
+    shibaToSnapshot,
+} from "./shiba";
 
 function seeded() {
     const doc = createFakeDoc();
@@ -41,5 +47,20 @@ describe("shiba export/import", () => {
 
     it("rejects a foreign document", () => {
         expect(() => parseShiba('{"format":"nope"}')).toThrow();
+    });
+
+    it("restores from a file round-trip via shibaToSnapshot", () => {
+        const { doc } = seeded();
+        const snapshot = shibaToSnapshot(
+            parseShiba(serializeShiba(exportShiba(doc.snapshot(), 1))),
+        );
+        const target = createFakeDoc();
+        const deps = testDeps({ ids: seqIdGen("dst") });
+        target.mutate((tx) =>
+            materializeDocSnapshot(tx, deps, snapshot, { label: "file" }),
+        );
+        const snap = target.snapshot();
+        expect(must(Object.values(snap.workspaces)[0]).name).toBe("W (file)");
+        expect(Object.values(snap.tabs)).toHaveLength(1);
     });
 });

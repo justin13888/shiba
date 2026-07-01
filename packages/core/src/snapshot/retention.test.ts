@@ -22,18 +22,24 @@ describe("planRetention", () => {
     it("captures when a due policy has no snapshot", () => {
         const plan = planRetention([], DEFAULT_RETENTION_POLICIES, NOW);
         expect(plan.shouldCapture).toBe(true);
-        expect(plan.triggers).toEqual(["hourly", "daily"]);
+        expect(plan.triggers).toEqual(["hourly"]);
     });
 
     it("does not capture before the cadence elapses", () => {
-        const recent = [meta("s", NOW - 1000, ["hourly", "daily"])];
+        const recent = [meta("s", NOW - 1000, ["hourly"])];
         const plan = planRetention(recent, DEFAULT_RETENTION_POLICIES, NOW);
         expect(plan.shouldCapture).toBe(false);
     });
 
-    it("expires snapshots past every owning policy's retention", () => {
-        const old = meta("old", NOW - 8 * DAY, ["hourly", "daily"]);
+    it("expires hourly snapshots past the one-week retention", () => {
+        const old = meta("old", NOW - 8 * DAY, ["hourly"]);
         const plan = planRetention([old], DEFAULT_RETENTION_POLICIES, NOW);
         expect(plan.expiredIds).toContain("old");
+    });
+
+    it("keeps hourly snapshots within the one-week window", () => {
+        const recent = meta("recent", NOW - 3 * DAY, ["hourly"]);
+        const plan = planRetention([recent], DEFAULT_RETENTION_POLICIES, NOW);
+        expect(plan.expiredIds).not.toContain("recent");
     });
 });

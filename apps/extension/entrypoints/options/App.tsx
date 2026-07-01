@@ -1,6 +1,7 @@
 import { type Component, createSignal, Show } from "solid-js";
 import { Button } from "@/src/lib/ui/button";
 import { disconnectSync, setupSync } from "@/src/runtime/sync";
+import { BackupSection } from "@/src/ui/settings/BackupSection";
 
 const Field: Component<{
     label: string;
@@ -63,7 +64,7 @@ export const App: Component = () => {
     };
 
     return (
-        <main class="mx-auto max-w-md space-y-5 bg-background p-6 text-foreground">
+        <main class="mx-auto max-w-2xl space-y-5 bg-background p-6 text-foreground">
             <header class="space-y-1">
                 <h1 class="text-lg font-semibold">🐕 Shiba — Sync</h1>
                 <p class="text-sm text-muted-foreground">
@@ -112,6 +113,9 @@ export const App: Component = () => {
                     </p>
                 )}
             </Show>
+
+            <hr class="border-border" />
+            <BackupSection />
         </main>
     );
 };

@@ -65,3 +65,23 @@ const ShibaExportSchema = v.object({
 export function parseShiba(json: string): ShibaExport {
     return v.parse(ShibaExportSchema, JSON.parse(json));
 }
+
+const byId = <T extends { id: string }>(records: T[]): Record<string, T> =>
+    Object.fromEntries(records.map((record) => [record.id, record]));
+
+/**
+ * Re-key a parsed backup into a {@link DocSnapshot} so it can be fed to
+ * `materializeDocSnapshot` — the same restore path a local snapshot uses. This is
+ * what makes a `.shiba.json` file a true round-trippable backup, not just an
+ * export.
+ */
+export function shibaToSnapshot(data: ShibaExport): DocSnapshot {
+    return {
+        schemaVersion: data.version,
+        workspaces: byId(data.workspaces),
+        folders: byId(data.folders),
+        groups: byId(data.groups),
+        tabs: byId(data.tabs),
+        tags: byId(data.tags),
+    };
+}
