@@ -1,13 +1,14 @@
 import { Tabs } from "@kobalte/core/tabs";
 import { queries } from "@shiba/core";
 import { makePersisted } from "@solid-primitives/storage";
-import { Plus, Save, Search } from "lucide-solid";
+import { Plus, Save, Search, Trash2 } from "lucide-solid";
 import { type Component, createMemo, createSignal, For, Show } from "solid-js";
 import { webextTabs } from "@/src/adapters/tabs";
 import { Button } from "@/src/lib/ui/button";
 import { useShiba } from "@/src/reactive/context";
 import { GroupCard } from "./GroupCard";
 import { matchesQuery } from "./match";
+import { TrashDialog } from "./TrashDialog";
 
 const Empty: Component<{ message: string }> = (props) => (
     <p class="py-16 text-center text-muted-foreground">{props.message}</p>
@@ -55,6 +56,7 @@ const GroupList: Component<{ workspaceId: string; query: string }> = (
 export const SavedView: Component = () => {
     const store = useShiba();
     const [query, setQuery] = createSignal("");
+    const [trashOpen, setTrashOpen] = createSignal(false);
     const [activeId, setActiveId] = makePersisted(createSignal(""), {
         storage: sessionStorage,
         name: "shiba.activeWorkspace",
@@ -85,10 +87,18 @@ export const SavedView: Component = () => {
         <div class="mx-auto flex min-h-screen max-w-3xl flex-col gap-4 p-6">
             <header class="flex items-center gap-2">
                 <h1 class="mr-auto text-xl font-semibold">🐕 Shiba</h1>
+                <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => setTrashOpen(true)}
+                >
+                    <Trash2 class="h-4 w-4" /> Trash
+                </Button>
                 <Button size="sm" onClick={() => void saveCurrentWindow()}>
                     <Save class="h-4 w-4" /> Save window
                 </Button>
             </header>
+            <TrashDialog open={trashOpen()} onOpenChange={setTrashOpen} />
 
             <div class="flex items-center gap-2 rounded-md border border-input px-3 focus-within:ring-2 focus-within:ring-ring">
                 <Search
