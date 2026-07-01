@@ -5,6 +5,7 @@ import { webextTabs } from "@/src/adapters/tabs";
 import {
     getWorkerRuntime,
     manageSync,
+    registerMaintenanceAlarms,
     serveBridge,
 } from "@/src/runtime/background";
 
@@ -23,6 +24,8 @@ async function saveTabs(tabs: BrowserTab[]): Promise<void> {
 export default defineBackground(() => {
     // Own the document + serve the page bridge (RPC + live doc port).
     serveBridge(getWorkerRuntime);
+    // Periodic maintenance: compaction + the document self-heal sweep.
+    registerMaintenanceAlarms(getWorkerRuntime);
     // Build eagerly so the doc is loaded/persisted even before a page connects,
     // and run the encrypted sync engine here (not in a page) against that doc.
     void getWorkerRuntime().then((rt) => manageSync(rt.doc));

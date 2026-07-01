@@ -12,6 +12,7 @@ export function getWorkerRuntime(): Promise<WorkerRuntime> {
     return runtimePromise;
 }
 
+export { registerMaintenanceAlarms } from "./alarms";
 export type { WorkerRuntime } from "./runtime";
 export { manageSync } from "./sync";
 export { serveBridge };
