@@ -8,6 +8,7 @@ import { readBackupSettings, writeBackupSettings } from "../settings";
 import { exportBackup, importBackup, restoreSnapshotById } from "./backup";
 import type { WorkerRuntime } from "./runtime";
 import { runRetention } from "./snapshots";
+import { getSyncStatus } from "./sync";
 
 /**
  * Serve the messaging bridge from the worker: answer `dispatch` RPCs and stream
@@ -47,6 +48,7 @@ export function serveBridge(getRuntime: () => Promise<WorkerRuntime>): void {
     );
     onMessage("getBackupSettings", () => readBackupSettings());
     onMessage("setBackupSettings", ({ data }) => writeBackupSettings(data));
+    onMessage("getSyncStatus", () => getSyncStatus());
 
     browser.runtime.onConnect.addListener((port) => {
         if (port.name !== DOC_PORT) return;

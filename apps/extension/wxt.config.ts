@@ -18,6 +18,10 @@ export default defineConfig({
     manifest: {
         name: "Shiba",
         permissions: ["storage", "tabs", "alarms", "contextMenus"],
+        // No popup: clicking the toolbar icon fires `action.onClicked` in the
+        // background (save + close the window, open Shiba). An explicit empty
+        // `action` keeps the clickable icon now that the popup entrypoint is gone.
+        action: {},
         browser_specific_settings: {
             gecko: { id: "shiba@justinchung.net" },
         },

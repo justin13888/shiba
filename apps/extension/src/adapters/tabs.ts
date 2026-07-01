@@ -54,3 +54,25 @@ export const webextTabs: BrowserTabs = {
         }
     },
 };
+
+/**
+ * The OneTab-style "save this window" set: regular (non-pinned) tabs of the
+ * current window, minus the extension's own page. Pinned tabs are deliberately
+ * left alone, and Shiba never stashes/closes itself.
+ */
+export async function savableCurrentWindow(): Promise<BrowserTab[]> {
+    const appOrigin = browser.runtime.getURL("/");
+    const tabs = await browser.tabs.query({
+        currentWindow: true,
+        pinned: false,
+    });
+    return collect(tabs).filter((tab) => !tab.url.startsWith(appOrigin));
+}
+
+/** Close the given tabs by id, skipping any without one. */
+export async function closeTabs(tabs: BrowserTab[]): Promise<void> {
+    const ids = tabs
+        .map((tab) => tab.id)
+        .filter((id): id is number => id != null);
+    if (ids.length > 0) await webextTabs.close(ids);
+}

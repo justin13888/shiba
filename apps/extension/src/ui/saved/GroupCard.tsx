@@ -37,8 +37,21 @@ export const GroupCard: Component<{ group: Group; query: string }> = (
     );
     const title = (): string => props.group.name || "Untitled";
 
-    const restoreAll = (): void =>
-        void webextTabs.open(tabs().map((t) => t.url));
+    // Restore is the inverse of "Save window" (stash + close): once the tabs are
+    // back in the browser the stash is spent, so clear the group. We open *all*
+    // the group's tabs — not just the search-filtered view — and only clear after
+    // the open resolves, so a failed open keeps the stash intact. A locked group
+    // resists deletion (data-model.md), so it reopens but is left in place.
+    const restoreAll = async (): Promise<void> => {
+        const all = queries.liveTabs(store.snap, props.group.id);
+        if (all.length === 0) return;
+        await webextTabs.open(all.map((t) => t.url));
+        if (props.group.locked) return;
+        await store.dispatch({
+            type: "softDelete",
+            ref: { kind: "group", id: props.group.id },
+        });
+    };
     const rename = (name: string): void =>
         void store.dispatch({
             type: "rename",
@@ -113,7 +126,11 @@ export const GroupCard: Component<{ group: Group; query: string }> = (
                 >
                     <Pencil class="h-4 w-4" />
                 </Button>
-                <Button variant="ghost" size="sm" onClick={restoreAll}>
+                <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => void restoreAll()}
+                >
                     <RotateCcw class="h-4 w-4" /> Restore
                 </Button>
                 <Button

@@ -1,4 +1,5 @@
 import {
+    type ConnectionStatus,
     type CrdtDocument,
     createSyncEngine,
     type SyncEngine,
@@ -6,8 +7,17 @@ import {
 import { webCryptoEngine } from "@shiba/crypto-webcrypto";
 import { browser } from "wxt/browser";
 import { createWsTransport } from "@/src/adapters/transport";
-import { readDek, readSyncConfig } from "../sync";
+import { readDek, readSyncConfig, type SyncStatus } from "../sync";
 import { DOC_ID } from "./runtime";
+
+// The worker owns the single sync engine, so it also owns the one true
+// connection status. The Options page reads this via the `getSyncStatus` RPC.
+let current: SyncStatus = { status: "offline", lastOnlineAt: null };
+
+/** Latest sync connection status tracked by the worker's engine. */
+export function getSyncStatus(): SyncStatus {
+    return current;
+}
 
 /**
  * Run the encrypted sync engine from the worker (not the page), so the single
@@ -20,12 +30,24 @@ import { DOC_ID } from "./runtime";
 export function manageSync(doc: CrdtDocument): () => void {
     let engine: SyncEngine | null = null;
 
+    const setStatus = (status: ConnectionStatus): void => {
+        current = {
+            status,
+            lastOnlineAt:
+                status === "online" ? Date.now() : current.lastOnlineAt,
+        };
+    };
+
     async function restart(): Promise<void> {
         engine?.stop();
         engine = null;
         const config = await readSyncConfig();
         const dek = await readDek();
-        if (!config || !dek) return;
+        if (!config || !dek) {
+            // Unpaired (or locked): no engine, no history to report.
+            current = { status: "offline", lastOnlineAt: null };
+            return;
+        }
         const key = await webCryptoEngine.importRecoveryKey(dek);
         const next = createSyncEngine({
             doc,
@@ -34,6 +56,7 @@ export function manageSync(doc: CrdtDocument): () => void {
             key,
             token: config.token,
             docId: DOC_ID,
+            onStatus: setStatus,
         });
         await next.start();
         engine = next;
@@ -53,5 +76,6 @@ export function manageSync(doc: CrdtDocument): () => void {
     return () => {
         browser.storage.onChanged.removeListener(onChange);
         engine?.stop();
+        current = { status: "offline", lastOnlineAt: null };
     };
 }

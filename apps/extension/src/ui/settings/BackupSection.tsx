@@ -40,8 +40,12 @@ export const BackupSection: Component = () => {
     const [snapshots, { refetch }] = createResource(listSnapshots);
     const [settings, { mutate: mutateSettings }] =
         createResource(getBackupSettings);
-    const [status, setStatus] = createSignal("");
+    const [status, setStatus] = createSignal<{
+        ok: boolean;
+        message: string;
+    }>();
     const [busy, setBusy] = createSignal(false);
+    const [capturing, setCapturing] = createSignal(false);
     let fileInput: HTMLInputElement | undefined;
 
     const withBusy = async (fn: () => Promise<void>): Promise<void> => {
@@ -56,38 +60,49 @@ export const BackupSection: Component = () => {
     const toggle = (enabled: boolean) =>
         withBusy(async () => {
             mutateSettings(await setBackupSettings({ enabled }));
-            setStatus(
-                enabled
+            setStatus({
+                ok: true,
+                message: enabled
                     ? "Automatic hourly backups on."
                     : "Automatic backups off — you can still snapshot manually.",
-            );
+            });
         });
 
     const snapshotNow = () =>
         withBusy(async () => {
-            const captured = await captureSnapshot();
-            setStatus(
-                captured
-                    ? "Snapshot captured."
-                    : "No changes since the last snapshot.",
-            );
-            await refetch();
+            setCapturing(true);
+            try {
+                const captured = await captureSnapshot();
+                // A fresh object every time so the aria-live region re-announces
+                // and re-renders even when the message text is unchanged — key to
+                // surfacing repeated "nothing to do" clicks.
+                setStatus({
+                    ok: true,
+                    message: captured
+                        ? "Snapshot captured."
+                        : "No new snapshot — your data is unchanged since the last one.",
+                });
+                await refetch();
+            } finally {
+                setCapturing(false);
+            }
         });
 
     const restore = (id: string) =>
         withBusy(async () => {
             const result = await restoreSnapshot(id);
-            setStatus(
-                result
+            setStatus({
+                ok: result != null,
+                message: result
                     ? "Restored into a new workspace. Open Shiba to review it."
                     : "That snapshot is no longer available.",
-            );
+            });
         });
 
     const remove = (id: string) =>
         withBusy(async () => {
             await deleteSnapshot(id);
-            setStatus("Snapshot deleted.");
+            setStatus({ ok: true, message: "Snapshot deleted." });
             await refetch();
         });
 
@@ -95,7 +110,7 @@ export const BackupSection: Component = () => {
         withBusy(async () => {
             const date = new Date().toISOString().slice(0, 10);
             downloadJson(`shiba-backup-${date}.json`, await exportBackup());
-            setStatus("Backup exported.");
+            setStatus({ ok: true, message: "Backup exported." });
         });
 
     const onImport = (event: Event & { currentTarget: HTMLInputElement }) => {
@@ -105,9 +120,15 @@ export const BackupSection: Component = () => {
         void withBusy(async () => {
             try {
                 await importBackup(await file.text());
-                setStatus("Imported into a new workspace.");
+                setStatus({
+                    ok: true,
+                    message: "Imported into a new workspace.",
+                });
             } catch {
-                setStatus("That file isn't a valid Shiba backup.");
+                setStatus({
+                    ok: false,
+                    message: "That file isn't a valid Shiba backup.",
+                });
             }
         });
     };
@@ -139,7 +160,8 @@ export const BackupSection: Component = () => {
                     onClick={() => void snapshotNow()}
                     disabled={busy()}
                 >
-                    <Archive class="h-4 w-4" /> Snapshot now
+                    <Archive class="h-4 w-4" />{" "}
+                    {capturing() ? "Capturing…" : "Snapshot now"}
                 </Button>
                 <Button
                     size="sm"
@@ -167,8 +189,20 @@ export const BackupSection: Component = () => {
                 />
             </div>
 
-            <p class="min-h-5 text-sm text-muted-foreground" aria-live="polite">
-                {status()}
+            <p class="min-h-5 text-sm" aria-live="polite">
+                <Show keyed when={status()}>
+                    {(s) => (
+                        <span
+                            class={
+                                s.ok
+                                    ? "text-muted-foreground"
+                                    : "text-destructive"
+                            }
+                        >
+                            {s.message}
+                        </span>
+                    )}
+                </Show>
             </p>
 
             <Show

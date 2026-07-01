@@ -20,7 +20,9 @@ and Firefox.
   ctrl-click opens in a new tab; "copy link address" works (it's a real link).
 - [ ] **Rename group** — the Rename (pencil) button opens an inline input; Enter/blur
   commits, Escape cancels and returns focus to the button.
-- [ ] **Restore group** — "Restore" opens all the group's tabs.
+- [ ] **Restore group** — "Restore" opens all the group's tabs and then clears the
+  group (moves it to Trash) — the inverse of "Save window". A **locked** group reopens
+  but is left in place; a failed open keeps the stash.
 - [ ] **Delete confirms** — deleting a tab or group shows a confirm dialog; cancel
   aborts, confirm moves it to Trash.
 - [ ] **Locked group** — a locked group shows a lock and its delete is refused.

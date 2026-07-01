@@ -3,7 +3,7 @@ import { queries } from "@shiba/core";
 import { makePersisted } from "@solid-primitives/storage";
 import { Plus, Save, Search, Trash2 } from "lucide-solid";
 import { type Component, createMemo, createSignal, For, Show } from "solid-js";
-import { webextTabs } from "@/src/adapters/tabs";
+import { closeTabs, savableCurrentWindow } from "@/src/adapters/tabs";
 import { Button } from "@/src/lib/ui/button";
 import { useShiba } from "@/src/reactive/context";
 import { GroupCard } from "./GroupCard";
@@ -70,12 +70,16 @@ export const SavedView: Component = () => {
     const saveCurrentWindow = async (): Promise<void> => {
         const ws = active();
         if (!ws) return;
-        const tabs = await webextTabs.queryCurrentWindow();
+        // Excludes pinned tabs and this Shiba page, so saving from the app never
+        // stashes or closes the tab you're looking at.
+        const tabs = await savableCurrentWindow();
+        if (tabs.length === 0) return;
         await store.dispatch({
             type: "saveBrowserTabs",
             tabs,
             options: { workspaceId: ws.id },
         });
+        await closeTabs(tabs);
     };
     const addWorkspace = (): void =>
         void store.dispatch({

@@ -6,6 +6,7 @@ import type {
 } from "@shiba/core";
 import { defineExtensionMessaging } from "@webext-core/messaging";
 import type { BackupSettings } from "@/src/runtime/settings";
+import type { SyncStatus } from "@/src/runtime/sync";
 
 /**
  * Page → worker RPC. The background worker owns the document; a page never
@@ -24,6 +25,7 @@ export interface ProtocolMap {
     importBackup(json: string): RestoreResult;
     getBackupSettings(): BackupSettings;
     setBackupSettings(patch: Partial<BackupSettings>): BackupSettings;
+    getSyncStatus(): SyncStatus;
 }
 
 export const { sendMessage, onMessage } =

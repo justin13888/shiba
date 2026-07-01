@@ -1,4 +1,9 @@
-import type { DataKey, KdfParams, KeyEnvelope } from "@shiba/core";
+import type {
+    ConnectionStatus,
+    DataKey,
+    KdfParams,
+    KeyEnvelope,
+} from "@shiba/core";
 import { webCryptoEngine } from "@shiba/crypto-webcrypto";
 import { fromBase64, toBase64 } from "@shiba/sync-protocol";
 import { browser } from "wxt/browser";
@@ -6,6 +11,13 @@ import { browser } from "wxt/browser";
 export interface SyncConfig {
     serverUrl: string;
     token: string;
+}
+
+/** Live connection status of the worker's sync engine, for the Options UI. */
+export interface SyncStatus {
+    status: ConnectionStatus;
+    /** When the engine was last `online` (ms epoch), or null if never. */
+    lastOnlineAt: number | null;
 }
 
 /** The device's saved server pairing, if any (device-local). */
