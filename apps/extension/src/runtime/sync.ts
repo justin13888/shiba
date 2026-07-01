@@ -1,51 +1,30 @@
-import {
-    type CrdtDocument,
-    createSyncEngine,
-    type KdfParams,
-    type KeyEnvelope,
-} from "@shiba/core";
+import type { DataKey, KdfParams, KeyEnvelope } from "@shiba/core";
 import { webCryptoEngine } from "@shiba/crypto-webcrypto";
 import { fromBase64, toBase64 } from "@shiba/sync-protocol";
 import { browser } from "wxt/browser";
-import { createWsTransport } from "../adapters/transport";
 
-interface SyncConfig {
+export interface SyncConfig {
     serverUrl: string;
     token: string;
 }
 
-async function readConfig(): Promise<SyncConfig | null> {
+/** The device's saved server pairing, if any (device-local). */
+export async function readSyncConfig(): Promise<SyncConfig | null> {
     const { syncConfig } = await browser.storage.local.get("syncConfig");
     return syncConfig && typeof syncConfig === "object"
         ? (syncConfig as SyncConfig)
         : null;
 }
 
-/** Whether the device is configured and unlocked for sync this session. */
-export async function isSyncReady(): Promise<boolean> {
+/** The unlocked data key (hex), held only in memory-backed session storage. */
+export async function readDek(): Promise<string | null> {
     const { dek } = await browser.storage.session.get("dek");
-    return (await readConfig()) !== null && typeof dek === "string";
+    return typeof dek === "string" ? dek : null;
 }
 
-/** Start the sync engine if configured + unlocked; returns a stop handle or null. */
-export async function startSync(
-    doc: CrdtDocument,
-): Promise<{ stop(): void } | null> {
-    const config = await readConfig();
-    const { dek } = await browser.storage.session.get("dek");
-    if (!config || typeof dek !== "string") return null;
-
-    const key = await webCryptoEngine.importRecoveryKey(dek);
-    const transport = createWsTransport(config.serverUrl);
-    const engine = createSyncEngine({
-        doc,
-        transport,
-        crypto: webCryptoEngine,
-        key,
-        token: config.token,
-    });
-    await engine.start();
-    return { stop: () => engine.stop() };
+/** Whether the device is configured and unlocked for sync this session. */
+export async function isSyncReady(): Promise<boolean> {
+    return (await readSyncConfig()) !== null && (await readDek()) !== null;
 }
 
 interface SetupInput {
@@ -57,7 +36,9 @@ interface SetupInput {
 /**
  * Pair this device with a sync server and unlock encryption. Mints a device
  * token, then either opens the existing key envelope with the passphrase or
- * creates one on first use. Caches the data key in (memory-only) session storage.
+ * creates one on first use. Caches the data key in (memory-only) session
+ * storage; the background worker's sync manager reacts to that write and
+ * (re)starts the engine — no reload required.
  */
 export async function setupSync(input: SetupInput): Promise<void> {
     const base = input.serverUrl.replace(/\/$/, "");
@@ -75,7 +56,7 @@ export async function setupSync(input: SetupInput): Promise<void> {
     const existing = await fetch(`${base}/keys`, {
         headers: { authorization: `Bearer ${token}` },
     });
-    let key: import("@shiba/core").DataKey;
+    let key: DataKey;
     if (existing.ok) {
         const km = (await existing.json()) as {
             salt: string;

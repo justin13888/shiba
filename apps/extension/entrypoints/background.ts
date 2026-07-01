@@ -2,7 +2,11 @@ import { type BrowserTab, queries } from "@shiba/core";
 import { browser } from "wxt/browser";
 import { defineBackground } from "wxt/utils/define-background";
 import { webextTabs } from "@/src/adapters/tabs";
-import { getWorkerRuntime, serveBridge } from "@/src/runtime/background";
+import {
+    getWorkerRuntime,
+    manageSync,
+    serveBridge,
+} from "@/src/runtime/background";
 
 async function saveTabs(tabs: BrowserTab[]): Promise<void> {
     if (tabs.length === 0) return;
@@ -19,8 +23,9 @@ async function saveTabs(tabs: BrowserTab[]): Promise<void> {
 export default defineBackground(() => {
     // Own the document + serve the page bridge (RPC + live doc port).
     serveBridge(getWorkerRuntime);
-    // Build eagerly so the doc is loaded/persisted even before a page connects.
-    void getWorkerRuntime();
+    // Build eagerly so the doc is loaded/persisted even before a page connects,
+    // and run the encrypted sync engine here (not in a page) against that doc.
+    void getWorkerRuntime().then((rt) => manageSync(rt.doc));
 
     browser.runtime.onInstalled.addListener(() => {
         browser.contextMenus.create({

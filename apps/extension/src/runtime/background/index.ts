@@ -13,4 +13,5 @@ export function getWorkerRuntime(): Promise<WorkerRuntime> {
 }
 
 export type { WorkerRuntime } from "./runtime";
+export { manageSync } from "./sync";
 export { serveBridge };
