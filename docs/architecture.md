@@ -1,6 +1,6 @@
 # Architecture
 
-Shiba is a pnpm-workspace monorepo built around one idea: **the CRDT document is
+Shiba is a Bun-workspace monorepo built around one idea: **the CRDT document is
 the single source of truth**, and everything else is an adapter around it.
 
 ## Layering (ports & adapters)

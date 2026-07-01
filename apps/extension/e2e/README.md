@@ -8,9 +8,10 @@ scenarios it should cover are the journeys in [`../../../docs/QA.md`](../../../d
 ## Setup
 
 ```bash
-pnpm --filter @shiba/extension add -D @playwright/test
-pnpm --filter @shiba/extension exec playwright install chromium
-pnpm --filter @shiba/extension build            # produces .output/chrome-mv3
+cd apps/extension
+bun add -D @playwright/test
+bunx playwright install chromium
+bun run build            # produces .output/chrome-mv3
 ```
 
 ## Loading the extension

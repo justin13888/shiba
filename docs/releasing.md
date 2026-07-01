@@ -6,9 +6,9 @@ and the `release-pr` / `release` workflows under [`.github/workflows`](../.githu
 
 ## Toolchain (mise)
 
-[mise](https://mise.jdx.dev) provisions the commit/release tools — `hk`, `pkl`,
-`convco`, `git-cliff` — pinned in `mise.toml`. Node stays on `.nvmrc` and pnpm on
-corepack; mise only manages the new tooling.
+[mise](https://mise.jdx.dev) provisions Bun (the package manager) plus the
+commit/release tools — `hk`, `pkl`, `convco`, `git-cliff` — pinned in `mise.toml`.
+Node stays on `.nvmrc`.
 
 ```bash
 mise install   # provision tools AND install git hooks (postinstall → `hk install`)

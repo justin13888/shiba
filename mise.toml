@@ -1,10 +1,12 @@
 # mise dev toolchain — https://mise.jdx.dev
 #
-# Node stays governed by .nvmrc and pnpm by the `packageManager` field in
-# package.json (corepack); mise only provisions the commit/release tooling so a
-# fresh clone is one `mise install` away from a working setup.
+# Node stays governed by .nvmrc; mise provisions Bun (the package manager) and
+# the commit/release tooling so a fresh clone is one `mise install` away from a
+# working setup. The Bun version tracks the `packageManager` field in
+# package.json.
 
 [tools]
+bun = "1.3.13"                      # package manager + task runner — https://bun.sh
 hk = "1.48.0"                       # git hook manager — https://hk.jdx.dev
 pkl = "0.31.1"                       # config language hk.pkl is written in
 "github:convco/convco" = "0.6.4"    # conventional-commit linter + version bumps
