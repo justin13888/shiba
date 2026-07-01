@@ -474,10 +474,14 @@ export function softDelete(tx: DocTx, deps: OpDeps, ref: EntityRef): void {
         case "tag":
             setDeleted(tx.tags, ref.id, now, now);
             return;
-        case "group":
+        case "group": {
+            // A locked group resists direct deletion (data-model.md). Cascades
+            // from deleting its container are still explicit and proceed.
+            if (tx.groups.get(ref.id)?.locked) return;
             deleteGroupSubtree(tx, ref.id, now);
             deps.analytics?.record({ type: "group_deleted", at: now });
             return;
+        }
         case "folder":
             deleteFolderSubtree(tx, ref.id, now);
             return;
