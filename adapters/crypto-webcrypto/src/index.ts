@@ -1,11 +1,5 @@
 /// <reference lib="dom" />
-import type {
-    CryptoEngine,
-    DataKey,
-    KdfParams,
-    KeyEnvelope,
-    Sealed,
-} from "@shiba/core";
+import type { CryptoEngine, DataKey, KdfParams, Sealed } from "@shiba/core";
 import { argon2id } from "hash-wasm";
 
 /** OWASP-aligned Argon2id defaults (19 MiB, t=2, p=1). */

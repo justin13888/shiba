@@ -1,20 +1,35 @@
-import { type BrowserTab, ops, queries } from "@shiba/core";
+import { type BrowserTab, queries } from "@shiba/core";
 import { browser } from "wxt/browser";
 import { defineBackground } from "wxt/utils/define-background";
 import { webextTabs } from "@/src/adapters/tabs";
-import { createRuntime } from "@/src/runtime/container";
+import {
+    getWorkerRuntime,
+    manageSync,
+    registerMaintenanceAlarms,
+    serveBridge,
+} from "@/src/runtime/background";
 
 async function saveTabs(tabs: BrowserTab[]): Promise<void> {
     if (tabs.length === 0) return;
-    const rt = await createRuntime();
+    const rt = await getWorkerRuntime();
     const ws = queries.defaultWorkspace(rt.doc.snapshot());
     if (!ws) return;
-    rt.commit((tx) =>
-        ops.saveBrowserTabs(tx, rt.deps, tabs, { workspaceId: ws.id }),
-    );
+    rt.dispatch({
+        type: "saveBrowserTabs",
+        tabs,
+        options: { workspaceId: ws.id },
+    });
 }
 
 export default defineBackground(() => {
+    // Own the document + serve the page bridge (RPC + live doc port).
+    serveBridge(getWorkerRuntime);
+    // Periodic maintenance: compaction + the document self-heal sweep.
+    registerMaintenanceAlarms(getWorkerRuntime);
+    // Build eagerly so the doc is loaded/persisted even before a page connects,
+    // and run the encrypted sync engine here (not in a page) against that doc.
+    void getWorkerRuntime().then((rt) => manageSync(rt.doc));
+
     browser.runtime.onInstalled.addListener(() => {
         browser.contextMenus.create({
             id: "shiba-save-tab",

@@ -7,6 +7,7 @@
  */
 
 export * from "./analytics";
+export * from "./commands";
 export { CORE_SCHEMA_VERSION } from "./constants";
 export * from "./doc";
 export * from "./import-export";

@@ -6,34 +6,26 @@ import {
     Show,
     useContext,
 } from "solid-js";
-import { createRuntime } from "../runtime/container";
-import { startSync } from "../runtime/sync";
+import { connectBridge } from "../runtime/bridge/client";
 import { createShibaStore, type ShibaStore } from "./store";
 
 const ShibaContext = createContext<ShibaStore>();
 
-/** Loads the runtime, provides the reactive store, and starts sync if configured. */
+/** Connects to the worker-owned document and provides the reactive store. */
 export function ShibaProvider(props: { children: JSX.Element }): JSX.Element {
-    const [runtime] = createResource(createRuntime);
+    const [client] = createResource(connectBridge);
     return (
         <Show
-            when={runtime()}
+            when={client()}
             fallback={
                 <div class="grid min-h-screen place-items-center text-muted-foreground">
                     Loading…
                 </div>
             }
         >
-            {(rt) => {
-                const store = createShibaStore(rt());
+            {(c) => {
+                const store = createShibaStore(c());
                 onCleanup(store.dispose);
-
-                let sync: { stop(): void } | null = null;
-                void startSync(rt().doc).then((handle) => {
-                    sync = handle;
-                });
-                onCleanup(() => sync?.stop());
-
                 return (
                     <ShibaContext.Provider value={store}>
                         {props.children}

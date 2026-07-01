@@ -14,6 +14,8 @@ export interface SyncEngineOptions {
     crypto: CryptoEngine;
     key: DataKey;
     token: string;
+    /** Bound into every ciphertext as AES-GCM AAD, tying it to this document. */
+    docId: string;
     onStatus?: (status: ConnectionStatus) => void;
 }
 
@@ -30,6 +32,22 @@ function bytesEqual(a: Uint8Array, b: Uint8Array): boolean {
 }
 
 /**
+ * Deterministic bytes for a docId, used as GCM AAD. Both peers derive the same
+ * value from the same id; AAD only needs to be a consistent binding, not a
+ * particular charset — so this uses UTF-16 code units and avoids `TextEncoder`,
+ * which isn't in `core`'s minimal (DOM-free) lib.
+ */
+function docAad(docId: string): Uint8Array {
+    const bytes = new Uint8Array(docId.length * 2);
+    for (let i = 0; i < docId.length; i++) {
+        const code = docId.charCodeAt(i);
+        bytes[i * 2] = code & 0xff;
+        bytes[i * 2 + 1] = code >>> 8;
+    }
+    return bytes;
+}
+
+/**
  * Offline-first sync over an encrypted, blind relay. Local edits are encrypted
  * and pushed as deltas; remote updates are decrypted and merged. On (re)connect
  * the engine pushes its full state so the server can never miss an offline edit;
@@ -42,18 +60,27 @@ export function createSyncEngine(options: SyncEngineOptions): SyncEngine {
     let ref = 0;
     const cleanups: Array<() => void> = [];
 
+    // Bind every ciphertext to this document via GCM AAD, so a blob can't be
+    // replayed under a different doc. (Server-assigned `seq` can't be bound at
+    // seal time — the client doesn't know it yet — so position-binding is not
+    // attempted here; see docs/encryption.md.)
+    const aad = docAad(options.docId);
     const seal = async (bytes: Uint8Array): Promise<EncryptedBlob> => {
-        const sealed = await crypto.seal(key, bytes);
+        const sealed = await crypto.seal(key, bytes, aad);
         return {
             nonce: toBase64(sealed.nonce),
             ciphertext: toBase64(sealed.ciphertext),
         };
     };
     const open = (blob: EncryptedBlob): Promise<Uint8Array> =>
-        crypto.open(key, {
-            nonce: fromBase64(blob.nonce),
-            ciphertext: fromBase64(blob.ciphertext),
-        });
+        crypto.open(
+            key,
+            {
+                nonce: fromBase64(blob.nonce),
+                ciphertext: fromBase64(blob.ciphertext),
+            },
+            aad,
+        );
 
     async function pushDelta(): Promise<void> {
         if (

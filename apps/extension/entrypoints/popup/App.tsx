@@ -1,20 +1,26 @@
-import { ops, queries } from "@shiba/core";
+import { queries } from "@shiba/core";
 import { FolderOpen, Save } from "lucide-solid";
 import type { Component } from "solid-js";
 import { browser } from "wxt/browser";
 import { webextTabs } from "@/src/adapters/tabs";
 import { Button } from "@/src/lib/ui/button";
-import { createRuntime } from "@/src/runtime/container";
+import { connectBridge } from "@/src/runtime/bridge/client";
 
 async function saveCurrentWindow(): Promise<void> {
-    const rt = await createRuntime();
-    const ws = queries.defaultWorkspace(rt.doc.snapshot());
-    if (!ws) return;
-    const tabs = await webextTabs.queryCurrentWindow();
-    rt.commit((tx) =>
-        ops.saveBrowserTabs(tx, rt.deps, tabs, { workspaceId: ws.id }),
-    );
-    window.close();
+    const client = await connectBridge();
+    try {
+        const ws = queries.defaultWorkspace(client.doc.snapshot());
+        if (!ws) return;
+        const tabs = await webextTabs.queryCurrentWindow();
+        await client.dispatch({
+            type: "saveBrowserTabs",
+            tabs,
+            options: { workspaceId: ws.id },
+        });
+    } finally {
+        client.dispose();
+        window.close();
+    }
 }
 
 function openApp(): void {
