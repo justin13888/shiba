@@ -1,6 +1,7 @@
-import { type Component, createSignal, Show } from "solid-js";
+import { type Component, createSignal, ErrorBoundary, Show } from "solid-js";
 import { Button } from "@/src/lib/ui/button";
 import { disconnectSync, setupSync } from "@/src/runtime/sync";
+import { ErrorScreen } from "@/src/ui/components/ErrorScreen";
 import { BackupSection } from "@/src/ui/settings/BackupSection";
 
 const Field: Component<{
@@ -64,58 +65,60 @@ export const App: Component = () => {
     };
 
     return (
-        <main class="mx-auto max-w-2xl space-y-5 bg-background p-6 text-foreground">
-            <header class="space-y-1">
-                <h1 class="text-lg font-semibold">🐕 Shiba — Sync</h1>
-                <p class="text-sm text-muted-foreground">
-                    End-to-end encrypted. Your passphrase never leaves this
-                    device.
-                </p>
-            </header>
-            <Field
-                label="Server URL"
-                value={serverUrl()}
-                onInput={setServerUrl}
-                placeholder="https://sync.example.com"
-            />
-            <Field
-                label="Server secret"
-                type="password"
-                value={serverSecret()}
-                onInput={setServerSecret}
-                placeholder="SHIBA_SERVER_SECRET"
-            />
-            <Field
-                label="Encryption passphrase"
-                type="password"
-                value={passphrase()}
-                onInput={setPassphrase}
-                placeholder="A strong passphrase you'll remember"
-            />
-            <div class="flex gap-2">
-                <Button onClick={connect} disabled={busy()}>
-                    {busy() ? "Connecting…" : "Connect"}
-                </Button>
-                <Button variant="outline" onClick={disconnect}>
-                    Disconnect
-                </Button>
-            </div>
-            <Show when={status()}>
-                {(s) => (
-                    <p
-                        class={
-                            s().ok
-                                ? "text-sm text-muted-foreground"
-                                : "text-sm text-destructive"
-                        }
-                    >
-                        {s().message}
+        <ErrorBoundary fallback={(error) => <ErrorScreen error={error} />}>
+            <main class="mx-auto max-w-2xl space-y-5 bg-background p-6 text-foreground">
+                <header class="space-y-1">
+                    <h1 class="text-lg font-semibold">🐕 Shiba — Sync</h1>
+                    <p class="text-sm text-muted-foreground">
+                        End-to-end encrypted. Your passphrase never leaves this
+                        device.
                     </p>
-                )}
-            </Show>
+                </header>
+                <Field
+                    label="Server URL"
+                    value={serverUrl()}
+                    onInput={setServerUrl}
+                    placeholder="https://sync.example.com"
+                />
+                <Field
+                    label="Server secret"
+                    type="password"
+                    value={serverSecret()}
+                    onInput={setServerSecret}
+                    placeholder="SHIBA_SERVER_SECRET"
+                />
+                <Field
+                    label="Encryption passphrase"
+                    type="password"
+                    value={passphrase()}
+                    onInput={setPassphrase}
+                    placeholder="A strong passphrase you'll remember"
+                />
+                <div class="flex gap-2">
+                    <Button onClick={connect} disabled={busy()}>
+                        {busy() ? "Connecting…" : "Connect"}
+                    </Button>
+                    <Button variant="outline" onClick={disconnect}>
+                        Disconnect
+                    </Button>
+                </div>
+                <Show when={status()}>
+                    {(s) => (
+                        <p
+                            class={
+                                s().ok
+                                    ? "text-sm text-muted-foreground"
+                                    : "text-sm text-destructive"
+                            }
+                        >
+                            {s().message}
+                        </p>
+                    )}
+                </Show>
 
-            <hr class="border-border" />
-            <BackupSection />
-        </main>
+                <hr class="border-border" />
+                <BackupSection />
+            </main>
+        </ErrorBoundary>
     );
 };

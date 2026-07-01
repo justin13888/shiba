@@ -2,6 +2,10 @@ import { type Group, queries } from "@shiba/core";
 import { formatDistanceToNow } from "date-fns";
 import { Lock, Pencil, RotateCcw, Trash2 } from "lucide-solid";
 import { type Component, createMemo, createSignal, For, Show } from "solid-js";
+
+/** Cap initially-rendered rows so a huge group can't flood the DOM; reveal on demand. */
+const TAB_CAP = 100;
+
 import { webextTabs } from "@/src/adapters/tabs";
 import { Button } from "@/src/lib/ui/button";
 import { useShiba } from "@/src/reactive/context";
@@ -21,12 +25,16 @@ export const GroupCard: Component<{ group: Group; query: string }> = (
     const store = useShiba();
     const confirm = useConfirm();
     const [editing, setEditing] = createSignal(false);
+    const [expanded, setExpanded] = createSignal(false);
     let renameButton: HTMLButtonElement | undefined;
 
     const tabs = createMemo(() =>
         queries
             .liveTabs(store.snap, props.group.id)
             .filter((t) => matchesQuery(t, props.query)),
+    );
+    const shownTabs = createMemo(() =>
+        expanded() ? tabs() : tabs().slice(0, TAB_CAP),
     );
     const title = (): string => props.group.name || "Untitled";
 
@@ -119,7 +127,18 @@ export const GroupCard: Component<{ group: Group; query: string }> = (
                 </Button>
             </div>
             <ul class="border-t border-border">
-                <For each={tabs()}>{(tab) => <TabRow tab={tab} />}</For>
+                <For each={shownTabs()}>{(tab) => <TabRow tab={tab} />}</For>
+                <Show when={tabs().length > TAB_CAP && !expanded()}>
+                    <li class="px-4 py-2">
+                        <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => setExpanded(true)}
+                        >
+                            Show {tabs().length - TAB_CAP} more
+                        </Button>
+                    </li>
+                </Show>
             </ul>
         </section>
     );
