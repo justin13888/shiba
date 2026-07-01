@@ -1,14 +1,29 @@
-import type { Command, CommandResult } from "@shiba/core";
+import type {
+    Command,
+    CommandResult,
+    RestoreResult,
+    SnapshotMeta,
+} from "@shiba/core";
 import { defineExtensionMessaging } from "@webext-core/messaging";
+import type { BackupSettings } from "@/src/runtime/settings";
 
 /**
  * Page → worker RPC. The background worker owns the document; a page never
  * mutates directly — it sends a serializable {@link Command} and the worker
- * applies it centrally. (Bulk document state travels over {@link DOC_PORT}, not
- * here, so RPC payloads stay small.)
+ * applies it centrally. Backup operations run here too (the worker holds the
+ * snapshot store). Bulk document state travels over {@link DOC_PORT}, not here,
+ * so RPC payloads stay small.
  */
 export interface ProtocolMap {
     dispatch(cmd: Command): CommandResult;
+    listSnapshots(): SnapshotMeta[];
+    restoreSnapshot(id: string): RestoreResult | null;
+    deleteSnapshot(id: string): void;
+    captureSnapshot(): boolean;
+    exportBackup(): string;
+    importBackup(json: string): RestoreResult;
+    getBackupSettings(): BackupSettings;
+    setBackupSettings(patch: Partial<BackupSettings>): BackupSettings;
 }
 
 export const { sendMessage, onMessage } =
