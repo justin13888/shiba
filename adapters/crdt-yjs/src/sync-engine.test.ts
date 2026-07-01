@@ -113,6 +113,7 @@ describe("sync engine (encrypted, over a blind relay)", () => {
             crypto: cryptoEngine,
             key,
             token: "t",
+            docId: "shiba",
         });
         const engineB = createSyncEngine({
             doc: docB,
@@ -120,6 +121,7 @@ describe("sync engine (encrypted, over a blind relay)", () => {
             crypto: cryptoEngine,
             key,
             token: "t",
+            docId: "shiba",
         });
         await engineA.start();
         await engineB.start();

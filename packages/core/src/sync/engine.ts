@@ -14,6 +14,8 @@ export interface SyncEngineOptions {
     crypto: CryptoEngine;
     key: DataKey;
     token: string;
+    /** Bound into every ciphertext as AES-GCM AAD, tying it to this document. */
+    docId: string;
     onStatus?: (status: ConnectionStatus) => void;
 }
 
@@ -42,18 +44,27 @@ export function createSyncEngine(options: SyncEngineOptions): SyncEngine {
     let ref = 0;
     const cleanups: Array<() => void> = [];
 
+    // Bind every ciphertext to this document via GCM AAD, so a blob can't be
+    // replayed under a different doc. (Server-assigned `seq` can't be bound at
+    // seal time — the client doesn't know it yet — so position-binding is not
+    // attempted here; see docs/encryption.md.)
+    const aad = new TextEncoder().encode(options.docId);
     const seal = async (bytes: Uint8Array): Promise<EncryptedBlob> => {
-        const sealed = await crypto.seal(key, bytes);
+        const sealed = await crypto.seal(key, bytes, aad);
         return {
             nonce: toBase64(sealed.nonce),
             ciphertext: toBase64(sealed.ciphertext),
         };
     };
     const open = (blob: EncryptedBlob): Promise<Uint8Array> =>
-        crypto.open(key, {
-            nonce: fromBase64(blob.nonce),
-            ciphertext: fromBase64(blob.ciphertext),
-        });
+        crypto.open(
+            key,
+            {
+                nonce: fromBase64(blob.nonce),
+                ciphertext: fromBase64(blob.ciphertext),
+            },
+            aad,
+        );
 
     async function pushDelta(): Promise<void> {
         if (

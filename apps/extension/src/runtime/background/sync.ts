@@ -7,6 +7,7 @@ import { webCryptoEngine } from "@shiba/crypto-webcrypto";
 import { browser } from "wxt/browser";
 import { createWsTransport } from "@/src/adapters/transport";
 import { readDek, readSyncConfig } from "../sync";
+import { DOC_ID } from "./runtime";
 
 /**
  * Run the encrypted sync engine from the worker (not the page), so the single
@@ -32,6 +33,7 @@ export function manageSync(doc: CrdtDocument): () => void {
             crypto: webCryptoEngine,
             key,
             token: config.token,
+            docId: DOC_ID,
         });
         await next.start();
         engine = next;
