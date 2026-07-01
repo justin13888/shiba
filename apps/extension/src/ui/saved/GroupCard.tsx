@@ -2,16 +2,15 @@ import { type Group, queries } from "@shiba/core";
 import { formatDistanceToNow } from "date-fns";
 import { Lock, Pencil, RotateCcw, Trash2 } from "lucide-solid";
 import { type Component, createMemo, createSignal, For, Show } from "solid-js";
-
-/** Cap initially-rendered rows so a huge group can't flood the DOM; reveal on demand. */
-const TAB_CAP = 100;
-
 import { webextTabs } from "@/src/adapters/tabs";
 import { Button } from "@/src/lib/ui/button";
 import { useShiba } from "@/src/reactive/context";
 import { useConfirm } from "@/src/ui/components/confirm";
 import { matchesQuery } from "./match";
 import { TabRow } from "./TabRow";
+
+/** Cap initially-rendered rows so a huge group can't flood the DOM; reveal on demand. */
+const TAB_CAP = 100;
 
 /**
  * A saved group. Rename is an explicit, keyboard-reachable action (not a
