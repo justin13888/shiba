@@ -1,21 +1,28 @@
 # Search
 
-> Status: outline — expanded in Phase 6.
+## Today: lexical
 
-Hybrid search combines an always-on lexical layer with an opt-in semantic layer.
+Two lexical layers exist:
 
-## Lexical (always on)
-`uFuzzy` over an in-memory index of titles, URLs, notes, tags, and group/
-workspace names. Instant; match highlighting. No model download.
+- **Saved-view filter** — the tab list filters live on a case-insensitive substring
+  match over each tab's title and URL (`ui/saved/match.ts`), with a real
+  "no results" state.
+- **Ranking math (pure)** — `core/search` provides `lexicalScore`/`lexicalSearch`
+  (weighted substring/token scoring) and `hybridSearch`, which normalizes a lexical
+  score and optionally blends a semantic cosine similarity. It is fully unit-tested
+  and independent of any model.
 
-## Semantic (opt-in, pure-JS, no WASM)
-**Model2Vec** static embeddings (~8–30 MB, lazily downloaded + cached). Embedding
-is tokenize → matrix lookup → mean-pool → normalize — no neural runtime. Per-tab
-vectors are computed at save time (and lazily backfilled) from `title + url +
-excerpt` and stored in an IndexedDB vector store; queries embed once and rank by
-brute-force cosine.
+The ranking math is not yet wired into the saved-view filter (which uses the simpler
+substring matcher); doing so is a small follow-up.
 
-## Hybrid ranking
-Weighted combination of lexical score and semantic similarity. The ranking math
-is pure (`core/search`); the model/tokenizer live behind `ports/embedder.ts` and
-are mocked in tests.
+## Roadmap (not yet built)
+
+The pieces below were described in earlier design notes but do **not** exist in code:
+
+- **`uFuzzy`** fuzzy matching + match highlighting (the lexical layer is hand-rolled
+  substring scoring today).
+- **Semantic search** via Model2Vec static embeddings, an IndexedDB vector store,
+  save-time vectorization, and brute-force cosine ranking. `ports/embedder.ts`
+  defines the contract, but there is **no embedder adapter** and no vector store.
+  `hybridSearch` already accepts a query vector + per-tab vectors, so wiring an
+  embedder is the remaining work.
