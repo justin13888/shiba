@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { createApp } from "./app";
+import { createApp, touchDevice } from "./app";
 import { createDb } from "./db";
 
 const make = () => createApp(createDb(":memory:"), "secret");
@@ -33,6 +33,27 @@ describe("sync server HTTP", () => {
 
     it("rejects unauthorized access to protected routes", async () => {
         expect((await make().request("/keys")).status).toBe(401);
+    });
+
+    it("stamps last_seen_at when a device is touched", async () => {
+        const db = createDb(":memory:");
+        const app = createApp(db, "secret");
+        const token = await mintToken(app);
+        const before = (await (
+            await app.request("/devices", {
+                headers: { authorization: `Bearer ${token}` },
+            })
+        ).json()) as { devices: { lastSeenAt: number | null }[] };
+        expect(before.devices[0]?.lastSeenAt).toBeNull();
+
+        touchDevice(db, token);
+
+        const after = (await (
+            await app.request("/devices", {
+                headers: { authorization: `Bearer ${token}` },
+            })
+        ).json()) as { devices: { lastSeenAt: number | null }[] };
+        expect(after.devices[0]?.lastSeenAt).toBeTypeOf("number");
     });
 
     it("stores and returns encrypted key material", async () => {

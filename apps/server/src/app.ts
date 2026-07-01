@@ -21,6 +21,14 @@ export function deviceForToken(db: Db, token: string): string | null {
     return row && !row.revoked ? row.deviceId : null;
 }
 
+/** Stamp a device's last-seen time (called when it opens the sync socket). */
+export function touchDevice(db: Db, token: string): void {
+    db.update(deviceTokens)
+        .set({ lastSeenAt: Date.now() })
+        .where(eq(deviceTokens.tokenHash, hashToken(token)))
+        .run();
+}
+
 const bearer = (header: string | undefined): string | undefined =>
     header?.startsWith("Bearer ") ? header.slice(7) : undefined;
 

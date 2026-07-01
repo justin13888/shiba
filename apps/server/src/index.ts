@@ -3,7 +3,7 @@ import { createNodeWebSocket } from "@hono/node-ws";
 import { parseClientMessage } from "@shiba/sync-protocol";
 import { gt } from "drizzle-orm";
 import type { WSContext } from "hono/ws";
-import { createApp, deviceForToken } from "./app";
+import { createApp, deviceForToken, touchDevice } from "./app";
 import { createDb } from "./db";
 import { env } from "./env";
 import { logger } from "./logger";
@@ -23,10 +23,11 @@ app.get(
         return {
             onOpen(_event, ws) {
                 deviceId = token ? deviceForToken(db, token) : null;
-                if (!deviceId) {
+                if (!deviceId || !token) {
                     ws.close(1008, "unauthorized");
                     return;
                 }
+                touchDevice(db, token);
                 sockets.add(ws);
             },
             onMessage(event, ws) {
