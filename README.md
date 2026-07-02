@@ -117,6 +117,17 @@ PORT=3000 \
 bun run --filter '@shiba/server' start
 ```
 
+Or run the published multi-arch container from GHCR:
+
+```bash
+docker run -d -p 3000:3000 \
+  -e SHIBA_SERVER_SECRET="$(openssl rand -hex 32)" \
+  -v shiba-data:/data \
+  ghcr.io/justin13888/shiba-server:latest
+```
+
+Compose file and full container guide: [`docs/deployment.md`](docs/deployment.md).
+
 | Env var | Default | Purpose |
 |---|---|---|
 | `PORT` | `3000` | HTTP/WebSocket port |
