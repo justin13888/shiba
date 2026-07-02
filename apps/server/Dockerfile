@@ -9,15 +9,21 @@
 # plus per-workspace symlink farms with *relative* links). We therefore install
 # in-image and copy the whole /app tree to the runtime stage unchanged: the
 # relative symlinks keep resolving because the working directory stays /app.
+#
+# Both stages share ONE base image so the glibc that native modules
+# (better-sqlite3, esbuild) compile against is identical to the runtime's —
+# mixing distros (e.g. a trixie Bun image + a bookworm Node image) makes the
+# better_sqlite3.node fail to load with a GLIBC version error.
 
 # ---- deps: resolve the workspace with Bun (matches CI: --frozen-lockfile) ----
-FROM oven/bun:1.3.13 AS build
+FROM node:22-bookworm-slim AS build
 WORKDIR /app
 
-# Build toolchain for native modules (better-sqlite3, esbuild) when no prebuilt
-# binary matches the target platform — notably the arm64 leg built under QEMU.
+# Build toolchain for native modules, plus Bun installed via npm so the build and
+# runtime stages stay on the same Debian release (identical glibc).
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends python3 make g++ \
+    && apt-get install -y --no-install-recommends python3 make g++ ca-certificates \
+    && npm install -g bun@1.3.13 \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy the whole workspace: Bun resolves every `workspace:*` dependency from its
@@ -27,7 +33,7 @@ RUN apt-get update \
 COPY . .
 RUN bun install --frozen-lockfile
 
-# ---- runtime: Node 22 (bookworm → same glibc as the Bun build stage) ----
+# ---- runtime: same base, so the compiled native modules load cleanly ----
 FROM node:22-bookworm-slim AS runtime
 ENV NODE_ENV=production \
     PORT=3000 \
