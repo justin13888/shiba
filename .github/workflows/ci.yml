@@ -50,6 +50,8 @@ jobs:
           name: extension-zips
           path: apps/extension/.output/*.zip
           if-no-files-found: error
+          # `.output` is a dotfile dir; upload-artifact@v4 skips hidden paths by default.
+          include-hidden-files: true
 
       # Server: build the image for this runner's arch and prove it boots. The
       # release build (publish-container.yml) is multi-arch; here we only need to
