@@ -1,0 +1,76 @@
+name: Publish Extension
+
+# On a version tag, builds the Chrome + Firefox packages, attaches them to the
+# GitHub release, and submits to the Chrome Web Store and Firefox AMO via WXT's
+# bundled publisher (`wxt submit` → publish-browser-extension).
+#
+# Neither store supports OIDC/trusted publishing, so their API credentials are
+# the repo's only required secrets:
+#   Chrome:  CHROME_EXTENSION_ID, CHROME_CLIENT_ID, CHROME_CLIENT_SECRET, CHROME_REFRESH_TOKEN
+#   Firefox: FIREFOX_JWT_ISSUER, FIREFOX_JWT_SECRET   (extension id is the fixed gecko id)
+# See docs/releasing.md → "First-time store setup".
+#
+# workflow_dispatch on a tag re-runs a publish; dispatch on a branch only builds
+# (the submit/attach steps are tag-gated), giving a safe dry run.
+
+on:
+  push:
+    tags:
+      - "v[0-9]+.[0-9]+.[0-9]+"
+  workflow_dispatch:
+
+permissions:
+  contents: write # attach the built zips to the GitHub release
+
+defaults:
+  run:
+    working-directory: apps/extension
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version-file: package.json
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+      - name: Install dependencies
+        working-directory: . # frozen lockfile lives at the workspace root
+        run: bun install --frozen-lockfile
+
+      # The tag is the single source of version truth: set it before building so
+      # the generated manifests carry the right version even for a hand-cut tag.
+      - name: Sync manifest version to tag
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: npm version --no-git-tag-version --allow-same-version "${GITHUB_REF_NAME#v}"
+
+      - name: Build store packages
+        run: |
+          bun run zip          # Chrome MV3  -> .output/shiba-<version>-chrome.zip
+          bun run zip:firefox  # Firefox MV2 -> shiba-<version>-firefox.zip + -sources.zip
+
+      - name: Attach packages to the GitHub release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: apps/extension/.output/*.zip # path is repo-root relative
+
+      - name: Submit to Chrome Web Store and Firefox AMO
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: |
+          bunx wxt submit \
+            --chrome-zip .output/*-chrome.zip \
+            --firefox-zip .output/*-firefox.zip \
+            --firefox-sources-zip .output/*-sources.zip
+        env:
+          CHROME_EXTENSION_ID: ${{ secrets.CHROME_EXTENSION_ID }}
+          CHROME_CLIENT_ID: ${{ secrets.CHROME_CLIENT_ID }}
+          CHROME_CLIENT_SECRET: ${{ secrets.CHROME_CLIENT_SECRET }}
+          CHROME_REFRESH_TOKEN: ${{ secrets.CHROME_REFRESH_TOKEN }}
+          # The Firefox add-on id is the fixed gecko id from wxt.config.ts, not a secret.
+          FIREFOX_EXTENSION_ID: shiba@justinchung.net
+          FIREFOX_JWT_ISSUER: ${{ secrets.FIREFOX_JWT_ISSUER }}
+          FIREFOX_JWT_SECRET: ${{ secrets.FIREFOX_JWT_SECRET }}

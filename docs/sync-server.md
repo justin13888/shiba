@@ -22,4 +22,4 @@ mints a device token (stored hashed). All other calls use the Bearer token.
 
 ## Configuration
 `PORT`, `DB_PATH`, `SHIBA_SERVER_SECRET`, `LOG_LEVEL`. Backups = copy the SQLite
-file. Docker image + compose are provided in Phase 7.
+file. Container image, compose, and TLS notes: [`deployment.md`](deployment.md).

@@ -1,0 +1,22 @@
+# Self-host the Shiba sync server from the published GHCR image.
+#   SHIBA_SERVER_SECRET=$(openssl rand -hex 32) docker compose up -d
+# Full guide: docs/deployment.md.
+
+services:
+  shiba-server:
+    image: ghcr.io/justin13888/shiba-server:latest
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      # REQUIRED — bootstrap secret for device pairing (POST /devices). Without
+      # it every enrollment is rejected 401. Generate once: openssl rand -hex 32
+      SHIBA_SERVER_SECRET: ${SHIBA_SERVER_SECRET:?set SHIBA_SERVER_SECRET}
+      NODE_ENV: production
+      LOG_LEVEL: info
+      # DB_PATH defaults to /data/shiba.sqlite inside the image → the volume below.
+    volumes:
+      - shiba-data:/data
+
+volumes:
+  shiba-data:
