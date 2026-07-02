@@ -24,3 +24,61 @@ jobs:
       - run: bun run lint
       - run: bun run typecheck
       - run: bun run test
+
+  # Build every shippable artifact so release breakage is caught on the PR, not
+  # at tag time. Mirrors what publish-extension.yml / publish-container.yml ship.
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version-file: package.json
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+      - run: bun install --frozen-lockfile
+
+      # Extension: build both store packages (Chrome MV3 + Firefox MV2 + the AMO
+      # sources zip) and keep them as artifacts for review.
+      - name: Build extension packages
+        run: |
+          bun run --filter @shiba/extension zip
+          bun run --filter @shiba/extension zip:firefox
+      - uses: actions/upload-artifact@v4
+        with:
+          name: extension-zips
+          path: apps/extension/.output/*.zip
+          if-no-files-found: error
+
+      # Server: build the image for this runner's arch and prove it boots. The
+      # release build (publish-container.yml) is multi-arch; here we only need to
+      # validate the Dockerfile — the workspace-symlink copy and native modules.
+      - uses: docker/setup-buildx-action@v3
+      - name: Build server image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: apps/server/Dockerfile
+          push: false
+          load: true
+          tags: shiba-server:ci
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+      - name: Smoke-test server image
+        run: |
+          docker run -d --name shiba -e SHIBA_SERVER_SECRET=ci -p 3000:3000 shiba-server:ci
+          ok=
+          for _ in $(seq 1 30); do
+            if curl -fsS http://localhost:3000/healthz; then
+              echo; echo "server is healthy"; ok=1; break
+            fi
+            sleep 2
+          done
+          echo "----- container logs -----"
+          docker logs shiba || true
+          docker rm -f shiba >/dev/null 2>&1 || true
+          if [ -z "$ok" ]; then
+            echo "server did not become healthy on /healthz"
+            exit 1
+          fi
