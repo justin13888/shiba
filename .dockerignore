@@ -1,0 +1,24 @@
+# Keep the build context source-only: dependencies are installed inside the image
+# for the target architecture, so host install output must never leak in.
+**/node_modules
+**/.output
+**/.wxt
+**/dist
+**/coverage
+**/test-results
+**/playwright-report
+
+# Local state and secrets.
+**/*.sqlite
+**/*.sqlite-journal
+**/*.sqlite-wal
+**/*.sqlite-shm
+**/.env
+**/.env.*
+!**/.env.example
+
+# VCS, editor, and misc noise.
+.git
+.github
+**/*.log
+.DS_Store
