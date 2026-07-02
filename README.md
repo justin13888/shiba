@@ -28,11 +28,11 @@ plus cross-cutting tags) and **sync you can actually trust**: offline-first, con
 | Snapshot retention, hybrid search ranking, analytics aggregation | ✅ core logic implemented & tested |
 | Folders / tags / trash / snapshots / analytics **UI**, drag-and-drop, command palette, sync setup UI, semantic-search model, themes | 🚧 integration layer over the finished engine |
 
-Everything green: `pnpm lint && pnpm typecheck && pnpm test` (70+ tests; `@shiba/core` ≥ 90% coverage).
+Everything green: `bun run lint && bun run typecheck && bun run test` (70+ tests; `@shiba/core` ≥ 90% coverage).
 
 ## Architecture & key decisions
 
-Shiba is a **pnpm-workspace monorepo** organized as ports & adapters around one idea: the
+Shiba is a **Bun-workspace monorepo** organized as ports & adapters around one idea: the
 **CRDT document is the single source of truth**, and everything else is an adapter around
 it. Local edits and remote (synced) updates flow through the *same* reactive path.
 
@@ -71,28 +71,32 @@ Decisions, and why:
   the CRDT→Solid bridge uses `reconcile` so only components reading changed records re-render.
 - **Validation = Valibot** (tiny, tree-shakeable) as the single source of truth for model
   types. **Lint/format = Biome.** **Strict TypeScript** with `noUncheckedIndexedAccess`.
+- **Tooling = Bun.** Bun is the package manager and workspace/task runner — fast installs,
+  no sprawling `node_modules`. It's *only* tooling: `bun run` executes the Node-shebang tools
+  (`tsc`, `vitest`, `wxt`, `tsx`) under Node, and the server self-hosts on Node, so there are
+  no `bun:*` runtime APIs and `npm install && npm start` stays a working fallback.
 
 Deeper write-ups live in [`docs/`](docs/): `architecture`, `data-model`, `sync`,
 `encryption`, `sync-server`, `search`, `analytics`, `testing`, `releasing`.
 
 ## Getting started (development)
 
-Prerequisites: **Node 20+** and **pnpm 9**.
+Prerequisites: **Node 22+** and **Bun 1.3+** (`mise install` provisions Bun).
 
 ```bash
-pnpm install
-pnpm --filter @shiba/extension dev          # Chrome dev build with HMR
-pnpm --filter @shiba/extension dev:firefox   # Firefox
+bun install
+bun run --filter '@shiba/extension' dev          # Chrome dev build with HMR
+bun run --filter '@shiba/extension' dev:firefox   # Firefox
 ```
 
 WXT prints an unpacked extension directory — load it via `chrome://extensions` →
 "Load unpacked" (or use WXT's auto-launch). Workspace-wide commands:
 
 ```bash
-pnpm build       # build every package
-pnpm typecheck   # tsc --noEmit across the workspace
-pnpm test        # vitest across the workspace
-pnpm lint        # biome check
+bun run build       # build every package
+bun run typecheck   # tsc --noEmit across the workspace
+bun run test        # vitest across the workspace
+bun run lint        # biome check
 ```
 
 ### Commits & releases
@@ -110,7 +114,7 @@ The server is a single Node process backed by one SQLite file.
 SHIBA_SERVER_SECRET=$(openssl rand -hex 32) \
 DB_PATH=./shiba.sqlite \
 PORT=3000 \
-pnpm --filter @shiba/server start
+bun run --filter '@shiba/server' start
 ```
 
 | Env var | Default | Purpose |

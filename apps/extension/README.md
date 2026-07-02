@@ -6,35 +6,35 @@ This folder contains browser extension code for Shiba.
 
 ### Prerequisites
 
-- Node.js
-  - pnpm
+- Node.js 22+
+- Bun 1.3+
 - Chrome and Firefox (for testing)
 
 ### Setup
 
 1. Clone this repository
-2. Install dependencies
+2. Install dependencies (from the repo root)
 
    ```sh
-   pnpm install
+   bun install
    ```
 
 3. Start the development server
 
    ```sh
-   pnpm dev
-   pnpm dev:firefox
+   bun run dev
+   bun run dev:firefox
    ```
 
 4. Load the extension in your browser
    1. For Chrome, go to `chrome://extensions`, enable developer mode, click "Load unpacked", and select the `dist` folder
-   2. Fore firefox, install `web-ext` with `pnpm install --global web-ext`, then run `web-ext run` in the project directory
+   2. For Firefox, install `web-ext` with `bun add -g web-ext`, then run `web-ext run` in the project directory
 
 ### Packaging
 
 1. Build the extension
 
    ```sh
-   pnpm build
-   pnpm build:firefox
+   bun run build
+   bun run build:firefox
    ```

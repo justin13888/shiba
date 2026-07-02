@@ -2,7 +2,7 @@
 
 Human acceptance pass. Each row is a criterion → steps → expected result. Automated
 coverage lives in [testing.md](./testing.md); this covers what needs eyes and a real
-browser. Load the unpacked build (`pnpm --filter @shiba/extension dev`) in Chrome
+browser. Load the unpacked build (`bun run --filter '@shiba/extension' dev`) in Chrome
 and Firefox.
 
 ## Setup & smoke

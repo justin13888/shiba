@@ -10,12 +10,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
+      # Bun is the package manager / task runner; the version tracks the
+      # `packageManager` field in package.json.
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version-file: package.json
+      # The code still runs on Node — `bun run` executes the node-shebang tools
+      # (tsc, vitest, wxt, tsx) under Node, and the server self-hosts on Node.
       - uses: actions/setup-node@v4
         with:
           node-version-file: .nvmrc
-          cache: pnpm
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm lint
-      - run: pnpm typecheck
-      - run: pnpm test
+      - run: bun install --frozen-lockfile
+      - run: bun run lint
+      - run: bun run typecheck
+      - run: bun run test
